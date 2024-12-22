@@ -7,7 +7,7 @@
 
 [Official Documentation](https://docs.ltpp.vip/HTTP-TYPE/)
 
-[Api Docs](https://docs.rs/http-type/latest/http-type/)
+[Api Docs](https://docs.rs/http-type/latest/http_type/)
 
 > A library providing essential types for HTTP, including request bodies, response headers, and other core HTTP abstractions.
 
