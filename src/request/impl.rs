@@ -85,4 +85,32 @@ impl<'a> Request<'a> {
             body,
         })
     }
+
+    pub fn method(&self) -> Cow<'a, str> {
+        self.method.clone()
+    }
+
+    pub fn host(&self) -> Cow<'a, str> {
+        self.host.clone()
+    }
+
+    pub fn path(&self) -> Cow<'a, str> {
+        self.path.clone()
+    }
+
+    pub fn query(&self) -> Cow<'a, str> {
+        self.query.clone()
+    }
+
+    pub fn hash(&self) -> Cow<'a, str> {
+        self.hash.clone()
+    }
+
+    pub fn headers(&self) -> HashMap<Cow<'a, str>, Cow<'a, str>> {
+        self.headers.clone()
+    }
+
+    pub fn body(&self) -> Vec<u8> {
+        self.body.clone()
+    }
 }
