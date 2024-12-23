@@ -97,9 +97,9 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "http-constant"
-version = "1.2.1"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f982c75c808d9e34ceb0f067d173f467a6e2cbc72d7c302e90d3e2ce7c2f5a7"
+checksum = "d3a5b28302c718893a1e9ad484b28e7c2ef7fc4f1f1bcca8c73f0263545facf3"
 dependencies = [
  "brotli",
  "flate2",
@@ -107,7 +107,7 @@ dependencies = [
 
 [[package]]
 name = "http-type"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = [
  "hex",
  "http-constant",
