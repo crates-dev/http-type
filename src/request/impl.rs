@@ -7,6 +7,14 @@ use std::io::{BufRead, BufReader, Read};
 use std::net::TcpStream;
 
 impl<'a> Request<'a> {
+    /// Creates a new `Request` object from a TCP stream.
+    ///
+    /// # Parameters
+    /// - `stream`: A reference to a `TcpStream` representing the incoming connection.
+    ///
+    /// # Returns
+    /// - `Ok`: A `Request` object populated with the HTTP request data.
+    /// - `Err`: An `Error` if the request is invalid or cannot be read.
     pub fn new(stream: &TcpStream) -> Result<Self, Error> {
         let mut reader: BufReader<&TcpStream> = BufReader::new(stream);
         let mut request_line: String = String::new();
@@ -86,30 +94,58 @@ impl<'a> Request<'a> {
         })
     }
 
+    /// Retrieves the HTTP method of the request.
+    ///
+    /// # Returns
+    /// - The HTTP method as a `Cow<'a, str>`.
     pub fn method(&self) -> Cow<'a, str> {
         self.method.clone()
     }
 
+    /// Retrieves the host of the request.
+    ///
+    /// # Returns
+    /// - The host as a `Cow<'a, str>`.
     pub fn host(&self) -> Cow<'a, str> {
         self.host.clone()
     }
 
+    /// Retrieves the path of the request.
+    ///
+    /// # Returns
+    /// - The path as a `Cow<'a, str>`.
     pub fn path(&self) -> Cow<'a, str> {
         self.path.clone()
     }
 
+    /// Retrieves the query string of the request.
+    ///
+    /// # Returns
+    /// - The query string as a `Cow<'a, str>`.
     pub fn query(&self) -> Cow<'a, str> {
         self.query.clone()
     }
 
+    /// Retrieves the fragment identifier of the request.
+    ///
+    /// # Returns
+    /// - The fragment identifier as a `Cow<'a, str>`.
     pub fn hash(&self) -> Cow<'a, str> {
         self.hash.clone()
     }
 
+    /// Retrieves all headers of the request.
+    ///
+    /// # Returns
+    /// - A `HashMap` containing all headers as key-value pairs.
     pub fn headers(&self) -> HashMap<Cow<'a, str>, Cow<'a, str>> {
         self.headers.clone()
     }
 
+    /// Retrieves the body of the request.
+    ///
+    /// # Returns
+    /// - The binary body as a `Vec<u8>`.
     pub fn body(&self) -> Vec<u8> {
         self.body.clone()
     }

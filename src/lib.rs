@@ -10,10 +10,10 @@ pub(crate) mod status_code;
 
 pub use content_type::r#type::*;
 pub use header::r#type::*;
-pub use http_url::{error::*, r#type::*};
+pub use http_url::{error::Error as HttpUrlError, r#type::*};
 pub use http_version::r#type::*;
 pub use methods::r#type::*;
 pub use protocol::r#type::*;
-pub use request::r#type::*;
-pub use response::r#type::*;
+pub use request::{error::Error as RequestError, r#type::*};
+pub use response::{error::Error as ResponseError, r#type::*};
 pub use status_code::r#type::*;
