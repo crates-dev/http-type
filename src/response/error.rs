@@ -1,3 +1,4 @@
+use http_constant::*;
 use std::{
     error::Error as StdError,
     fmt::{self, Display},
@@ -14,7 +15,7 @@ impl StdError for Error {}
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::ResponseError(data) => write!(f, "Response Error: {}", data),
+            Self::ResponseError(data) => write!(f, "Response Error{}{}", COLON_SPACE, data),
             Self::Unknown => write!(f, "{}", "Unknown"),
         }
     }

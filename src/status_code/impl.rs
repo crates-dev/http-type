@@ -55,6 +55,36 @@ impl StatusCode {
         }
     }
 
+    /// Converts an HTTP status code to its corresponding textual description.
+    ///
+    /// This method matches a given numeric HTTP status code and returns the corresponding
+    /// textual representation defined in the `StatusCode` enum.
+    ///
+    /// # Parameters
+    /// - `code`: A `usize` representing the HTTP status code to convert.
+    ///
+    /// # Return Value
+    /// - `String`: A string representing the textual description of the HTTP status code.
+    ///   For example:
+    ///   - `200` returns `"OK"`.
+    ///   - `404` returns `"Not Found"`.
+    ///   - Unrecognized codes return `"Unknown"`.
+    pub fn phrase(code: usize) -> String {
+        match code {
+            200 => Self::Ok.to_string(),
+            201 => Self::Created.to_string(),
+            204 => Self::NoContent.to_string(),
+            400 => Self::BadRequest.to_string(),
+            401 => Self::Unauthorized.to_string(),
+            403 => Self::Forbidden.to_string(),
+            404 => Self::NotFound.to_string(),
+            500 => Self::InternalServerError.to_string(),
+            501 => Self::NotImplemented.to_string(),
+            502 => Self::BadGateway.to_string(),
+            _ => Self::Unknown.to_string(),
+        }
+    }
+
     pub fn same(&self, code_str: &str) -> bool {
         self.code().to_string() == code_str || self.to_string() == code_str
     }

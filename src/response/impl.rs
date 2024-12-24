@@ -1,4 +1,5 @@
 use super::{error::Error, r#type::Response};
+use crate::StatusCode;
 use http_constant::*;
 use std::{borrow::Cow, collections::HashMap, io::Write, net::TcpStream};
 
@@ -45,6 +46,7 @@ impl<'a> Response<'a> {
     /// - A mutable reference to the `Response` for chaining.
     pub fn status_code(&mut self, code: usize) -> &mut Self {
         self.status_code = code;
+        self.reason_phrase(StatusCode::phrase(code));
         self
     }
 
@@ -96,11 +98,11 @@ impl<'a> Response<'a> {
     pub fn build(&mut self) -> Vec<u8> {
         let mut response_str: String = String::new();
         response_str.push_str(&format!(
-            "{} {} {}{}",
-            self.version, self.status_code, self.reason_phrase, HTTP_BR
+            "{}{}{}{}{}{}",
+            self.version, SPACE, self.status_code, SPACE, self.reason_phrase, HTTP_BR
         ));
         for (key, value) in &self.headers {
-            response_str.push_str(&format!("{}: {}{}", key, value, HTTP_BR));
+            response_str.push_str(&format!("{}{}{}{}", key, COLON_SPACE, value, HTTP_BR));
         }
         response_str.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_str.into_bytes();
