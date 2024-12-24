@@ -3,13 +3,13 @@ use crate::StatusCode;
 use http_constant::*;
 use std::{borrow::Cow, collections::HashMap, io::Write, net::TcpStream};
 
-impl<'a> Default for Response<'a> {
+impl Default for Response {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<'a> Response<'a> {
+impl Response {
     /// Creates a new instance of `Response`.
     ///
     /// # Returns
@@ -32,7 +32,7 @@ impl<'a> Response<'a> {
     ///
     /// # Returns
     /// - A mutable reference to the `Response` for chaining.
-    pub fn version<S: Into<Cow<'a, str>>>(&mut self, version: S) -> &mut Self {
+    pub fn version<S: Into<Cow<'static, str>>>(&mut self, version: S) -> &mut Self {
         self.version = version.into();
         self
     }
@@ -57,7 +57,7 @@ impl<'a> Response<'a> {
     ///
     /// # Returns
     /// - A mutable reference to the `Response` for chaining.
-    pub fn reason_phrase<S: Into<Cow<'a, str>>>(&mut self, phrase: S) -> &mut Self {
+    pub fn reason_phrase<S: Into<Cow<'static, str>>>(&mut self, phrase: S) -> &mut Self {
         self.reason_phrase = phrase.into();
         self
     }
@@ -72,8 +72,8 @@ impl<'a> Response<'a> {
     /// - A mutable reference to the `Response` for chaining.
     pub fn header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
-        K: Into<Cow<'a, str>>,
-        V: Into<Cow<'a, str>>,
+        K: Into<Cow<'static, str>>,
+        V: Into<Cow<'static, str>>,
     {
         self.headers.insert(key.into(), value.into());
         self

@@ -10,11 +10,11 @@ use std::{borrow::Cow, collections::HashMap};
 /// - `body`: The binary body of the response.
 /// - `response`: The serialized HTTP response including headers and body.
 #[derive(Debug, Clone)]
-pub struct Response<'a> {
-    pub(super) version: Cow<'a, str>,
+pub struct Response {
+    pub(super) version: Cow<'static, str>,
     pub(super) status_code: usize,
-    pub(super) reason_phrase: Cow<'a, str>,
-    pub(super) headers: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    pub(super) reason_phrase: Cow<'static, str>,
+    pub(super) headers: HashMap<Cow<'static, str>, Cow<'static, str>>,
     pub(super) body: Vec<u8>,
     pub(super) response: Vec<u8>,
 }

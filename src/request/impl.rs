@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read};
 use std::net::TcpStream;
 
-impl<'a> Request<'a> {
+impl Request {
     /// Creates a new `Request` object from a TCP stream.
     ///
     /// # Parameters
@@ -50,7 +50,7 @@ impl<'a> Request<'a> {
         } else {
             Cow::Owned(full_path)
         };
-        let mut headers: HashMap<Cow<'a, str>, Cow<'a, str>> = HashMap::new();
+        let mut headers: HashMap<Cow<'static, str>, Cow<'static, str>> = HashMap::new();
         let mut host: Cow<'_, str> = Cow::Borrowed(EMPTY_STR);
         let mut content_length: usize = 0;
         loop {
@@ -97,40 +97,40 @@ impl<'a> Request<'a> {
     /// Retrieves the HTTP method of the request.
     ///
     /// # Returns
-    /// - The HTTP method as a `Cow<'a, str>`.
-    pub fn method(&self) -> Cow<'a, str> {
+    /// - The HTTP method as a `Cow<'static, str>`.
+    pub fn method(&self) -> Cow<'static, str> {
         self.method.clone()
     }
 
     /// Retrieves the host of the request.
     ///
     /// # Returns
-    /// - The host as a `Cow<'a, str>`.
-    pub fn host(&self) -> Cow<'a, str> {
+    /// - The host as a `Cow<'static, str>`.
+    pub fn host(&self) -> Cow<'static, str> {
         self.host.clone()
     }
 
     /// Retrieves the path of the request.
     ///
     /// # Returns
-    /// - The path as a `Cow<'a, str>`.
-    pub fn path(&self) -> Cow<'a, str> {
+    /// - The path as a `Cow<'static, str>`.
+    pub fn path(&self) -> Cow<'static, str> {
         self.path.clone()
     }
 
     /// Retrieves the query string of the request.
     ///
     /// # Returns
-    /// - The query string as a `Cow<'a, str>`.
-    pub fn query(&self) -> Cow<'a, str> {
+    /// - The query string as a `Cow<'static, str>`.
+    pub fn query(&self) -> Cow<'static, str> {
         self.query.clone()
     }
 
     /// Retrieves the fragment identifier of the request.
     ///
     /// # Returns
-    /// - The fragment identifier as a `Cow<'a, str>`.
-    pub fn hash(&self) -> Cow<'a, str> {
+    /// - The fragment identifier as a `Cow<'static, str>`.
+    pub fn hash(&self) -> Cow<'static, str> {
         self.hash.clone()
     }
 
@@ -138,7 +138,7 @@ impl<'a> Request<'a> {
     ///
     /// # Returns
     /// - A `HashMap` containing all headers as key-value pairs.
-    pub fn headers(&self) -> HashMap<Cow<'a, str>, Cow<'a, str>> {
+    pub fn headers(&self) -> HashMap<Cow<'static, str>, Cow<'static, str>> {
         self.headers.clone()
     }
 
