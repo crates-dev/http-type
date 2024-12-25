@@ -1,3 +1,4 @@
+use lombok_macros::*;
 use std::{borrow::Cow, collections::HashMap};
 
 /// Represents an HTTP response.
@@ -9,7 +10,7 @@ use std::{borrow::Cow, collections::HashMap};
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the response.
 /// - `response`: The serialized HTTP response including headers and body.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Lombok)]
 pub struct Response {
     pub(super) version: Cow<'static, str>,
     pub(super) status_code: usize,

@@ -18,77 +18,11 @@ impl Response {
         Response {
             version: Cow::Borrowed(HTTP_VERSION_1_1),
             status_code: 200,
-            reason_phrase: Cow::Borrowed(OK),
+            reason_phrase: Cow::Borrowed(EMPTY_STR),
             headers: HashMap::new(),
             body: Vec::new(),
             response: Vec::new(),
         }
-    }
-
-    /// Sets the HTTP version for the response.
-    ///
-    /// # Parameters
-    /// - `version`: The HTTP version to set (e.g., HTTP/1.1).
-    ///
-    /// # Returns
-    /// - A mutable reference to the `Response` for chaining.
-    pub fn version<S: Into<Cow<'static, str>>>(&mut self, version: S) -> &mut Self {
-        self.version = version.into();
-        self
-    }
-
-    /// Sets the HTTP status code for the response.
-    ///
-    /// # Parameters
-    /// - `code`: The status code to set (e.g., 404).
-    ///
-    /// # Returns
-    /// - A mutable reference to the `Response` for chaining.
-    pub fn status_code(&mut self, code: usize) -> &mut Self {
-        self.status_code = code;
-        self.reason_phrase(StatusCode::phrase(code));
-        self
-    }
-
-    /// Sets the reason phrase for the response.
-    ///
-    /// # Parameters
-    /// - `phrase`: The reason phrase to set (e.g., Not Found).
-    ///
-    /// # Returns
-    /// - A mutable reference to the `Response` for chaining.
-    pub fn reason_phrase<S: Into<Cow<'static, str>>>(&mut self, phrase: S) -> &mut Self {
-        self.reason_phrase = phrase.into();
-        self
-    }
-
-    /// Adds a header to the response.
-    ///
-    /// # Parameters
-    /// - `key`: The name of the header.
-    /// - `value`: The value of the header.
-    ///
-    /// # Returns
-    /// - A mutable reference to the `Response` for chaining.
-    pub fn header<K, V>(&mut self, key: K, value: V) -> &mut Self
-    where
-        K: Into<Cow<'static, str>>,
-        V: Into<Cow<'static, str>>,
-    {
-        self.headers.insert(key.into(), value.into());
-        self
-    }
-
-    /// Sets the body of the response.
-    ///
-    /// # Parameters
-    /// - `body`: The body content as a byte vector.
-    ///
-    /// # Returns
-    /// - A mutable reference to the `Response` for chaining.
-    pub fn body<B: Into<Vec<u8>>>(&mut self, body: B) -> &mut Self {
-        self.body = body.into();
-        self
     }
 
     /// Builds the full HTTP response as a byte vector.
@@ -96,6 +30,9 @@ impl Response {
     /// # Returns
     /// - The serialized HTTP response including headers and body.
     pub fn build(&mut self) -> Vec<u8> {
+        if self.reason_phrase.is_empty() {
+            self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()).into());
+        }
         let mut response_str: String = String::new();
         response_str.push_str(&format!(
             "{}{}{}{}{}{}",

@@ -1,3 +1,4 @@
+use lombok_macros::*;
 use std::{borrow::Cow, collections::HashMap};
 
 /// Represents an HTTP request.
@@ -10,7 +11,7 @@ use std::{borrow::Cow, collections::HashMap};
 /// - `hash`: The fragment identifier of the request (e.g., #section).
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the request.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Lombok)]
 pub struct Request {
     pub(crate) method: Cow<'static, str>,
     pub(crate) host: Cow<'static, str>,
