@@ -107,7 +107,7 @@ dependencies = [
 
 [[package]]
 name = "http-type"
-version = "2.0.4"
+version = "2.0.5"
 dependencies = [
  "hex",
  "http-constant",

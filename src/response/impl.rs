@@ -25,6 +25,26 @@ impl Response {
         }
     }
 
+    /// Adds a header to the response.
+    ///
+    /// This function inserts a key-value pair into the response headers.
+    /// The key and value are converted into `Cow<'a, str>`, allowing for efficient handling of both owned and borrowed string data.
+    ///
+    /// # Parameters
+    /// - `key`: The header key, which will be converted into a `Cow<'a, str>`.
+    /// - `value`: The value of the header, which will be converted into a `Cow<'a, str>`.
+    ///
+    /// # Returns
+    /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
+    pub fn header<K, V>(&mut self, key: K, value: V) -> &mut Self
+    where
+        K: Into<Cow<'static, str>>,
+        V: Into<Cow<'static, str>>,
+    {
+        self.headers.insert(key.into(), value.into());
+        self
+    }
+
     /// Builds the full HTTP response as a byte vector.
     ///
     /// # Returns
