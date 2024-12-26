@@ -105,7 +105,7 @@ impl Request {
     ///
     /// # Returns
     /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
-    pub fn header<K, V>(&mut self, key: K, value: V) -> &mut Self
+    pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<Cow<'static, str>>,
         V: Into<Cow<'static, str>>,
