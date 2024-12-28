@@ -1,5 +1,15 @@
+use super::error::Error as ResponseError;
 use lombok_macros::*;
 use std::{borrow::Cow, collections::HashMap};
+
+///  ResponseData
+pub type ResponseData = Vec<u8>;
+
+///  ResponseBody
+pub type ResponseBody = Vec<u8>;
+
+///  ResponseResult
+pub type ResponseResult = Result<ResponseData, ResponseError>;
 
 /// Represents an HTTP response.
 ///
@@ -16,6 +26,6 @@ pub struct Response {
     pub(super) status_code: usize,
     pub(super) reason_phrase: Cow<'static, str>,
     pub(super) headers: HashMap<Cow<'static, str>, Cow<'static, str>>,
-    pub(super) body: Vec<u8>,
-    pub(super) response: Vec<u8>,
+    pub(super) body: ResponseBody,
+    pub(super) response: ResponseData,
 }

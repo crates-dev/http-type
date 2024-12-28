@@ -1,5 +1,5 @@
 use super::{error::Error, r#type::Response};
-use crate::StatusCode;
+use crate::{ResponseData, StatusCode};
 use http_constant::*;
 use std::{borrow::Cow, collections::HashMap, io::Write, net::TcpStream};
 
@@ -49,7 +49,7 @@ impl Response {
     ///
     /// # Returns
     /// - The serialized HTTP response including headers and body.
-    pub fn build(&mut self) -> Vec<u8> {
+    pub fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()).into());
         }
@@ -81,18 +81,16 @@ impl Response {
     /// # Returns
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    pub fn send(&mut self, mut stream: &TcpStream) -> Result<Vec<u8>, Error> {
+    pub fn send(&mut self, mut stream: &TcpStream) -> Result<ResponseData, Error> {
         if self.response.is_empty() {
-            let response: Vec<u8> = self.build();
+            let response: ResponseData = self.build();
             self.set_response(response);
         }
-        let send_res: Result<Vec<u8>, Error> = stream
+        let send_res: Result<ResponseData, Error> = stream
             .write_all(&self.response)
             .map_err(|err| Error::ResponseError(err.to_string()))
-            .and_then(|_| Ok(vec![]));
-        if send_res.is_err() {
-            return send_res;
-        }
-        Ok(self.get_response().clone())
+            .and_then(|_| Ok(self.get_response()))
+            .cloned();
+        send_res
     }
 }

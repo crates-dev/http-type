@@ -1,6 +1,27 @@
 use lombok_macros::*;
 use std::{borrow::Cow, collections::HashMap};
 
+/// RequestMethod
+pub type RequestMethod = Cow<'static, str>;
+
+/// RequestHost
+pub type RequestHost = Cow<'static, str>;
+
+/// RequestPath
+pub type RequestPath = Cow<'static, str>;
+
+/// RequestQuery
+pub type RequestQuery = Cow<'static, str>;
+
+/// RequestHash
+pub type RequestHash = Cow<'static, str>;
+
+///  RequestBody
+pub type RequestBody = Vec<u8>;
+
+/// RequestHeaders
+pub type RequestHeaders = HashMap<Cow<'static, str>, Cow<'static, str>>;
+
 /// Represents an HTTP request.
 ///
 /// # Fields
@@ -13,11 +34,11 @@ use std::{borrow::Cow, collections::HashMap};
 /// - `body`: The binary body of the request.
 #[derive(Debug, Clone, Lombok)]
 pub struct Request {
-    pub(crate) method: Cow<'static, str>,
-    pub(crate) host: Cow<'static, str>,
-    pub(crate) path: Cow<'static, str>,
-    pub(crate) query: Cow<'static, str>,
-    pub(crate) hash: Cow<'static, str>,
-    pub(crate) headers: HashMap<Cow<'static, str>, Cow<'static, str>>,
-    pub(crate) body: Vec<u8>,
+    pub(crate) method: RequestMethod,
+    pub(crate) host: RequestHost,
+    pub(crate) path: RequestPath,
+    pub(crate) query: RequestQuery,
+    pub(crate) hash: RequestHash,
+    pub(crate) headers: RequestHeaders,
+    pub(crate) body: RequestBody,
 }

@@ -1,3 +1,7 @@
+use crate::{
+    RequestBody, RequestHash, RequestHeaders, RequestHost, RequestMethod, RequestPath, RequestQuery,
+};
+
 use super::error::Error;
 use super::r#type::Request;
 use http_constant::*;
@@ -25,33 +29,33 @@ impl Request {
         if parts.len() < 3 {
             return Err(Error::InvalidHttpRequest(request_line));
         }
-        let method: Cow<'_, str> = Cow::Owned(parts[0].to_string());
+        let method: RequestMethod = Cow::Owned(parts[0].to_string());
         let full_path: String = parts[1].to_string();
         let hash_index: Option<usize> = full_path.find(HASH_SYMBOL);
         let query_index: Option<usize> = full_path.find(QUERY_SYMBOL);
-        let hash: Cow<'_, str> = hash_index.map_or(Cow::Borrowed(EMPTY_STR), |i| {
+        let hash: RequestHash = hash_index.map_or(Cow::Borrowed(EMPTY_STR), |i| {
             let temp: String = full_path[i + 1..].to_string();
             temp.into()
         });
-        let query: Cow<'_, str> = query_index.map_or(Cow::Borrowed(EMPTY_STR), |i| {
-            let temp = full_path[i + 1..].to_string();
+        let query: RequestQuery = query_index.map_or(Cow::Borrowed(EMPTY_STR), |i| {
+            let temp: String = full_path[i + 1..].to_string();
             if hash_index.is_none() || hash_index.unwrap() <= i {
                 return temp.into();
             }
-            let data = temp
+            let data: String = temp
                 .split(HASH_SYMBOL)
                 .next()
                 .unwrap_or_default()
                 .to_string();
             data.into()
         });
-        let path: Cow<'_, str> = if let Some(i) = query_index.or(hash_index) {
+        let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
             Cow::Owned(full_path[..i].to_string())
         } else {
             Cow::Owned(full_path)
         };
-        let mut headers: HashMap<Cow<'static, str>, Cow<'static, str>> = HashMap::new();
-        let mut host: Cow<'_, str> = Cow::Borrowed(EMPTY_STR);
+        let mut headers: RequestHeaders = HashMap::new();
+        let mut host: RequestHost = Cow::Borrowed(EMPTY_STR);
         let mut content_length: usize = 0;
         loop {
             let mut header_line: String = String::new();
@@ -76,7 +80,7 @@ impl Request {
             }
             headers.insert(key, value);
         }
-        let mut body: Vec<u8> = Vec::new();
+        let mut body: RequestBody = Vec::new();
         if content_length > 0 {
             body.resize(content_length, 0);
             reader
