@@ -56,15 +56,20 @@ impl Response {
         let mut response_str: String = String::new();
         response_str.push_str(&format!(
             "{}{}{}{}{}{}",
-            self.version, SPACE, self.status_code, SPACE, self.reason_phrase, HTTP_BR
+            self.get_version(),
+            SPACE,
+            self.get_status_code(),
+            SPACE,
+            self.get_reason_phrase(),
+            HTTP_BR
         ));
-        for (key, value) in &self.headers {
+        for (key, value) in self.get_headers() {
             response_str.push_str(&format!("{}{}{}{}", key, COLON_SPACE, value, HTTP_BR));
         }
         response_str.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_str.into_bytes();
-        response_bytes.extend_from_slice(&self.body);
-        self.response = response_bytes.clone();
+        response_bytes.extend_from_slice(self.get_body());
+        self.set_response(response_bytes.clone());
         response_bytes
     }
 
@@ -76,13 +81,18 @@ impl Response {
     /// # Returns
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    pub fn send(&mut self, mut stream: &TcpStream) -> Result<(), Error> {
+    pub fn send(&mut self, mut stream: &TcpStream) -> Result<Vec<u8>, Error> {
         if self.response.is_empty() {
-            self.response = self.build();
+            let response: Vec<u8> = self.build();
+            self.set_response(response);
         }
-        stream
+        let send_res: Result<Vec<u8>, Error> = stream
             .write_all(&self.response)
             .map_err(|err| Error::ResponseError(err.to_string()))
-            .and_then(|_| Ok(()))
+            .and_then(|_| Ok(vec![]));
+        if send_res.is_err() {
+            return send_res;
+        }
+        Ok(self.get_response().clone())
     }
 }
