@@ -1,5 +1,6 @@
 use crate::{
-    RequestBody, RequestHash, RequestHeaders, RequestHost, RequestMethod, RequestPath, RequestQuery,
+    RequestBody, RequestHash, RequestHeaders, RequestHost, RequestMethod, RequestNewResult,
+    RequestPath, RequestQuery,
 };
 
 use super::error::Error;
@@ -19,7 +20,7 @@ impl Request {
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `Error` if the request is invalid or cannot be read.
-    pub fn new(stream: &TcpStream) -> Result<Self, Error> {
+    pub fn new(stream: &TcpStream) -> RequestNewResult {
         let mut reader: BufReader<&TcpStream> = BufReader::new(stream);
         let mut request_line: String = String::new();
         reader

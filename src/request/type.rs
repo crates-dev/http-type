@@ -1,3 +1,4 @@
+use super::error::Error as RequestError;
 use lombok_macros::*;
 use std::{borrow::Cow, collections::HashMap};
 
@@ -21,6 +22,9 @@ pub type RequestBody = Vec<u8>;
 
 /// RequestHeaders
 pub type RequestHeaders = HashMap<Cow<'static, str>, Cow<'static, str>>;
+
+/// RequestNewResult
+pub type RequestNewResult = Result<Request, RequestError>;
 
 /// Represents an HTTP request.
 ///

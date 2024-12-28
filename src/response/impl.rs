@@ -1,5 +1,5 @@
 use super::{error::Error, r#type::Response};
-use crate::{ResponseData, StatusCode};
+use crate::{ResponseData, ResponseResult, StatusCode};
 use http_constant::*;
 use std::{borrow::Cow, collections::HashMap, io::Write, net::TcpStream};
 
@@ -81,12 +81,12 @@ impl Response {
     /// # Returns
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    pub fn send(&mut self, mut stream: &TcpStream) -> Result<ResponseData, Error> {
+    pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
         if self.response.is_empty() {
             let response: ResponseData = self.build();
             self.set_response(response);
         }
-        let send_res: Result<ResponseData, Error> = stream
+        let send_res: ResponseResult = stream
             .write_all(&self.response)
             .map_err(|err| Error::ResponseError(err.to_string()))
             .and_then(|_| Ok(self.get_response()))
