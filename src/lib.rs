@@ -14,6 +14,7 @@ pub use arc_mutex::r#type::*;
 pub use arc_rwlock::r#type::*;
 pub use content_type::r#type::*;
 pub use header::r#type::*;
+pub use http_constant::*;
 pub use http_url::{error::Error as HttpUrlError, r#type::*};
 pub use http_version::r#type::*;
 pub use methods::r#type::*;
