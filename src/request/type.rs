@@ -1,27 +1,27 @@
 use super::error::Error as RequestError;
 use lombok_macros::*;
-use std::{borrow::Cow, collections::HashMap};
+use std::collections::HashMap;
 
 /// RequestMethod
-pub type RequestMethod = Cow<'static, str>;
+pub type RequestMethod = String;
 
 /// RequestHost
-pub type RequestHost = Cow<'static, str>;
+pub type RequestHost = String;
 
 /// RequestPath
-pub type RequestPath = Cow<'static, str>;
+pub type RequestPath = String;
 
 /// RequestQuery
-pub type RequestQuery = Cow<'static, str>;
+pub type RequestQuery = String;
 
 /// RequestHash
-pub type RequestHash = Cow<'static, str>;
+pub type RequestHash = String;
 
 ///  RequestBody
 pub type RequestBody = Vec<u8>;
 
 /// RequestHeaders
-pub type RequestHeaders = HashMap<Cow<'static, str>, Cow<'static, str>>;
+pub type RequestHeaders = HashMap<String, String>;
 
 /// RequestNewResult
 pub type RequestNewResult = Result<Request, RequestError>;

@@ -1,7 +1,7 @@
 use super::{error::Error, r#type::Response};
 use crate::{ResponseData, ResponseResult, StatusCode};
 use http_constant::*;
-use std::{borrow::Cow, collections::HashMap, io::Write, net::TcpStream};
+use std::{collections::HashMap, io::Write, net::TcpStream};
 
 impl Default for Response {
     fn default() -> Self {
@@ -16,9 +16,9 @@ impl Response {
     /// - An initialized `Response` with default values.
     pub fn new() -> Self {
         Response {
-            version: Cow::Borrowed(HTTP_VERSION_1_1),
+            version: HTTP_VERSION_1_1.to_owned(),
             status_code: 200,
-            reason_phrase: Cow::Borrowed(EMPTY_STR),
+            reason_phrase: EMPTY_STR.to_owned(),
             headers: HashMap::new(),
             body: Vec::new(),
             response: Vec::new(),
@@ -28,18 +28,18 @@ impl Response {
     /// Adds a header to the response.
     ///
     /// This function inserts a key-value pair into the response headers.
-    /// The key and value are converted into `Cow<'a, str>`, allowing for efficient handling of both owned and borrowed string data.
+    /// The key and value are converted into `String`, allowing for efficient handling of both owned and borrowed string data.
     ///
     /// # Parameters
-    /// - `key`: The header key, which will be converted into a `Cow<'a, str>`.
-    /// - `value`: The value of the header, which will be converted into a `Cow<'a, str>`.
+    /// - `key`: The header key, which will be converted into a `String`.
+    /// - `value`: The value of the header, which will be converted into a `String`.
     ///
     /// # Returns
     /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
-        K: Into<Cow<'static, str>>,
-        V: Into<Cow<'static, str>>,
+        K: Into<String>,
+        V: Into<String>,
     {
         self.headers.insert(key.into(), value.into());
         self

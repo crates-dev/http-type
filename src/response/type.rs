@@ -1,6 +1,6 @@
 use super::error::Error as ResponseError;
 use lombok_macros::*;
-use std::{borrow::Cow, collections::HashMap};
+use std::collections::HashMap;
 
 ///  ResponseData
 pub type ResponseData = Vec<u8>;
@@ -22,10 +22,10 @@ pub type ResponseResult = Result<ResponseData, ResponseError>;
 /// - `response`: The serialized HTTP response including headers and body.
 #[derive(Debug, Clone, Lombok)]
 pub struct Response {
-    pub(super) version: Cow<'static, str>,
+    pub(super) version: String,
     pub(super) status_code: usize,
-    pub(super) reason_phrase: Cow<'static, str>,
-    pub(super) headers: HashMap<Cow<'static, str>, Cow<'static, str>>,
+    pub(super) reason_phrase: String,
+    pub(super) headers: HashMap<String, String>,
     pub(super) body: ResponseBody,
     pub(super) response: ResponseData,
 }
