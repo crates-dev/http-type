@@ -1,6 +1,7 @@
 pub(crate) mod arc_mutex;
 pub(crate) mod arc_rwlock;
 pub(crate) mod content_type;
+pub(crate) mod file_extension;
 pub(crate) mod header;
 pub(crate) mod http_url;
 pub(crate) mod http_version;
@@ -13,6 +14,7 @@ pub(crate) mod status_code;
 pub use arc_mutex::r#type::*;
 pub use arc_rwlock::r#type::*;
 pub use content_type::r#type::*;
+pub use file_extension::r#type::*;
 pub use header::r#type::*;
 pub use http_constant::*;
 pub use http_url::{error::Error as HttpUrlError, r#type::*};

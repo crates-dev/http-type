@@ -1,5 +1,5 @@
 use super::r#type::ContentType;
-use http_constant::{APPLICATION_JSON, APPLICATION_XML, FORM_URLENCODED, TEXT_HTML, TEXT_PLAIN};
+use http_constant::*;
 use serde::Serialize;
 use serde_json;
 use serde_xml_rs;
