@@ -1,3 +1,4 @@
+pub(crate) mod any;
 pub(crate) mod arc_mutex;
 pub(crate) mod arc_rwlock;
 pub(crate) mod content_type;
@@ -11,6 +12,7 @@ pub(crate) mod request;
 pub(crate) mod response;
 pub(crate) mod status_code;
 
+pub use any::r#type::*;
 pub use arc_mutex::r#type::*;
 pub use arc_rwlock::r#type::*;
 pub use content_type::r#type::*;
