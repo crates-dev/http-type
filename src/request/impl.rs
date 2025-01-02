@@ -10,6 +10,20 @@ use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read};
 use std::net::TcpStream;
 
+impl Default for Request {
+    fn default() -> Self {
+        Self {
+            method: String::new(),
+            host: String::new(),
+            path: String::new(),
+            query: String::new(),
+            hash: String::new(),
+            headers: HashMap::new(),
+            body: Vec::new(),
+        }
+    }
+}
+
 impl Request {
     /// Creates a new `Request` object from a TCP stream.
     ///
