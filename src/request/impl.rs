@@ -38,10 +38,10 @@ impl Request {
         let mut request_line: String = String::new();
         reader
             .read_line(&mut request_line)
-            .map_err(|e| Error::HttpReadError(e.to_string()))?;
+            .map_err(|_| Error::HttpReadError)?;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         if parts.len() < 3 {
-            return Err(Error::InvalidHttpRequest(request_line));
+            return Err(Error::InvalidHttpRequest);
         }
         let method: RequestMethod = parts[0].to_string();
         let full_path: String = parts[1].to_string();
@@ -75,7 +75,7 @@ impl Request {
             let mut header_line: String = String::new();
             reader
                 .read_line(&mut header_line)
-                .map_err(|e| Error::HttpReadError(e.to_string()))?;
+                .map_err(|_| Error::HttpReadError)?;
             let header_line: &str = header_line.trim();
             if header_line.is_empty() {
                 break;
@@ -99,7 +99,7 @@ impl Request {
             body.resize(content_length, 0);
             reader
                 .read_exact(&mut body)
-                .map_err(|e| Error::HttpReadError(e.to_string()))?;
+                .map_err(|_| Error::HttpReadError)?;
         }
         Ok(Request {
             method,
