@@ -4,9 +4,12 @@ use std::{
     fmt::{self, Display},
 };
 
+use crate::Response;
+
 #[derive(Debug)]
 pub enum Error {
     ResponseError(String),
+    HasSendResponse(Response),
     Unknown,
 }
 
@@ -16,6 +19,7 @@ impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::ResponseError(data) => write!(f, "Response Error{}{}", COLON_SPACE, data),
+            Self::HasSendResponse(data) => write!(f, "Response Error{}{:?}", COLON_SPACE, data),
             Self::Unknown => write!(f, "{}", "Unknown"),
         }
     }
