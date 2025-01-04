@@ -49,7 +49,7 @@ impl Response {
     ///
     /// # Returns
     /// - The serialized HTTP response including headers and body.
-    pub fn build(&mut self) -> ResponseData {
+    fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()).into());
         }
@@ -82,10 +82,8 @@ impl Response {
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
     pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
-        if self.response.is_empty() {
-            let response: ResponseData = self.build();
-            self.set_response(response);
-        }
+        let response: ResponseData = self.build();
+        self.set_response(response);
         let send_res: ResponseResult = stream
             .write_all(&self.response)
             .and_then(|_| stream.flush())
