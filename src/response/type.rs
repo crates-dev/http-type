@@ -20,7 +20,6 @@ pub type ResponseResult = Result<ResponseData, ResponseError>;
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the response.
 /// - `response`: The serialized HTTP response including headers and body.
-/// - `has_send`: Has send response
 #[derive(Debug, Clone, Lombok)]
 pub struct Response {
     pub(super) version: String,
@@ -29,6 +28,4 @@ pub struct Response {
     pub(super) headers: HashMap<String, String>,
     pub(super) body: ResponseBody,
     pub(super) response: ResponseData,
-    #[set(pub(super))]
-    pub(super) has_send: bool,
 }

@@ -22,7 +22,6 @@ impl Response {
             headers: HashMap::new(),
             body: Vec::new(),
             response: Vec::new(),
-            has_send: false,
         }
     }
 
@@ -83,11 +82,6 @@ impl Response {
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
     pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
-        if *self.get_has_send() {
-            let response: Response = self.clone();
-            return Err(Error::HasSendResponse(response));
-        }
-        self.set_has_send(true);
         if self.response.is_empty() {
             let response: ResponseData = self.build();
             self.set_response(response);
@@ -98,9 +92,6 @@ impl Response {
             .map_err(|err| Error::ResponseError(err.to_string()))
             .and_then(|_| Ok(self.get_response()))
             .cloned();
-        if send_res.is_err() {
-            self.set_has_send(false);
-        }
         send_res
     }
 }
