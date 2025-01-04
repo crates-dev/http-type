@@ -73,6 +73,24 @@ impl Response {
         response_bytes
     }
 
+    /// Sends the HTTP response body over a TCP stream.
+    ///
+    /// # Parameters
+    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
+    ///
+    /// # Returns
+    /// - `Ok`: If the response body is successfully sent.
+    /// - `Err`: If an error occurs during sending.
+    pub fn send_body(&mut self, mut stream: &TcpStream) -> ResponseResult {
+        let send_res: ResponseResult = stream
+            .write_all(&self.get_body())
+            .and_then(|_| stream.flush())
+            .map_err(|err| Error::ResponseError(err.to_string()))
+            .and_then(|_| Ok(self.get_body()))
+            .cloned();
+        send_res
+    }
+
     /// Sends the HTTP response over a TCP stream.
     ///
     /// # Parameters
