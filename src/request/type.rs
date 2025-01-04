@@ -12,10 +12,7 @@ pub type RequestHost = String;
 pub type RequestPath = String;
 
 /// RequestQuery
-pub type RequestQuery = String;
-
-/// RequestHash
-pub type RequestHash = String;
+pub type RequestQuery = HashMap<String, String>;
 
 ///  RequestBody
 pub type RequestBody = Vec<u8>;
@@ -33,7 +30,6 @@ pub type RequestNewResult = Result<Request, RequestError>;
 /// - `host`: The host of the request (e.g., example.com).
 /// - `path`: The path of the request (e.g., /api/v1/resource).
 /// - `query`: The query string of the request (e.g., ?key=value).
-/// - `hash`: The fragment identifier of the request (e.g., #section).
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the request.
 #[derive(Debug, Clone, Lombok)]
@@ -42,7 +38,6 @@ pub struct Request {
     pub(crate) host: RequestHost,
     pub(crate) path: RequestPath,
     pub(crate) query: RequestQuery,
-    pub(crate) hash: RequestHash,
     pub(crate) headers: RequestHeaders,
     pub(crate) body: RequestBody,
 }

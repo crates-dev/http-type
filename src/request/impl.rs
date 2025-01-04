@@ -1,14 +1,10 @@
-use crate::{
-    RequestBody, RequestHash, RequestHeaders, RequestHost, RequestMethod, RequestNewResult,
-    RequestPath, RequestQuery,
-};
-
 use super::error::Error;
 use super::r#type::Request;
-use http_constant::*;
+use crate::*;
 use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read};
 use std::net::TcpStream;
+use std::str::SplitN;
 
 impl Default for Request {
     fn default() -> Self {
@@ -16,8 +12,7 @@ impl Default for Request {
             method: String::new(),
             host: String::new(),
             path: String::new(),
-            query: String::new(),
-            hash: String::new(),
+            query: HashMap::new(),
             headers: HashMap::new(),
             body: Vec::new(),
         }
@@ -47,11 +42,7 @@ impl Request {
         let full_path: String = parts[1].to_string();
         let hash_index: Option<usize> = full_path.find(HASH_SYMBOL);
         let query_index: Option<usize> = full_path.find(QUERY_SYMBOL);
-        let hash: RequestHash = hash_index.map_or(EMPTY_STR.to_owned(), |i| {
-            let temp: String = full_path[i + 1..].to_string();
-            temp.into()
-        });
-        let query: RequestQuery = query_index.map_or(EMPTY_STR.to_owned(), |i| {
+        let query_string: String = query_index.map_or(EMPTY_STR.to_owned(), |i| {
             let temp: String = full_path[i + 1..].to_string();
             if hash_index.is_none() || hash_index.unwrap() <= i {
                 return temp.into();
@@ -63,6 +54,7 @@ impl Request {
                 .to_string();
             data.into()
         });
+        let query: RequestQuery = Self::parse_query(&query_string);
         let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
             full_path[..i].to_string()
         } else {
@@ -106,10 +98,23 @@ impl Request {
             host,
             path,
             query,
-            hash,
             headers,
             body,
         })
+    }
+
+    /// Parse query
+    fn parse_query(query: &str) -> RequestQuery {
+        let mut query_map: RequestQuery = HashMap::new();
+        for pair in query.split(AND) {
+            let mut parts: SplitN<'_, &str> = pair.splitn(2, EQUAL);
+            let key: String = parts.next().unwrap_or_default().to_string();
+            let value: String = parts.next().unwrap_or_default().to_string();
+            if !key.is_empty() {
+                query_map.insert(key, value);
+            }
+        }
+        query_map
     }
 
     /// Adds a header to the request.
