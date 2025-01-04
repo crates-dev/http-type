@@ -11,6 +11,7 @@ pub(crate) mod protocol;
 pub(crate) mod request;
 pub(crate) mod response;
 pub(crate) mod status_code;
+pub(crate) mod stream;
 
 pub use any::r#type::*;
 pub use arc_mutex::r#type::*;
@@ -26,3 +27,4 @@ pub use protocol::r#type::*;
 pub use request::{error::Error as RequestError, r#type::*};
 pub use response::{error::Error as ResponseError, r#type::*};
 pub use status_code::r#type::*;
+pub use stream::r#type::*;
