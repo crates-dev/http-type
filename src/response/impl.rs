@@ -49,7 +49,7 @@ impl Response {
     ///
     /// # Returns
     /// - The serialized HTTP response including headers and body.
-    fn build(&mut self) -> ResponseData {
+    pub fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()).into());
         }
