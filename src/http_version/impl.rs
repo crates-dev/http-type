@@ -1,6 +1,9 @@
 use super::r#type::HttpVersion;
 use http_constant::*;
-use std::fmt::{self, Display};
+use std::{
+    fmt::{self, Display},
+    str::FromStr,
+};
 
 impl Default for HttpVersion {
     fn default() -> Self {
@@ -16,5 +19,17 @@ impl Display for HttpVersion {
             Self::Unknown(_) => UNKNOWN_HTTP_VERSION,
         };
         write!(f, "{}", version_str)
+    }
+}
+
+impl FromStr for HttpVersion {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            version_1_1 if version_1_1 == HTTP_VERSION_1_1 => Ok(Self::HTTP1_1),
+            version_2 if version_2 == HTTP_VERSION_2 => Ok(Self::HTTP2),
+            _ => Ok(Self::Unknown(s.to_string())),
+        }
     }
 }
