@@ -40,3 +40,5 @@ pub enum StatusCode {
     /// Unknown status code
     Unknown,
 }
+
+pub type StatusCodeType = usize;

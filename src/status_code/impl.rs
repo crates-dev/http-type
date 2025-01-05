@@ -1,3 +1,5 @@
+use crate::StatusCodeType;
+
 use super::r#type::StatusCode;
 use std::{
     fmt::{self, Display},
@@ -39,7 +41,7 @@ impl StatusCode {
     ///   - `Self::Ok` returns `200`.
     ///   - `Self::BadRequest` returns `400`.
     ///   - `Self::Unknown` returns `0`.
-    pub fn code(&self) -> u16 {
+    pub fn code(&self) -> StatusCodeType {
         match self {
             Self::Ok => 200,
             Self::Created => 201,

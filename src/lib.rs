@@ -1,6 +1,7 @@
 pub(crate) mod any;
 pub(crate) mod arc_mutex;
 pub(crate) mod arc_rwlock;
+pub(crate) mod body;
 pub(crate) mod content_type;
 pub(crate) mod file_extension;
 pub(crate) mod header;
@@ -16,6 +17,7 @@ pub(crate) mod stream;
 pub use any::r#type::*;
 pub use arc_mutex::r#type::*;
 pub use arc_rwlock::r#type::*;
+pub use body::r#type::*;
 pub use content_type::r#type::*;
 pub use file_extension::r#type::*;
 pub use header::r#type::*;
