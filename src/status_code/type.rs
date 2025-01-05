@@ -41,4 +41,4 @@ pub enum StatusCode {
     Unknown,
 }
 
-pub type StatusCodeType = usize;
+pub type StatusCodeUsize = usize;
