@@ -4,6 +4,7 @@ use http_constant::*;
 use std::{collections::HashMap, io::Write, net::TcpStream};
 
 impl Default for Response {
+    #[inline]
     fn default() -> Self {
         Self::new()
     }
@@ -14,6 +15,7 @@ impl Response {
     ///
     /// # Returns
     /// - An initialized `Response` with default values.
+    #[inline]
     pub fn new() -> Self {
         Response {
             version: HTTP_VERSION_1_1.to_owned(),
@@ -36,6 +38,7 @@ impl Response {
     ///
     /// # Returns
     /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
+    #[inline]
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<String>,
@@ -49,6 +52,7 @@ impl Response {
     ///
     /// # Returns
     /// - The serialized HTTP response including headers and body.
+    #[inline]
     pub fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()).into());
@@ -81,6 +85,7 @@ impl Response {
     /// # Returns
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
+    #[inline]
     pub fn send_body(&mut self, mut stream: &TcpStream) -> ResponseResult {
         let send_res: ResponseResult = stream
             .write_all(&self.get_body())
@@ -99,6 +104,7 @@ impl Response {
     /// # Returns
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
+    #[inline]
     pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
         let response: ResponseData = self.build();
         self.set_response(response);

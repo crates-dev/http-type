@@ -40,6 +40,7 @@ impl StatusCode {
     ///   - `Self::Ok` returns `200`.
     ///   - `Self::BadRequest` returns `400`.
     ///   - `Self::Unknown` returns `0`.
+    #[inline]
     pub fn code(&self) -> StatusCodeUsize {
         match self {
             Self::Ok => 200,
@@ -70,6 +71,7 @@ impl StatusCode {
     ///   - `200` returns `"OK"`.
     ///   - `404` returns `"Not Found"`.
     ///   - Unrecognized codes return `"Unknown"`.
+    #[inline]
     pub fn phrase(code: usize) -> String {
         match code {
             200 => Self::Ok.to_string(),
@@ -86,12 +88,14 @@ impl StatusCode {
         }
     }
 
+    #[inline]
     pub fn same(&self, code_str: &str) -> bool {
         self.code().to_string() == code_str || self.to_string() == code_str
     }
 }
 
 impl Display for StatusCode {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::Ok => "OK",
@@ -113,6 +117,7 @@ impl Display for StatusCode {
 impl FromStr for StatusCode {
     type Err = ();
 
+    #[inline]
     fn from_str(code_str: &str) -> Result<Self, Self::Err> {
         match code_str {
             _code_str if Self::Ok.same(_code_str) => Ok(Self::Ok),
@@ -131,6 +136,7 @@ impl FromStr for StatusCode {
 }
 
 impl Default for StatusCode {
+    #[inline]
     fn default() -> Self {
         Self::Ok
     }

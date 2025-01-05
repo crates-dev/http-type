@@ -7,6 +7,7 @@ use std::net::TcpStream;
 use std::str::SplitN;
 
 impl Default for Request {
+    #[inline]
     fn default() -> Self {
         Self {
             method: String::new(),
@@ -28,6 +29,7 @@ impl Request {
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `Error` if the request is invalid or cannot be read.
+    #[inline]
     pub fn new(stream: &TcpStream) -> RequestNewResult {
         let mut reader: BufReader<&TcpStream> = BufReader::new(stream);
         let mut request_line: String = String::new();
@@ -104,6 +106,7 @@ impl Request {
     }
 
     /// Parse query
+    #[inline]
     fn parse_query(query: &str) -> RequestQuery {
         let mut query_map: RequestQuery = HashMap::new();
         for pair in query.split(AND) {
@@ -128,6 +131,7 @@ impl Request {
     ///
     /// # Returns
     /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
+    #[inline]
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<String>,

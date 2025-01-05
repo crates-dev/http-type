@@ -6,12 +6,14 @@ use std::{
 };
 
 impl Default for HttpVersion {
+    #[inline]
     fn default() -> Self {
         Self::HTTP1_1
     }
 }
 
 impl Display for HttpVersion {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let version_str = match self {
             Self::HTTP1_1 => HTTP_VERSION_1_1,
@@ -25,6 +27,7 @@ impl Display for HttpVersion {
 impl FromStr for HttpVersion {
     type Err = String;
 
+    #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             version_1_1 if version_1_1 == HTTP_VERSION_1_1 => Ok(Self::HTTP1_1),
