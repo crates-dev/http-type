@@ -30,13 +30,13 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "http-constant"
-version = "1.22.0"
+version = "1.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59a6b4e686a83a70ccd638203da8559222576e4ea425e511d78d8026fac9f82e"
+checksum = "e41a9d4d7d14da8c14d79141e57d5fcfae4814300e8cfbaa7b306cea23839095"
 
 [[package]]
 name = "http-type"
-version = "2.22.0"
+version = "2.25.0"
 dependencies = [
  "hex",
  "http-constant",
@@ -207,9 +207,9 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
 name = "lombok-macros"
-version = "1.6.0"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6cbdd55c44298b06e66321811a2e826c8bccbf8ac32a2b105c1c8c1676cdf109"
+checksum = "01686dff91f3191b201bfe504889b27d145af69525478a52fc27e2ef8f52a9b2"
 dependencies = [
  "proc-macro2",
  "quote",
