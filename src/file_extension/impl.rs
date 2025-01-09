@@ -19,6 +19,12 @@ impl FileExtension {
     }
 
     #[inline]
+    pub fn get_extension_name(full_path: &str) -> String {
+        let ext_name: String = full_path.split(POINT).last().unwrap_or_default().to_owned();
+        ext_name
+    }
+
+    #[inline]
     pub fn get_content_type(&self) -> &'static str {
         match self {
             Self::FileExtension123 => APPLICATION_VND_LOTUS_1_2_3,
