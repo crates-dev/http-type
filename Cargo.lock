@@ -30,13 +30,13 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "http-constant"
-version = "1.25.0"
+version = "1.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb37523f40fe53d5ae3171dc23673f86e51b8aa0384f25ee50aad427b52eb637"
+checksum = "b7e2991db9cba1223b35dcf186f4a5bf9ff5fdb44abfe346d424fe9107cd4c90"
 
 [[package]]
 name = "http-type"
-version = "2.27.0"
+version = "2.27.1"
 dependencies = [
  "hex",
  "http-constant",

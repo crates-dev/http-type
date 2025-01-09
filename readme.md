@@ -11,8 +11,6 @@
 
 > A library providing essential types for HTTP, including request bodies, response headers, and other core HTTP abstractions.
 
-## Features
-
 ## Installation
 
 To use this crate, you can run cmd:
