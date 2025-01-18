@@ -1,5 +1,5 @@
 use super::{error::Error, r#type::Response};
-use crate::{ResponseData, ResponseResult, StatusCode};
+use crate::{CloseStreamResult, ResponseData, ResponseResult, StatusCode};
 use http_constant::*;
 use std::{collections::HashMap, io::Write, net::TcpStream};
 
@@ -94,6 +94,26 @@ impl Response {
             .and_then(|_| Ok(self.get_body()))
             .cloned();
         send_res
+    }
+
+    /// Closes the stream after sending the response.
+    ///
+    /// This function is responsible for:
+    /// - Building the response using the `build()` method.
+    /// - Setting the response using the `set_response()` method.
+    /// - Shutting down the write half of the TCP stream to indicate no more data will be sent.
+    ///
+    /// # Parameters
+    /// - `stream`: A reference to the `TcpStream` that will be closed after sending the response.
+    ///
+    /// # Returns
+    /// - `CloseStreamResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
+    #[inline]
+    pub fn close(&mut self, stream: &TcpStream) -> CloseStreamResult {
+        let _ = stream
+            .shutdown(std::net::Shutdown::Both)
+            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        Ok(())
     }
 
     /// Sends the HTTP response over a TCP stream.

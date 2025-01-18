@@ -11,6 +11,9 @@ pub type ResponseBody = Vec<u8>;
 ///  ResponseResult
 pub type ResponseResult = Result<ResponseData, ResponseError>;
 
+///  CloseStreamResult
+pub type CloseStreamResult = Result<(), ResponseError>;
+
 /// Represents an HTTP response.
 ///
 /// # Fields

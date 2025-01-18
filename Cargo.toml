@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "2.27.1"
+version = "2.28.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
