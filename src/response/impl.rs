@@ -2,6 +2,8 @@ use super::{error::Error, r#type::Response};
 use crate::{CloseStreamResult, ResponseData, ResponseResult, StatusCode};
 use http_constant::*;
 use std::{collections::HashMap, io::Write, net::TcpStream};
+use tokio::io::AsyncWriteExt;
+use tokio::net::TcpStream as TokioTcpStream;
 
 impl Default for Response {
     #[inline]
@@ -135,5 +137,67 @@ impl Response {
             .and_then(|_| Ok(self.get_response()))
             .cloned();
         send_res
+    }
+
+    /// Sends the HTTP response body over a TCP stream.
+    ///
+    /// # Parameters
+    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
+    ///
+    /// # Returns
+    /// - `Ok`: If the response body is successfully sent.
+    /// - `Err`: If an error occurs during sending.
+    #[inline]
+    pub async fn async_send_body(&mut self, stream: &mut TokioTcpStream) -> ResponseResult {
+        stream
+            .write_all(&self.get_body())
+            .await
+            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        stream
+            .flush()
+            .await
+            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        Ok(self.get_response().clone())
+    }
+
+    /// Closes the stream after sending the response.
+    ///
+    /// This function is responsible for:
+    /// - Building the response using the `build()` method.
+    /// - Setting the response using the `set_response()` method.
+    /// - Shutting down the write half of the TCP stream to indicate no more data will be sent.
+    ///
+    /// # Parameters
+    /// - `stream`: A reference to the `TcpStream` that will be closed after sending the response.
+    ///
+    /// # Returns
+    /// - `CloseStreamResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
+    #[inline]
+    pub fn async_close(&mut self, stream: &mut TokioTcpStream) -> CloseStreamResult {
+        let _ = stream.shutdown();
+        Ok(())
+    }
+
+    /// Sends the HTTP response over a TCP stream.
+    ///
+    /// # Parameters
+    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
+    ///
+    /// # Returns
+    /// - `Ok`: If the response is successfully sent.
+    /// - `Err`: If an error occurs during sending.
+    #[inline]
+    pub async fn async_send(&mut self, stream: &mut TokioTcpStream) -> ResponseResult {
+        let response: ResponseData = self.build();
+        self.set_response(response);
+        stream
+            .write_all(&self.response)
+            .await
+            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        stream
+            .flush()
+            .await
+            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        Ok(self.get_response().clone())
     }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "2.29.0"
+version = "2.30.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -21,7 +21,7 @@ http-constant = "1.25.1"
 lombok-macros = "1.7.0"
 serde = "1.0.217"
 serde-xml-rs = "0.6.0"
-serde_json = "1.0.135"
+serde_json = "1.0.136"
 serde_urlencoded = "0.7.1"
 url = "2.5.4"
 tokio = { version = "1.43.0", features = ["full"] }
