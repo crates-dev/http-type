@@ -96,7 +96,7 @@ checksum = "b7e2991db9cba1223b35dcf186f4a5bf9ff5fdb44abfe346d424fe9107cd4c90"
 
 [[package]]
 name = "http-type"
-version = "2.30.0"
+version = "2.30.1"
 dependencies = [
  "hex",
  "http-constant",

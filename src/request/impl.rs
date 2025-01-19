@@ -124,7 +124,6 @@ impl Request {
             .read_line(&mut request_line)
             .await
             .map_err(|_| Error::HttpReadError)?;
-
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         if parts.len() < 3 {
             return Err(Error::InvalidHttpRequest);
@@ -198,6 +197,12 @@ impl Request {
     }
 
     /// Parse query
+    ///
+    /// # Parameters
+    /// - `query`: &str
+    ///
+    /// # Returns
+    /// - RequestQuery
     #[inline]
     fn parse_query(query: &str) -> RequestQuery {
         let mut query_map: RequestQuery = HashMap::new();
