@@ -89,31 +89,37 @@ impl Response {
         }
         let mut response_string: String = String::new();
         self.push_http_response_first_line(&mut response_string);
-        let mut compress_type: Compress = Compress::default();
-        let mut connection: &str = CONNECTION_KEEP_ALIVE;
-        let mut content_type: &str = TEXT_HTML;
+        let mut compress_type_opt: Option<Compress> = None;
+        let mut connection_opt: Option<&str> = None;
+        let mut content_type_opt: Option<&str> = None;
         for (key, value) in self.get_headers() {
             if key == CONTENT_LENGTH {
                 continue;
             } else if key == CONTENT_ENCODING {
-                compress_type = value.parse::<Compress>().unwrap_or_default();
+                compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
             } else if key == CONNECTION {
-                connection = value;
+                connection_opt = Some(value);
             } else if key == CONTENT_TYPE {
-                content_type = value;
+                content_type_opt = Some(value);
             }
-            Self::push_header(&mut response_string, key, HTTP_BR);
+            Self::push_header(&mut response_string, key, &value);
         }
-        Self::push_header(&mut response_string, CONNECTION, connection);
-        Self::push_header(
-            &mut response_string,
-            CONTENT_TYPE,
-            &format!("{}{}{}", content_type, SEMICOLON_SPACE, CHARSET_UTF_8),
-        );
+        if connection_opt.is_none() {
+            Self::push_header(&mut response_string, CONNECTION, CONNECTION_KEEP_ALIVE);
+        }
+        if content_type_opt.is_none() {
+            Self::push_header(
+                &mut response_string,
+                CONTENT_TYPE,
+                &format!("{}{}{}", TEXT_HTML, SEMICOLON_SPACE, CHARSET_UTF_8),
+            );
+        }
         let mut body: Cow<Vec<u8>> = Cow::Borrowed(self.get_body());
-        if !compress_type.is_unknown() {
-            let tmp_body: Cow<'_, Vec<u8>> = compress_type.encode(&body, DEFAULT_BUFFER_SIZE);
-            body = Cow::Owned(tmp_body.into_owned());
+        if let Some(compress_type) = compress_type_opt {
+            if !compress_type.is_unknown() {
+                let tmp_body: Cow<'_, Vec<u8>> = compress_type.encode(&body, DEFAULT_BUFFER_SIZE);
+                body = Cow::Owned(tmp_body.into_owned());
+            }
         }
         let len_string: String = body.len().to_string();
         let len_str: &str = len_string.as_str();
@@ -136,7 +142,7 @@ impl Response {
     #[inline]
     pub fn send_body(&mut self, mut stream: &TcpStream) -> ResponseResult {
         let send_res: ResponseResult = stream
-            .write_all(&self.get_body())
+            .write_all(self.get_body())
             .and_then(|_| stream.flush())
             .map_err(|err| Error::ResponseError(err.to_string()))
             .and_then(|_| Ok(()));
@@ -175,7 +181,7 @@ impl Response {
     pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
         self.build();
         stream
-            .write_all(&self.response)
+            .write_all(self.get_response())
             .and_then(|_| stream.flush())
             .map_err(|err| Error::ResponseError(err.to_string()))?;
         Ok(())
@@ -192,7 +198,7 @@ impl Response {
     #[inline]
     pub async fn async_send_body(&mut self, stream: &mut TokioTcpStream) -> ResponseResult {
         stream
-            .write_all(&self.get_body())
+            .write_all(self.get_body())
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
         stream
@@ -232,7 +238,7 @@ impl Response {
     pub async fn async_send(&mut self, stream: &mut TokioTcpStream) -> ResponseResult {
         self.build();
         stream
-            .write_all(&self.response)
+            .write_all(&self.get_response())
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
         stream
