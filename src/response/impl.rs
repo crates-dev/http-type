@@ -89,14 +89,14 @@ impl Response {
         }
         let mut response_string: String = String::new();
         self.push_http_response_first_line(&mut response_string);
-        let mut zip_type: Compress = Compress::default();
+        let mut compress_type: Compress = Compress::default();
         let mut connection: &str = CONNECTION_KEEP_ALIVE;
         let mut content_type: &str = TEXT_HTML;
         for (key, value) in self.get_headers() {
             if key == CONTENT_LENGTH {
                 continue;
             } else if key == CONTENT_ENCODING {
-                zip_type = value.parse::<Compress>().unwrap_or_default();
+                compress_type = value.parse::<Compress>().unwrap_or_default();
             } else if key == CONNECTION {
                 connection = value;
             } else if key == CONTENT_TYPE {
@@ -107,10 +107,8 @@ impl Response {
         Self::push_header(&mut response_string, CONNECTION, connection);
         Self::push_header(&mut response_string, CONTENT_TYPE, content_type);
         let mut body: Cow<Vec<u8>> = Cow::Borrowed(self.get_body());
-        if !zip_type.is_unknown() {
-            let tmp_body: Cow<'_, Vec<u8>> = zip_type.encode(&body, DEFAULT_BUFFER_SIZE);
-            body = Cow::Owned(tmp_body.into_owned());
-            let tmp_body: Cow<'_, Vec<u8>> = zip_type.encode(&body, DEFAULT_BUFFER_SIZE);
+        if !compress_type.is_unknown() {
+            let tmp_body: Cow<'_, Vec<u8>> = compress_type.encode(&body, DEFAULT_BUFFER_SIZE);
             body = Cow::Owned(tmp_body.into_owned());
         }
         let len_string: String = body.len().to_string();
@@ -137,8 +135,7 @@ impl Response {
             .write_all(&self.get_body())
             .and_then(|_| stream.flush())
             .map_err(|err| Error::ResponseError(err.to_string()))
-            .and_then(|_| Ok(self.get_body()))
-            .cloned();
+            .and_then(|_| Ok(()));
         send_res
     }
 
@@ -172,12 +169,12 @@ impl Response {
     /// - `Err`: If an error occurs during sending.
     #[inline]
     pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
-        let response: ResponseData = self.build();
+        self.build();
         stream
             .write_all(&self.response)
             .and_then(|_| stream.flush())
             .map_err(|err| Error::ResponseError(err.to_string()))?;
-        Ok(response)
+        Ok(())
     }
 
     /// Sends the HTTP response body over a TCP stream.
@@ -198,7 +195,7 @@ impl Response {
             .flush()
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
-        Ok(self.get_response().clone())
+        Ok(())
     }
 
     /// Closes the stream after sending the response.
@@ -229,7 +226,7 @@ impl Response {
     /// - `Err`: If an error occurs during sending.
     #[inline]
     pub async fn async_send(&mut self, stream: &mut TokioTcpStream) -> ResponseResult {
-        let response: ResponseData = self.build();
+        self.build();
         stream
             .write_all(&self.response)
             .await
@@ -238,6 +235,6 @@ impl Response {
             .flush()
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
-        Ok(response)
+        Ok(())
     }
 }

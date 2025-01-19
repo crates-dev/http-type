@@ -9,7 +9,7 @@ pub type ResponseData = Vec<u8>;
 pub type ResponseBody = Vec<u8>;
 
 ///  ResponseResult
-pub type ResponseResult = Result<ResponseData, ResponseError>;
+pub type ResponseResult = Result<(), ResponseError>;
 
 ///  CloseStreamResult
 pub type CloseStreamResult = Result<(), ResponseError>;
