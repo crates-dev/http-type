@@ -1,7 +1,8 @@
 use super::{error::Error, r#type::Response};
 use crate::{CloseStreamResult, ResponseData, ResponseResult, StatusCode};
+use http_compress::*;
 use http_constant::*;
-use std::{collections::HashMap, io::Write, net::TcpStream};
+use std::{borrow::Cow, collections::HashMap, io::Write, net::TcpStream};
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream as TokioTcpStream;
 
@@ -50,6 +51,33 @@ impl Response {
         self
     }
 
+    /// Pushes a header with a key and value into the response string.
+    ///
+    /// # Parameters
+    /// - `response_string`: A mutable reference to the string where the header will be added.
+    /// - `key`: The header key as a string slice (`&str`).
+    /// - `value`: The header value as a string slice (`&str`).
+    pub(super) fn push_header(response_string: &mut String, key: &str, value: &str) {
+        response_string.push_str(&format!("{}{}{}{}", key, COLON_SPACE, value, HTTP_BR));
+    }
+
+    /// Pushes the first line of an HTTP response (version, status code, and reason phrase) into the response string.
+    /// This corresponds to the status line of the HTTP response.
+    ///
+    /// # Parameters
+    /// - `response_string`: A mutable reference to the string where the first line will be added.
+    pub(super) fn push_http_response_first_line(&self, response_string: &mut String) {
+        response_string.push_str(&format!(
+            "{}{}{}{}{}{}",
+            self.get_version(),
+            SPACE,
+            self.get_status_code(),
+            SPACE,
+            self.get_reason_phrase(),
+            HTTP_BR
+        ));
+    }
+
     /// Builds the full HTTP response as a byte vector.
     ///
     /// # Returns
@@ -59,22 +87,38 @@ impl Response {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()).into());
         }
-        let mut response_str: String = String::new();
-        response_str.push_str(&format!(
-            "{}{}{}{}{}{}",
-            self.get_version(),
-            SPACE,
-            self.get_status_code(),
-            SPACE,
-            self.get_reason_phrase(),
-            HTTP_BR
-        ));
+        let mut response_string: String = String::new();
+        self.push_http_response_first_line(&mut response_string);
+        let mut zip_type: Compress = Compress::default();
+        let mut connection: &str = CONNECTION_KEEP_ALIVE;
+        let mut content_type: &str = TEXT_HTML;
         for (key, value) in self.get_headers() {
-            response_str.push_str(&format!("{}{}{}{}", key, COLON_SPACE, value, HTTP_BR));
+            if key == CONTENT_LENGTH {
+                continue;
+            } else if key == CONTENT_ENCODING {
+                zip_type = value.parse::<Compress>().unwrap_or_default();
+            } else if key == CONNECTION {
+                connection = value;
+            } else if key == CONTENT_TYPE {
+                content_type = value;
+            }
+            Self::push_header(&mut response_string, key, HTTP_BR);
         }
-        response_str.push_str(HTTP_BR);
-        let mut response_bytes: Vec<u8> = response_str.into_bytes();
-        response_bytes.extend_from_slice(self.get_body());
+        Self::push_header(&mut response_string, CONNECTION, connection);
+        Self::push_header(&mut response_string, CONTENT_TYPE, content_type);
+        let mut body: Cow<Vec<u8>> = Cow::Borrowed(self.get_body());
+        if !zip_type.is_unknown() {
+            let tmp_body: Cow<'_, Vec<u8>> = zip_type.encode(&body, DEFAULT_BUFFER_SIZE);
+            body = Cow::Owned(tmp_body.into_owned());
+            let tmp_body: Cow<'_, Vec<u8>> = zip_type.encode(&body, DEFAULT_BUFFER_SIZE);
+            body = Cow::Owned(tmp_body.into_owned());
+        }
+        let len_string: String = body.len().to_string();
+        let len_str: &str = len_string.as_str();
+        Self::push_header(&mut response_string, CONTENT_LENGTH, len_str);
+        response_string.push_str(HTTP_BR);
+        let mut response_bytes: Vec<u8> = response_string.into_bytes();
+        response_bytes.extend_from_slice(&body);
         self.set_response(response_bytes.clone());
         response_bytes
     }
@@ -129,14 +173,11 @@ impl Response {
     #[inline]
     pub fn send(&mut self, mut stream: &TcpStream) -> ResponseResult {
         let response: ResponseData = self.build();
-        self.set_response(response);
-        let send_res: ResponseResult = stream
+        stream
             .write_all(&self.response)
             .and_then(|_| stream.flush())
-            .map_err(|err| Error::ResponseError(err.to_string()))
-            .and_then(|_| Ok(self.get_response()))
-            .cloned();
-        send_res
+            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        Ok(response)
     }
 
     /// Sends the HTTP response body over a TCP stream.
@@ -189,7 +230,6 @@ impl Response {
     #[inline]
     pub async fn async_send(&mut self, stream: &mut TokioTcpStream) -> ResponseResult {
         let response: ResponseData = self.build();
-        self.set_response(response);
         stream
             .write_all(&self.response)
             .await
@@ -198,6 +238,6 @@ impl Response {
             .flush()
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
-        Ok(self.get_response().clone())
+        Ok(response)
     }
 }
