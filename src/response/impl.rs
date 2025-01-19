@@ -105,7 +105,11 @@ impl Response {
             Self::push_header(&mut response_string, key, HTTP_BR);
         }
         Self::push_header(&mut response_string, CONNECTION, connection);
-        Self::push_header(&mut response_string, CONTENT_TYPE, content_type);
+        Self::push_header(
+            &mut response_string,
+            CONTENT_TYPE,
+            &format!("{}{}{}", content_type, SEMICOLON_SPACE, CHARSET_UTF_8),
+        );
         let mut body: Cow<Vec<u8>> = Cow::Borrowed(self.get_body());
         if !compress_type.is_unknown() {
             let tmp_body: Cow<'_, Vec<u8>> = compress_type.encode(&body, DEFAULT_BUFFER_SIZE);
