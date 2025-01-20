@@ -1,10 +1,13 @@
 use super::error::Error;
 use super::r#type::Request;
 use crate::*;
-use std::collections::HashMap;
-use std::io::{BufRead, BufReader, Read};
-use std::net::TcpStream;
-use std::str::SplitN;
+use std::{
+    collections::HashMap,
+    io::{BufRead, BufReader, Read},
+    net::TcpStream,
+    str::SplitN,
+    sync::RwLockReadGuard,
+};
 
 impl Default for Request {
     #[inline]
@@ -24,14 +27,16 @@ impl Request {
     /// Creates a new `Request` object from a TCP stream.
     ///
     /// # Parameters
-    /// - `stream`: A reference to a `TcpStream` representing the incoming connection.
+    /// - `stream`: A reference to a `ArcLockStream` representing the incoming connection.
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `Error` if the request is invalid or cannot be read.
     #[inline]
-    pub fn new(stream: &TcpStream) -> RequestNewResult {
-        let mut reader: BufReader<&TcpStream> = BufReader::new(stream);
+    pub fn new(stream: ArcLockStream) -> RequestNewResult {
+        let stream: RwLockReadGuard<'_, TcpStream> =
+            stream.read().map_err(|_| Error::HttpReadError)?;
+        let mut reader: BufReader<&TcpStream> = BufReader::new(&stream);
         let mut request_line: String = String::new();
         reader
             .read_line(&mut request_line)
