@@ -1,3 +1,3 @@
 #!/bin/bash
-git remote add ltpp ssh://git@git.ltpp.vip:66/root/http-type.git;
+git remote add jihulab ssh://jihulab.com:ltpp/http-type.git;
 git remote add origin git@github.com:ltpp-universe/http-type.git;
