@@ -16,6 +16,7 @@
 /// - `BadGateway`: HTTP 502, indicates that the server, while acting as a gateway or proxy, received an invalid response from the upstream server.
 /// - `Unknown`: Represents an unknown status code, typically used when the status code is not recognized or is undefined.
 /// ```
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StatusCode {
     /// 200 OK
     Ok,

@@ -3,7 +3,7 @@ use std::{
     fmt::{self, Display},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     HttpReadError,
     InvalidHttpRequest,

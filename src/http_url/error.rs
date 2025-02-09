@@ -10,7 +10,7 @@ use std::{
 ///
 /// # Variants
 /// - `InvalidUrl`: Indicates that the provided URL is invalid.
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     InvalidUrl,
 }

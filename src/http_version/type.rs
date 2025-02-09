@@ -7,7 +7,7 @@
 /// The variants include:
 /// - `HTTP1_1`: Represents HTTP version 1.1.
 /// - `HTTP2`: Represents HTTP version 2.0.
-#[derive(Debug, PartialEq, Clone, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HttpVersion {
     /// HTTP version 1.1
     HTTP1_1,

@@ -6,7 +6,7 @@ use std::{
 
 use crate::Response;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
     ResponseError(String),
     HasSendResponse(Response),

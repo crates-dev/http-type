@@ -23,7 +23,7 @@ pub type CloseStreamResult = Result<(), ResponseError>;
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the response.
 /// - `response`: The serialized HTTP response including headers and body.
-#[derive(Debug, Clone, Lombok)]
+#[derive(Debug, Clone, Lombok, PartialEq, Eq)]
 pub struct Response {
     pub(super) version: String,
     pub(super) status_code: usize,
