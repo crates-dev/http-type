@@ -1,9 +1,13 @@
+<center>
+
 ## http-type
 
 [![](https://img.shields.io/crates/v/http-type.svg)](https://crates.io/crates/http-type)
 [![](https://docs.rs/http-type/badge.svg)](https://docs.rs/http-type)
-[![](https://img.shields.io/crates/l/http-type.svg)](./LICENSE)
 [![](https://github.com/ltpp-universe/http-type/workflows/Rust/badge.svg)](https://github.com/ltpp-universe/http-type/actions?query=workflow:Rust)
+[![](https://img.shields.io/crates/l/http-type.svg)](./LICENSE)
+
+</center>
 
 [Official Documentation](https://docs.ltpp.vip/HTTP-TYPE/)
 
