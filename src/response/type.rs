@@ -36,7 +36,6 @@ pub type CloseStreamResult = Result<(), ResponseError>;
 pub struct Response {
     #[set(skip)]
     pub(super) version: ResponseVersion,
-    #[set(skip)]
     pub(super) status_code: ResponseStatusCode,
     #[set(skip)]
     pub(super) reason_phrase: ResponseReasonPhrase,

@@ -80,25 +80,6 @@ impl Response {
         self
     }
 
-    /// Set the status code of the response.
-    ///
-    /// This method allows you to set the HTTP status code of the response by converting
-    /// the provided value into a `ResponseStatusCode` type. The `status_code` is updated
-    /// with the converted value, and the method returns a mutable reference to the current
-    /// instance for method chaining.
-    ///
-    /// # Parameters
-    /// - `status_code`: The HTTP status code to be set. It can be any type that can be converted
-    ///   into a `ResponseStatusCode` using the `Into` trait.
-    ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    #[inline]
-    pub fn set_status_code<T: Into<ResponseStatusCode>>(&mut self, status_code: T) -> &mut Self {
-        self.status_code = status_code.into();
-        self
-    }
-
     /// Set the reason phrase of the response.
     ///
     /// This method allows you to set the reason phrase of the response by converting the
