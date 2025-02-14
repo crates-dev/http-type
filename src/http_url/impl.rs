@@ -1,6 +1,5 @@
 use super::error::Error;
-use super::r#type::HttpUrlComponents;
-use crate::protocol::r#type::Protocol;
+use crate::*;
 use url::Url as UrlParser;
 
 impl Default for HttpUrlComponents {

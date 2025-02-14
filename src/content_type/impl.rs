@@ -1,5 +1,4 @@
-use super::r#type::ContentType;
-use http_constant::*;
+use crate::*;
 use serde::Serialize;
 use serde_json;
 use serde_xml_rs;

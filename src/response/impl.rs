@@ -1,4 +1,4 @@
-use super::{error::Error, r#type::Response};
+use super::error::Error;
 use crate::*;
 use http_compress::*;
 use std::{borrow::Cow, collections::HashMap, io::Write, net::TcpStream};

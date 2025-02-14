@@ -1,5 +1,4 @@
-use super::r#type::HttpVersion;
-use http_constant::*;
+use crate::*;
 use std::{
     fmt::{self, Display},
     str::FromStr,

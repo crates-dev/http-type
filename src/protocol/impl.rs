@@ -1,5 +1,4 @@
-use super::r#type::Protocol;
-use http_constant::*;
+use crate::*;
 
 use std::{
     fmt::{self, Display},

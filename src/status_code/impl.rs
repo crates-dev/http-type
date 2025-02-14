@@ -1,4 +1,3 @@
-use super::r#type::StatusCode;
 use crate::*;
 use std::{
     fmt::{self, Display},

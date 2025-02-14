@@ -1,5 +1,4 @@
-use super::r#type::Methods;
-use http_constant::*;
+use crate::*;
 use std::fmt::{self, Display};
 
 impl Default for Methods {

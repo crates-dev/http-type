@@ -1,5 +1,4 @@
 use super::error::Error;
-use super::r#type::Request;
 use crate::*;
 use std::{
     collections::HashMap,
