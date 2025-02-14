@@ -238,4 +238,110 @@ impl Request {
         self.headers.insert(key.into(), value.into());
         self
     }
+
+    /// Set the body of the response.
+    ///
+    /// This method allows you to set the body of the response by converting the provided
+    /// value into a `RequestBody` type. The `body` is updated with the converted value,
+    /// and the method returns a mutable reference to the current instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `body`: The body of the response to be set. It can be any type that can be converted
+    ///   into a `RequestBody` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    /// Set the body of the response.
+    ///
+    /// This method allows you to set the body of the response by converting the provided
+    /// value into a `RequestBody` type. The `body` is updated with the converted value,
+    /// and the method returns a mutable reference to the current instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `body`: The body of the response to be set. It can be any type that can be converted
+    ///   into a `RequestBody` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    #[inline]
+    pub fn set_body<T: Into<RequestBody>>(&mut self, body: T) -> &mut Self {
+        self.body = body.into();
+        self
+    }
+
+    /// Set the HTTP method of the request.
+    ///
+    /// This method allows you to set the HTTP method (e.g., GET, POST) of the request
+    /// by converting the provided value into a `RequestMethod` type. The `method` is updated
+    /// with the converted value, and the method returns a mutable reference to the current
+    /// instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `method`: The HTTP method to be set for the request. It can be any type that can
+    ///   be converted into a `RequestMethod` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    #[inline]
+    pub fn set_method<T: Into<RequestMethod>>(&mut self, method: T) -> &mut Self {
+        self.method = method.into();
+        self
+    }
+
+    /// Set the host of the request.
+    ///
+    /// This method allows you to set the host (e.g., www.example.com) for the request
+    /// by converting the provided value into a `RequestHost` type. The `host` is updated
+    /// with the converted value, and the method returns a mutable reference to the current
+    /// instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `host`: The host to be set for the request. It can be any type that can be converted
+    ///   into a `RequestHost` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    #[inline]
+    pub fn set_host<T: Into<RequestHost>>(&mut self, host: T) -> &mut Self {
+        self.host = host.into();
+        self
+    }
+
+    /// Set the path of the request.
+    ///
+    /// This method allows you to set the path (e.g., /api/v1/resource) for the request
+    /// by converting the provided value into a `RequestPath` type. The `path` is updated
+    /// with the converted value, and the method returns a mutable reference to the current
+    /// instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `path`: The path to be set for the request. It can be any type that can be converted
+    ///   into a `RequestPath` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    #[inline]
+    pub fn set_path<T: Into<RequestPath>>(&mut self, path: T) -> &mut Self {
+        self.path = path.into();
+        self
+    }
+
+    /// Set the query string of the request.
+    ///
+    /// This method allows you to set the query string (e.g., ?key=value) for the request
+    /// by converting the provided value into a `RequestQuery` type. The `query` is updated
+    /// with the converted value, and the method returns a mutable reference to the current
+    /// instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `query`: The query string to be set for the request. It can be any type that can
+    ///   be converted into a `RequestQuery` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    #[inline]
+    pub fn set_query<T: Into<RequestQuery>>(&mut self, query: T) -> &mut Self {
+        self.query = query.into();
+        self
+    }
 }

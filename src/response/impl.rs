@@ -1,7 +1,6 @@
 use super::{error::Error, r#type::Response};
-use crate::{CloseStreamResult, ResponseData, ResponseResult, StatusCode};
+use crate::*;
 use http_compress::*;
-use http_constant::*;
 use std::{borrow::Cow, collections::HashMap, io::Write, net::TcpStream};
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream as TokioTcpStream;
@@ -51,12 +50,84 @@ impl Response {
         self
     }
 
+    /// Set the body of the response.
+    ///
+    /// This method allows you to set the body of the response by converting the provided
+    /// value into a `ResponseBody` type. The `body` is updated with the converted value,
+    /// and the method returns a mutable reference to the current instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `body`: The body of the response to be set. It can be any type that can be converted
+    ///   into a `ResponseBody` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    /// Set the body of the response.
+    ///
+    /// This method allows you to set the body of the response by converting the provided
+    /// value into a `ResponseBody` type. The `body` is updated with the converted value,
+    /// and the method returns a mutable reference to the current instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `body`: The body of the response to be set. It can be any type that can be converted
+    ///   into a `ResponseBody` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    #[inline]
+    pub fn set_body<T: Into<ResponseBody>>(&mut self, body: T) -> &mut Self {
+        self.body = body.into();
+        self
+    }
+
+    /// Set the status code of the response.
+    ///
+    /// This method allows you to set the HTTP status code of the response by converting
+    /// the provided value into a `ResponseStatusCode` type. The `status_code` is updated
+    /// with the converted value, and the method returns a mutable reference to the current
+    /// instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `status_code`: The HTTP status code to be set. It can be any type that can be converted
+    ///   into a `ResponseStatusCode` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    #[inline]
+    pub fn set_status_code<T: Into<ResponseStatusCode>>(&mut self, status_code: T) -> &mut Self {
+        self.status_code = status_code.into();
+        self
+    }
+
+    /// Set the reason phrase of the response.
+    ///
+    /// This method allows you to set the reason phrase of the response by converting the
+    /// provided value into a `ResponseReasonPhrase` type. The `reason_phrase` is updated
+    /// with the converted value, and the method returns a mutable reference to the current
+    /// instance for method chaining.
+    ///
+    /// # Parameters
+    /// - `reason_phrase`: The reason phrase to be set for the response. It can be any type
+    ///   that can be converted into a `ResponseReasonPhrase` using the `Into` trait.
+    ///
+    /// # Return Value
+    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    #[inline]
+    pub fn set_reason_phrase<T: Into<ResponseReasonPhrase>>(
+        &mut self,
+        reason_phrase: T,
+    ) -> &mut Self {
+        self.reason_phrase = reason_phrase.into();
+        self
+    }
+
     /// Pushes a header with a key and value into the response string.
     ///
     /// # Parameters
     /// - `response_string`: A mutable reference to the string where the header will be added.
     /// - `key`: The header key as a string slice (`&str`).
     /// - `value`: The header value as a string slice (`&str`).
+    #[inline]
     pub(super) fn push_header(response_string: &mut String, key: &str, value: &str) {
         response_string.push_str(&format!("{}{}{}{}", key, COLON_SPACE, value, HTTP_BR));
     }
@@ -66,6 +137,7 @@ impl Response {
     ///
     /// # Parameters
     /// - `response_string`: A mutable reference to the string where the first line will be added.
+    #[inline]
     pub(super) fn push_http_response_first_line(&self, response_string: &mut String) {
         response_string.push_str(&format!(
             "{}{}{}{}{}{}",
@@ -85,7 +157,7 @@ impl Response {
     #[inline]
     pub fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
-            self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()).into());
+            self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()));
         }
         let mut response_string: String = String::new();
         self.push_http_response_first_line(&mut response_string);

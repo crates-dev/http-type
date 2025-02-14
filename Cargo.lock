@@ -162,7 +162,7 @@ checksum = "d4f65c1d734142034b3e28ee07df50974f6adc2fb2eeb877963181e826d2aa6a"
 
 [[package]]
 name = "http-type"
-version = "2.33.1"
+version = "2.34.0"
 dependencies = [
  "hex",
  "http-compress",
