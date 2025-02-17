@@ -25,14 +25,13 @@ impl Request {
     /// Creates a new `Request` object from a TCP stream.
     ///
     /// # Parameters
-    /// - `stream`: A reference to a `&std::net::TcpStream` representing the incoming connection.
+    /// - `reader`: A mut reference to a `&BufReader<&TcpStream>`
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `Error` if the request is invalid or cannot be read.
     #[inline]
-    pub fn new(stream: &std::net::TcpStream) -> RequestNewResult {
-        let mut reader: BufReader<&TcpStream> = BufReader::new(&stream);
+    pub fn new_from_reader(reader: &mut BufReader<&TcpStream>) -> RequestNewResult {
         let mut request_line: String = String::new();
         reader
             .read_line(&mut request_line)
@@ -104,6 +103,20 @@ impl Request {
             headers,
             body,
         })
+    }
+
+    /// Creates a new `Request` object from a TCP stream.
+    ///
+    /// # Parameters
+    /// - `stream`: A reference to a `&std::net::TcpStream` representing the incoming connection.
+    ///
+    /// # Returns
+    /// - `Ok`: A `Request` object populated with the HTTP request data.
+    /// - `Err`: An `Error` if the request is invalid or cannot be read.
+    #[inline]
+    pub fn new_from_stream(stream: &std::net::TcpStream) -> RequestNewResult {
+        let mut reader: BufReader<&TcpStream> = BufReader::new(&stream);
+        Self::new_from_reader(&mut reader)
     }
 
     /// Creates a new `Request` object from a TCP stream.
