@@ -71,7 +71,7 @@ impl FromStr for Protocol {
 
     #[inline]
     fn from_str(data: &str) -> Result<Self, Self::Err> {
-        match data.to_lowercase().as_str() {
+        match data {
             _data if _data.eq_ignore_ascii_case(HTTP) => Ok(Self::HTTP),
             _data if _data.eq_ignore_ascii_case(HTTPS) => Ok(Self::HTTPS),
             _ => Ok(Self::Unknown(data.to_string())),
