@@ -30,3 +30,10 @@ pub use request::{error::Error as RequestError, r#type::*};
 pub use response::{error::Error as ResponseError, r#type::*};
 pub use status_code::r#type::*;
 pub use stream::r#type::*;
+
+pub(crate) use std::sync::Arc;
+pub(crate) use tokio::{
+    io::AsyncWriteExt,
+    net::TcpStream,
+    sync::{Mutex, MutexGuard, RwLock, RwLockWriteGuard},
+};
