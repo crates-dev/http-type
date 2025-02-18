@@ -1,6 +1,5 @@
 use super::error::Error;
 use crate::*;
-use std::{collections::HashMap, str::SplitN};
 
 impl Default for Request {
     #[inline]
@@ -20,15 +19,15 @@ impl Request {
     /// Creates a new `Request` object from a TCP stream.
     ///
     /// # Parameters
-    /// - `reader`: A mut reference to a `&mut std::io::BufReader<&std::net::TcpStream>`
+    /// - `reader`: A mut reference to a `&mut BufReader<&mut TcpStream>`
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `Error` if the request is invalid or cannot be read.
     #[inline]
-    pub fn from_reader(reader: &mut std::io::BufReader<&std::net::TcpStream>) -> RequestNewResult {
+    pub async fn from_reader(reader: &mut BufReader<&mut TcpStream>) -> RequestNewResult {
         let mut request_line: String = String::new();
-        std::io::BufRead::read_line(reader, &mut request_line).map_err(|_| Error::HttpReadError)?;
+        let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         if parts.len() < 3 {
             return Err(Error::InvalidHttpRequest);
@@ -60,8 +59,7 @@ impl Request {
         let mut content_length: usize = 0;
         loop {
             let mut header_line: String = String::new();
-            std::io::BufRead::read_line(reader, &mut header_line)
-                .map_err(|_| Error::HttpReadError)?;
+            let _ = AsyncBufReadExt::read_line(reader, &mut header_line).await;
             let header_line: &str = header_line.trim();
             if header_line.is_empty() {
                 break;
@@ -83,7 +81,7 @@ impl Request {
         let mut body: RequestBody = Vec::new();
         if content_length > 0 {
             body.resize(content_length, 0);
-            std::io::Read::read_exact(reader, &mut body).map_err(|_| Error::HttpReadError)?;
+            let _ = AsyncReadExt::read_exact(reader, &mut body);
         }
         Ok(Request {
             method,
@@ -93,99 +91,6 @@ impl Request {
             headers,
             body,
         })
-    }
-
-    /// Creates a new `Request` object from a TCP stream.
-    ///
-    /// # Parameters
-    /// - `reader`: A mut reference to a `&mut tokio::io::BufReader<&mut tokio::net::TcpStream>`
-    ///
-    /// # Returns
-    /// - `Ok`: A `Request` object populated with the HTTP request data.
-    /// - `Err`: An `Error` if the request is invalid or cannot be read.
-    #[inline]
-    pub async fn from_tokio_reader(
-        reader: &mut tokio::io::BufReader<&mut tokio::net::TcpStream>,
-    ) -> RequestNewResult {
-        let mut request_line: String = String::new();
-        let _ = tokio::io::AsyncBufReadExt::read_line(reader, &mut request_line).await;
-        let parts: Vec<&str> = request_line.split_whitespace().collect();
-        if parts.len() < 3 {
-            return Err(Error::InvalidHttpRequest);
-        }
-        let method: RequestMethod = parts[0].to_string();
-        let full_path: String = parts[1].to_string();
-        let hash_index: Option<usize> = full_path.find(HASH_SYMBOL);
-        let query_index: Option<usize> = full_path.find(QUERY_SYMBOL);
-        let query_string: String = query_index.map_or(EMPTY_STR.to_owned(), |i| {
-            let temp: String = full_path[i + 1..].to_string();
-            if hash_index.is_none() || hash_index.unwrap() <= i {
-                return temp.into();
-            }
-            let data: String = temp
-                .split(HASH_SYMBOL)
-                .next()
-                .unwrap_or_default()
-                .to_string();
-            data.into()
-        });
-        let query: RequestQuery = Self::parse_query(&query_string);
-        let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
-            full_path[..i].to_string()
-        } else {
-            full_path
-        };
-        let mut headers: RequestHeaders = HashMap::new();
-        let mut host: RequestHost = EMPTY_STR.to_owned();
-        let mut content_length: usize = 0;
-        loop {
-            let mut header_line: String = String::new();
-            let _ = tokio::io::AsyncBufReadExt::read_line(reader, &mut header_line).await;
-            let header_line: &str = header_line.trim();
-            if header_line.is_empty() {
-                break;
-            }
-            let parts: Vec<&str> = header_line.splitn(2, COLON_SPACE_SYMBOL).collect();
-            if parts.len() != 2 {
-                continue;
-            }
-            let key: String = parts[0].trim().to_string();
-            let value: String = parts[1].trim().to_string();
-            if key.eq_ignore_ascii_case(HOST) {
-                host = value.to_string();
-            }
-            if key.eq_ignore_ascii_case(CONTENT_LENGTH) {
-                content_length = value.parse().unwrap_or(0);
-            }
-            headers.insert(key, value);
-        }
-        let mut body: RequestBody = Vec::new();
-        if content_length > 0 {
-            body.resize(content_length, 0);
-            let _ = tokio::io::AsyncReadExt::read_exact(reader, &mut body);
-        }
-        Ok(Request {
-            method,
-            host,
-            path,
-            query,
-            headers,
-            body,
-        })
-    }
-
-    /// Creates a new `Request` object from a TCP stream.
-    ///
-    /// # Parameters
-    /// - `stream`: A reference to a `&std::net::TcpStream` representing the incoming connection.
-    ///
-    /// # Returns
-    /// - `Ok`: A `Request` object populated with the HTTP request data.
-    /// - `Err`: An `Error` if the request is invalid or cannot be read.
-    #[inline]
-    pub fn from_stream(stream: &std::net::TcpStream) -> RequestNewResult {
-        let mut reader: std::io::BufReader<&std::net::TcpStream> = std::io::BufReader::new(stream);
-        Self::from_reader(&mut reader)
     }
 
     /// Creates a new `Request` object from a TCP stream.
@@ -197,11 +102,10 @@ impl Request {
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `Error` if the request is invalid or cannot be read.
     #[inline]
-    pub async fn from_tokio_stream(stream: &ArcRwLockStream) -> RequestNewResult {
-        let mut buf_stream: RwLockWriteGuard<'_, tokio::net::TcpStream> = stream.write().await;
-        let mut reader: tokio::io::BufReader<&mut tokio::net::TcpStream> =
-            tokio::io::BufReader::new(&mut buf_stream);
-        Self::from_tokio_reader(&mut reader).await
+    pub async fn from_stream(stream: &ArcRwLockStream) -> RequestNewResult {
+        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
+        let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
+        Self::from_reader(&mut reader).await
     }
 
     /// Parse query

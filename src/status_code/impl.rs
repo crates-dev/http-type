@@ -1,8 +1,4 @@
 use crate::*;
-use std::{
-    fmt::{self, Display},
-    str::FromStr,
-};
 
 /// The `StatusCode` enum represents the HTTP status codes.
 ///

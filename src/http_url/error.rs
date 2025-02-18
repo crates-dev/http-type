@@ -1,7 +1,4 @@
-use std::{
-    error::Error as StdError,
-    fmt::{self, Display},
-};
+use crate::*;
 
 /// Represents different types of errors that can occur in the application.
 ///

@@ -1,5 +1,4 @@
 use crate::*;
-use std::fmt::{self, Display};
 
 impl Default for Methods {
     #[inline]

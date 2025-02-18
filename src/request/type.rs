@@ -1,6 +1,5 @@
 use super::error::Error as RequestError;
-use lombok_macros::*;
-use std::collections::HashMap;
+use crate::*;
 
 /// RequestMethod
 pub type RequestMethod = String;

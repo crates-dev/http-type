@@ -1,10 +1,4 @@
-use http_constant::*;
-use std::{
-    error::Error as StdError,
-    fmt::{self, Display},
-};
-
-use crate::Response;
+use crate::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {

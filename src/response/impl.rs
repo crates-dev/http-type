@@ -1,7 +1,5 @@
 use super::error::Error;
 use crate::*;
-use http_compress::*;
-use std::{borrow::Cow, collections::HashMap};
 
 impl Default for Response {
     #[inline]

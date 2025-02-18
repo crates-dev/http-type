@@ -1,8 +1,4 @@
 use crate::*;
-use std::{
-    fmt::{self, Display},
-    str::FromStr,
-};
 
 impl Default for FileExtension {
     #[inline]

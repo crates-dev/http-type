@@ -1,11 +1,4 @@
 use crate::*;
-use serde::Serialize;
-use serde_json;
-use serde_xml_rs;
-use std::{
-    fmt::{Debug, Display},
-    str::FromStr,
-};
 
 impl ContentType {
     /// Handles the `application/json` Content-Type by serializing the provided data

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::*;
 
 /// A type alias for a `HashMap<String, String>`, representing the headers of an HTTP request or response.
 /// This structure stores key-value pairs, where each key is the name of an HTTP header (e.g., `Content-Type`, `Host`),

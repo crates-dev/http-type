@@ -1,2 +1,3 @@
-pub use std::any::Any;
+use crate::*;
+
 pub type BoxAny = Box<dyn Any>;

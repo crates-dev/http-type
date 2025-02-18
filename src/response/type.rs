@@ -1,6 +1,5 @@
 use super::error::Error as ResponseError;
-use lombok_macros::*;
-use std::collections::HashMap;
+use crate::*;
 
 ///  Response data
 pub type ResponseData = Vec<u8>;
