@@ -103,7 +103,7 @@ impl Request {
     /// - `Err`: An `Error` if the request is invalid or cannot be read.
     #[inline]
     pub async fn from_stream(stream: &ArcRwLockStream) -> RequestNewResult {
-        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
+        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
         Self::from_reader(&mut reader).await
     }

@@ -40,14 +40,14 @@ pub(crate) use std::{
     any::Any,
     borrow::Cow,
     collections::HashMap,
+    error::Error as StdError,
     fmt::{self, Debug, Display},
     str::FromStr,
     str::SplitN,
     sync::Arc,
-    error::Error as StdError,
 };
 pub(crate) use tokio::{
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
     net::TcpStream,
-    sync::{Mutex, MutexGuard, RwLock, RwLockWriteGuard},
+    sync::{Mutex, MutexGuard, RwLock, RwLockReadGuard, RwLockWriteGuard},
 };

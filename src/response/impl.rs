@@ -190,7 +190,7 @@ impl Response {
     /// - `Err`: If an error occurs during sending.
     #[inline]
     pub async fn send_body(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.write().await;
+        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
         stream
             .write_all(self.get_body())
             .await
@@ -216,7 +216,7 @@ impl Response {
     /// - `CloseStreamResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
     #[inline]
     pub async fn close(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.write().await;
+        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
         let _ = stream.shutdown();
         Ok(())
     }
@@ -232,7 +232,7 @@ impl Response {
     #[inline]
     pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         self.build();
-        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.write().await;
+        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
         stream
             .write_all(&self.get_response())
             .await
