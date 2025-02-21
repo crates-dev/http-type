@@ -15,4 +15,4 @@ pub type ArcMutexGuardTcpStream<'a> = Arc<MutexGuard<'a, TcpStream>>;
 pub type OptionArcMutexGuardTcpStream<'a> = Option<ArcMutexGuardTcpStream<'a>>;
 
 #[derive(Clone, Debug)]
-pub struct ArcRwLockStream(pub(crate) ArcRwLock<TcpStream>);
+pub struct ArcRwLockStream(pub(super) ArcRwLock<TcpStream>);
