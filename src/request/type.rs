@@ -34,14 +34,14 @@ pub type RequestNewResult = Result<Request, RequestError>;
 #[derive(Debug, Clone, Lombok, PartialEq, Eq)]
 pub struct Request {
     #[set(skip)]
-    pub(crate) method: RequestMethod,
+    pub(super) method: RequestMethod,
     #[set(skip)]
-    pub(crate) host: RequestHost,
+    pub(super) host: RequestHost,
     #[set(skip)]
-    pub(crate) path: RequestPath,
+    pub(super) path: RequestPath,
     #[set(skip)]
-    pub(crate) query: RequestQuery,
-    pub(crate) headers: RequestHeaders,
+    pub(super) query: RequestQuery,
+    pub(super) headers: RequestHeaders,
     #[set(skip)]
-    pub(crate) body: RequestBody,
+    pub(super) body: RequestBody,
 }
