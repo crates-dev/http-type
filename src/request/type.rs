@@ -10,14 +10,26 @@ pub type RequestHost = String;
 /// RequestPath
 pub type RequestPath = String;
 
+/// RequestQuery key
+pub type RequestQueryKey = String;
+
+/// RequestQuery value
+pub type RequestQueryValue = String;
+
 /// RequestQuery
-pub type RequestQuery = HashMap<String, String>;
+pub type RequestQuery = HashMap<RequestQueryKey, RequestQueryValue>;
 
 ///  RequestBody
 pub type RequestBody = Vec<u8>;
 
+/// RequestHeaders key
+pub type RequestHeadersKey = String;
+
+/// RequestHeaders value
+pub type RequestHeadersValue = String;
+
 /// RequestHeaders
-pub type RequestHeaders = HashMap<String, String>;
+pub type RequestHeaders = HashMap<RequestHeadersKey, RequestHeadersValue>;
 
 /// RequestNewResult
 pub type RequestNewResult = Result<Request, RequestError>;
