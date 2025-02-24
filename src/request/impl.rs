@@ -147,6 +147,24 @@ impl Request {
             .and_then(|data| Some(data.clone()))
     }
 
+    /// Retrieves the value of a request header by its key.
+    ///
+    /// # Parameters
+    /// - `key`: The header's key, which can be of any type that implements `Into<RequestHeadersKey>`.
+    ///
+    /// # Returns
+    /// - `Option<RequestHeadersValue>`: Returns `Some(value)` if the key exists in the request headers,
+    ///   or `None` if the key does not exist.
+    #[inline]
+    pub fn get_header<K>(&self, key: K) -> Option<RequestHeadersValue>
+    where
+        K: Into<RequestHeadersKey>,
+    {
+        self.headers
+            .get(&key.into())
+            .and_then(|data| Some(data.clone()))
+    }
+
     /// Adds a header to the request.
     ///
     /// This function inserts a key-value pair into the request headers.
