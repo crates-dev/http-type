@@ -141,15 +141,20 @@ impl Response {
         let mut compress_type_opt: Option<Compress> = None;
         let mut connection_opt: Option<&str> = None;
         let mut content_type_opt: Option<&str> = None;
-        for (key, value) in self.get_headers() {
-            if key == CONTENT_LENGTH {
+        let headers: &ResponseHeaders = self.get_headers();
+        let mut unset_content_length: bool = false;
+        for (key, value) in headers {
+            if key.eq_ignore_ascii_case(CONTENT_LENGTH) {
                 continue;
-            } else if key == CONTENT_ENCODING {
+            } else if key.eq_ignore_ascii_case(CONTENT_ENCODING) {
                 compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
-            } else if key == CONNECTION {
+            } else if key.eq_ignore_ascii_case(CONNECTION) {
                 connection_opt = Some(value);
-            } else if key == CONTENT_TYPE {
+            } else if key.eq_ignore_ascii_case(CONTENT_TYPE) {
                 content_type_opt = Some(value);
+                if value.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
+                    unset_content_length = true;
+                }
             }
             Self::push_header(&mut response_string, key, &value);
         }
@@ -164,15 +169,17 @@ impl Response {
             );
         }
         let mut body: Cow<Vec<u8>> = Cow::Borrowed(self.get_body());
-        if let Some(compress_type) = compress_type_opt {
-            if !compress_type.is_unknown() {
-                let tmp_body: Cow<'_, Vec<u8>> = compress_type.encode(&body, DEFAULT_BUFFER_SIZE);
-                body = Cow::Owned(tmp_body.into_owned());
+        if !unset_content_length {
+            if let Some(compress_type) = compress_type_opt {
+                if !compress_type.is_unknown() {
+                    let tmp_body: Cow<'_, Vec<u8>> =
+                        compress_type.encode(&body, DEFAULT_BUFFER_SIZE);
+                    body = Cow::Owned(tmp_body.into_owned());
+                }
             }
+            let len_string: String = body.len().to_string();
+            Self::push_header(&mut response_string, CONTENT_LENGTH, &len_string);
         }
-        let len_string: String = body.len().to_string();
-        let len_str: &str = len_string.as_str();
-        Self::push_header(&mut response_string, CONTENT_LENGTH, len_str);
         response_string.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_string.into_bytes();
         response_bytes.extend_from_slice(&body);

@@ -7,6 +7,9 @@ pub type ResponseData = Vec<u8>;
 ///  Response body
 pub type ResponseBody = Vec<u8>;
 
+///  Response headers
+pub type ResponseHeaders = HashMap<String, String>;
+
 /// Response version
 pub type ResponseVersion = String;
 
@@ -38,7 +41,7 @@ pub struct Response {
     pub(super) status_code: ResponseStatusCode,
     #[set(skip)]
     pub(super) reason_phrase: ResponseReasonPhrase,
-    pub(super) headers: HashMap<String, String>,
+    pub(super) headers: ResponseHeaders,
     #[set(skip)]
     pub(super) body: ResponseBody,
     #[set(super)]
