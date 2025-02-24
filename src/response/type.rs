@@ -7,8 +7,14 @@ pub type ResponseData = Vec<u8>;
 ///  Response body
 pub type ResponseBody = Vec<u8>;
 
+///  Response headers key
+pub type ResponseHeadersKey = String;
+
+///  Response headers value
+pub type ResponseHeadersValue = String;
+
 ///  Response headers
-pub type ResponseHeaders = HashMap<String, String>;
+pub type ResponseHeaders = HashMap<ResponseHeadersKey, ResponseHeadersValue>;
 
 /// Response version
 pub type ResponseVersion = String;

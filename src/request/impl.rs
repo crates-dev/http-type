@@ -8,7 +8,7 @@ impl Default for Request {
             method: String::new(),
             host: String::new(),
             path: String::new(),
-            query: HashMap::new(),
+            querys: HashMap::new(),
             headers: HashMap::new(),
             body: Vec::new(),
         }
@@ -48,7 +48,7 @@ impl Request {
                 .to_string();
             data.into()
         });
-        let query: RequestQuery = Self::parse_query(&query_string);
+        let querys: RequestQuerys = Self::parse_querys(&query_string);
         let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
             full_path[..i].to_string()
         } else {
@@ -87,7 +87,7 @@ impl Request {
             method,
             host,
             path,
-            query,
+            querys,
             headers,
             body,
         })
@@ -108,16 +108,16 @@ impl Request {
         Self::from_reader(&mut reader).await
     }
 
-    /// Parse query
+    /// Parse querys
     ///
     /// # Parameters
     /// - `query`: &str
     ///
     /// # Returns
-    /// - RequestQuery
+    /// - RequestQuerys
     #[inline]
-    fn parse_query(query: &str) -> RequestQuery {
-        let mut query_map: RequestQuery = HashMap::new();
+    fn parse_querys(query: &str) -> RequestQuerys {
+        let mut query_map: RequestQuerys = HashMap::new();
         for pair in query.split(AND) {
             let mut parts: SplitN<'_, &str> = pair.splitn(2, EQUAL);
             let key: String = parts.next().unwrap_or_default().to_string();
@@ -237,22 +237,21 @@ impl Request {
         self
     }
 
-    /// Set the query string of the request.
-    ///
-    /// This method allows you to set the query string (e.g., ?key=value) for the request
-    /// by converting the provided value into a `RequestQuery` type. The `query` is updated
-    /// with the converted value, and the method returns a mutable reference to the current
-    /// instance for method chaining.
+    /// Sets a query parameter for the request.
     ///
     /// # Parameters
-    /// - `query`: The query string to be set for the request. It can be any type that can
-    ///   be converted into a `RequestQuery` using the `Into` trait.
+    /// - `key`: The query parameter's key, which can be of any type that implements `Into<RequestQuerysKey>`.
+    /// - `value`: The query parameter's value, which can be of any type that implements `Into<RequestQuerysValue>`.
     ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    /// # Returns
+    /// - Returns a mutable reference to the current instance (`Self`), allowing for method chaining.
     #[inline]
-    pub fn set_query<T: Into<RequestQuery>>(&mut self, query: T) -> &mut Self {
-        self.query = query.into();
+    pub fn set_query<K: Into<RequestQuerysKey>, V: Into<RequestQuerysValue>>(
+        &mut self,
+        key: K,
+        value: V,
+    ) -> &mut Self {
+        self.querys.insert(key.into(), value.into());
         self
     }
 }

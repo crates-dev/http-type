@@ -10,14 +10,14 @@ pub type RequestHost = String;
 /// RequestPath
 pub type RequestPath = String;
 
-/// RequestQuery key
-pub type RequestQueryKey = String;
+/// RequestQuerys key
+pub type RequestQuerysKey = String;
 
-/// RequestQuery value
-pub type RequestQueryValue = String;
+/// RequestQuerys value
+pub type RequestQuerysValue = String;
 
-/// RequestQuery
-pub type RequestQuery = HashMap<RequestQueryKey, RequestQueryValue>;
+/// RequestQuerys
+pub type RequestQuerys = HashMap<RequestQuerysKey, RequestQuerysValue>;
 
 ///  RequestBody
 pub type RequestBody = Vec<u8>;
@@ -51,8 +51,7 @@ pub struct Request {
     pub(super) host: RequestHost,
     #[set(skip)]
     pub(super) path: RequestPath,
-    #[set(skip)]
-    pub(super) query: RequestQuery,
+    pub(super) querys: RequestQuerys,
     pub(super) headers: RequestHeaders,
     #[set(skip)]
     pub(super) body: RequestBody,
