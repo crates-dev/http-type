@@ -129,6 +129,24 @@ impl Request {
         query_map
     }
 
+    /// Retrieves the value of a query parameter by its key.
+    ///
+    /// # Parameters
+    /// - `key`: The query parameter's key, which can be of any type that implements `Into<RequestQuerysKey>`.
+    ///
+    /// # Returns
+    /// - `Option<RequestQuerysValue>`: Returns `Some(value)` if the key exists in the query parameters,
+    ///   or `None` if the key does not exist.
+    #[inline]
+    pub fn get_query<K>(&self, key: K) -> Option<RequestQuerysValue>
+    where
+        K: Into<RequestQuerysKey>,
+    {
+        self.querys
+            .get(&key.into())
+            .and_then(|data| Some(data.clone()))
+    }
+
     /// Adds a header to the request.
     ///
     /// This function inserts a key-value pair into the request headers.

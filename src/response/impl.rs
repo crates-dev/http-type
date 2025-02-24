@@ -25,22 +25,40 @@ impl Response {
         }
     }
 
+    /// Retrieves the value of a response header by its key.
+    ///
+    /// # Parameters
+    /// - `key`: The header's key, which can be of any type that implements `Into<ResponseHeadersKey>`.
+    ///
+    /// # Returns
+    /// - `Option<ResponseHeadersValue>`: Returns `Some(value)` if the key exists in the response headers,
+    ///   or `None` if the key does not exist.
+    #[inline]
+    pub fn get_header<K>(&self, key: K) -> Option<ResponseHeadersValue>
+    where
+        K: Into<ResponseHeadersKey>,
+    {
+        self.headers
+            .get(&key.into())
+            .and_then(|data| Some(data.clone()))
+    }
+
     /// Adds a header to the response.
     ///
     /// This function inserts a key-value pair into the response headers.
-    /// The key and value are converted into `String`, allowing for efficient handling of both owned and borrowed string data.
+    /// The key and value are converted into `ResponseHeadersKey`, allowing for efficient handling of both owned and borrowed string data.
     ///
     /// # Parameters
-    /// - `key`: The header key, which will be converted into a `String`.
-    /// - `value`: The value of the header, which will be converted into a `String`.
+    /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
+    /// - `value`: The value of the header, which will be converted into a `ResponseHeadersValue`.
     ///
     /// # Returns
     /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
     #[inline]
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
-        K: Into<String>,
-        V: Into<String>,
+        K: Into<ResponseHeadersKey>,
+        V: Into<ResponseHeadersValue>,
     {
         self.headers.insert(key.into(), value.into());
         self
