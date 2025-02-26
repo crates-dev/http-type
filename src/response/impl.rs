@@ -8,6 +8,13 @@ impl Default for Response {
     }
 }
 
+impl fmt::Display for Response {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl Response {
     /// Creates a new instance of `Response`.
     ///

@@ -15,6 +15,13 @@ impl Default for Request {
     }
 }
 
+impl fmt::Display for Request {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl Request {
     /// Creates a new `Request` object from a TCP stream.
     ///
