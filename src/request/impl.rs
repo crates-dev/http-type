@@ -81,7 +81,7 @@ impl Request {
         let mut body: RequestBody = Vec::new();
         if content_length > 0 {
             body.resize(content_length, 0);
-            let _ = AsyncReadExt::read_exact(reader, &mut body);
+            let _ = AsyncReadExt::read_exact(reader, &mut body).await;
         }
         Ok(Request {
             method,
