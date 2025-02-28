@@ -3,34 +3,24 @@ use crate::*;
 
 /// RequestMethod
 pub type RequestMethod = String;
-
 /// RequestHost
 pub type RequestHost = String;
-
 /// RequestPath
 pub type RequestPath = String;
-
 /// RequestQuerys key
 pub type RequestQuerysKey = String;
-
 /// RequestQuerys value
 pub type RequestQuerysValue = String;
-
 /// RequestQuerys
 pub type RequestQuerys = HashMap<RequestQuerysKey, RequestQuerysValue>;
-
 ///  RequestBody
 pub type RequestBody = Vec<u8>;
-
 /// RequestHeaders key
 pub type RequestHeadersKey = String;
-
 /// RequestHeaders value
 pub type RequestHeadersValue = String;
-
 /// RequestHeaders
 pub type RequestHeaders = HashMap<RequestHeadersKey, RequestHeadersValue>;
-
 /// RequestNewResult
 pub type RequestNewResult = Result<Request, RequestError>;
 

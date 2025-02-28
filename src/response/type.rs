@@ -3,31 +3,22 @@ use crate::*;
 
 ///  Response data
 pub type ResponseData = Vec<u8>;
-
 ///  Response body
 pub type ResponseBody = Vec<u8>;
-
 ///  Response headers key
 pub type ResponseHeadersKey = String;
-
 ///  Response headers value
 pub type ResponseHeadersValue = String;
-
 ///  Response headers
 pub type ResponseHeaders = HashMap<ResponseHeadersKey, ResponseHeadersValue>;
-
 /// Response version
 pub type ResponseVersion = String;
-
 /// Response status code
 pub type ResponseStatusCode = usize;
-
 /// Response reason phrase
 pub type ResponseReasonPhrase = String;
-
 ///  Response result
 pub type ResponseResult = Result<(), ResponseError>;
-
 ///  Close stream result
 pub type CloseStreamResult = Result<(), ResponseError>;
 

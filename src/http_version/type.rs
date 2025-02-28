@@ -11,10 +11,8 @@
 pub enum HttpVersion {
     /// HTTP version 1.1
     HTTP1_1,
-
     /// HTTP version 2.0
     HTTP2,
-
     /// Unknown version
     Unknown(String),
 }
