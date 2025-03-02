@@ -114,9 +114,9 @@ dependencies = [
 
 [[package]]
 name = "flate2"
-version = "1.0.35"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c936bfdafb507ebbf50b8074c54fa31c5be9a1e7e5f467dd659697041407d07c"
+checksum = "11faaf5a5236997af9848be0bef4db95824b1d534ebc64d0f0c6cf3e67bd38dc"
 dependencies = [
  "crc32fast",
  "miniz_oxide",
@@ -145,9 +145,9 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "http-compress"
-version = "2.2.4"
+version = "2.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28b4861cd885310158502fec3b5b77476473429a2ebfa32d736414b46e48213a"
+checksum = "4f27da543d4dd3e0dddcb291d3ba93ac330d98ef2ca062a5b5eb935999c53d5e"
 dependencies = [
  "brotli",
  "flate2",
@@ -156,13 +156,13 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "1.29.0"
+version = "1.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e12cb1453c646f80c681382a4e3da4b7345e1f6d4ff6ffd6f12909f5d00740d"
+checksum = "590d21ec88bcc3a54fd43344c452f59a1908ead7fdf6a9d4f22dcf514efb843a"
 
 [[package]]
 name = "http-type"
-version = "3.7.1"
+version = "3.7.2"
 dependencies = [
  "hex",
  "http-compress",
@@ -351,9 +351,9 @@ checksum = "04cbf5b083de1c7e0222a7a51dbfdba1cbe1c6ab0b15e29fff3f6c077fd9cd9f"
 
 [[package]]
 name = "lombok-macros"
-version = "1.7.3"
+version = "1.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09ef4d1374d56438de85a648837714144c55b8d50c7ed0aeb1ff53269228fa54"
+checksum = "d9203d7ef929978612d2c71f5e7ed13529d00e4e9b6a683a2c59713148ab574b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -368,9 +368,9 @@ checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
 name = "miniz_oxide"
-version = "0.8.3"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8402cab7aefae129c6977bb0ff1b8fd9a04eb5b51efc50a70bea51cda0c7924"
+checksum = "8e3e04debbb59698c15bacbb6d93584a8c0ca9cc3213cb423d31f760d8843ce5"
 dependencies = [
  "adler2",
 ]
