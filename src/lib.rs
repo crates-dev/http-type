@@ -42,7 +42,7 @@ pub(crate) use std::{
     collections::HashMap,
     error::Error as StdError,
     fmt::{self, Debug, Display},
-    net::IpAddr,
+    net::{IpAddr, SocketAddr},
     str::FromStr,
     str::SplitN,
     sync::Arc,
