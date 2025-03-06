@@ -74,4 +74,13 @@ impl HttpVersion {
     pub fn is_unknown(&self) -> bool {
         matches!(self, Self::Unknown(_))
     }
+
+    /// Checks if the current version is HTTP/1.1 or higher.
+    #[inline]
+    pub fn is_http1_1_or_higher(&self) -> bool {
+        match self {
+            Self::HTTP1_1 | Self::HTTP2 | Self::HTTP3 => true,
+            _ => false,
+        }
+    }
 }
