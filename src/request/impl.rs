@@ -5,8 +5,9 @@ impl Default for Request {
     #[inline]
     fn default() -> Self {
         Self {
-            method: String::new(),
+            method: Methods::default(),
             host: String::new(),
+            version: HttpVersion::default(),
             path: String::new(),
             querys: HashMap::new(),
             headers: HashMap::new(),
@@ -39,8 +40,15 @@ impl Request {
         if parts.len() < 3 {
             return Err(Error::InvalidHttpRequest);
         }
-        let method: RequestMethod = parts[0].to_string();
-        let full_path: String = parts[1].to_string();
+        let method: RequestMethod = parts[0]
+            .to_string()
+            .parse::<RequestMethod>()
+            .unwrap_or_default();
+        let full_path: RequestPath = parts[1].to_string();
+        let version: RequestVersion = parts[2]
+            .to_string()
+            .parse::<RequestVersion>()
+            .unwrap_or_default();
         let hash_index: Option<usize> = full_path.find(HASH_SYMBOL);
         let query_index: Option<usize> = full_path.find(QUERY_SYMBOL);
         let query_string: String = query_index.map_or(EMPTY_STR.to_owned(), |i| {
@@ -93,6 +101,7 @@ impl Request {
         Ok(Request {
             method,
             host,
+            version,
             path,
             querys,
             headers,

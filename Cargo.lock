@@ -156,13 +156,13 @@ dependencies = [
 
 [[package]]
 name = "http-constant"
-version = "1.29.1"
+version = "1.30.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "590d21ec88bcc3a54fd43344c452f59a1908ead7fdf6a9d4f22dcf514efb843a"
+checksum = "6b1949824d36bc78ec436c2124a9648f6f2560f725755936b497997ce1e1698a"
 
 [[package]]
 name = "http-type"
-version = "3.10.0"
+version = "3.11.0"
 dependencies = [
  "hex",
  "http-compress",

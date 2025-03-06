@@ -2,9 +2,11 @@ use super::error::Error as RequestError;
 use crate::*;
 
 /// RequestMethod
-pub type RequestMethod = String;
+pub type RequestMethod = Methods;
 /// RequestHost
 pub type RequestHost = String;
+/// RequestVersion
+pub type RequestVersion = HttpVersion;
 /// RequestPath
 pub type RequestPath = String;
 /// RequestQuerys key
@@ -29,6 +31,7 @@ pub type RequestNewResult = Result<Request, RequestError>;
 /// # Fields
 /// - `method`: The HTTP method of the request (e.g., GET, POST).
 /// - `host`: The host of the request (e.g., example.com).
+/// - `version`: The version of the request (e.g., HTTP/1.1).
 /// - `path`: The path of the request (e.g., /api/v1/resource).
 /// - `query`: The query string of the request (e.g., ?key=value).
 /// - `headers`: A collection of HTTP headers as key-value pairs.
@@ -39,6 +42,8 @@ pub struct Request {
     pub(super) method: RequestMethod,
     #[set(skip)]
     pub(super) host: RequestHost,
+    #[set(skip)]
+    pub(super) version: RequestVersion,
     #[set(skip)]
     pub(super) path: RequestPath,
     pub(super) querys: RequestQuerys,
