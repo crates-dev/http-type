@@ -4,6 +4,7 @@ use crate::*;
 pub enum Error {
     ResponseError(String),
     HasSendResponse(Response),
+    CloseError(String),
     Unknown,
 }
 
@@ -14,6 +15,7 @@ impl Display for Error {
         match self {
             Self::ResponseError(data) => write!(f, "Response Error{}{}", COLON_SPACE, data),
             Self::HasSendResponse(data) => write!(f, "Response Error{}{:?}", COLON_SPACE, data),
+            Self::CloseError(data) => write!(f, "Close Error{}{}", COLON_SPACE, data),
             Self::Unknown => write!(f, "{}", "Unknown"),
         }
     }

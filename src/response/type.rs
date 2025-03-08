@@ -19,8 +19,6 @@ pub type ResponseStatusCode = usize;
 pub type ResponseReasonPhrase = String;
 ///  Response result
 pub type ResponseResult = Result<(), ResponseError>;
-///  Close stream result
-pub type CloseStreamResult = Result<(), ResponseError>;
 
 /// Represents an HTTP response.
 ///

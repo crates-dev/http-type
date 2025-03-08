@@ -245,12 +245,14 @@ impl Response {
     /// - `stream`: A reference to the `TcpStream` that will be closed after sending the response.
     ///
     /// # Returns
-    /// - `CloseStreamResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
+    /// - `ResponseResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
     #[inline]
     pub async fn close(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
-        let _ = stream.shutdown();
-        Ok(())
+        stream
+            .shutdown()
+            .await
+            .map_err(|err| ResponseError::CloseError(err.to_string()))
     }
 
     /// Sends the HTTP response over a TCP stream.
