@@ -4,6 +4,7 @@ use crate::*;
 pub enum Error {
     HttpReadError,
     InvalidHttpRequest,
+    InvalidWebSocketRequest,
     InvalidUrl,
     TcpStreamConnectError,
     RequestError,
@@ -27,6 +28,7 @@ impl Display for Error {
         match self {
             Self::HttpReadError => write!(f, "Http read error"),
             Self::InvalidHttpRequest => write!(f, "Invalid http request"),
+            Self::InvalidWebSocketRequest => write!(f, "Invalid websocket request"),
             Self::InvalidUrl => write!(f, "Invalid URL"),
             Self::TcpStreamConnectError => write!(f, "TCP Stream Connection Error"),
             Self::RequestError => write!(f, "Request Error"),

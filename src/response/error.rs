@@ -5,6 +5,7 @@ pub enum Error {
     ResponseError(String),
     HasSendResponse(Response),
     CloseError(String),
+    WebSocketHandShakeError,
     Unknown,
 }
 
@@ -16,7 +17,8 @@ impl Display for Error {
             Self::ResponseError(data) => write!(f, "Response Error{}{}", COLON_SPACE, data),
             Self::HasSendResponse(data) => write!(f, "Response Error{}{:?}", COLON_SPACE, data),
             Self::CloseError(data) => write!(f, "Close Error{}{}", COLON_SPACE, data),
-            Self::Unknown => write!(f, "{}", "Unknown"),
+            Self::WebSocketHandShakeError => write!(f, "Websocket handshake error"),
+            Self::Unknown => write!(f, "Unknown"),
         }
     }
 }

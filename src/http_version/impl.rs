@@ -83,4 +83,9 @@ impl HttpVersion {
             _ => false,
         }
     }
+
+    #[inline]
+    pub fn is_http(&self) -> bool {
+        !self.is_unknown()
+    }
 }

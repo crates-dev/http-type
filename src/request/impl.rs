@@ -12,6 +12,7 @@ impl Default for Request {
             querys: HashMap::new(),
             headers: HashMap::new(),
             body: Vec::new(),
+            upgrade_type: UpgradeType::default(),
         }
     }
 }
@@ -98,6 +99,10 @@ impl Request {
             body.resize(content_length, 0);
             let _ = AsyncReadExt::read_exact(reader, &mut body).await;
         }
+        let upgrade_type: UpgradeType = headers
+            .get(UPGRADE)
+            .and_then(|data| data.parse::<UpgradeType>().ok())
+            .unwrap_or_default();
         Ok(Request {
             method,
             host,
@@ -106,6 +111,7 @@ impl Request {
             querys,
             headers,
             body,
+            upgrade_type,
         })
     }
 
@@ -113,15 +119,49 @@ impl Request {
     ///
     /// # Parameters
     /// - `stream`: A reference to a `&ArcRwLockStream` representing the incoming connection.
+    /// - `is_websocket`: Is websocket
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `Error` if the request is invalid or cannot be read.
     #[inline]
-    pub async fn from_stream(stream: &ArcRwLockStream) -> RequestNewResult {
+    pub async fn from_stream(stream: &ArcRwLockStream, is_websocket: bool) -> RequestNewResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::from_reader(&mut reader).await
+        if is_websocket {
+            Self::from_ws_reader(&mut reader).await
+        } else {
+            Self::from_reader(&mut reader).await
+        }
+    }
+
+    /// Reads a WebSocket request from a TCP stream and constructs a `Request` object.
+    ///
+    /// This function reads data from the provided `BufReader` wrapped around a `TcpStream`.
+    /// It attempts to read up to 1024 bytes into a buffer and constructs a `Request` object
+    /// based on the received data. The request body is set using the received bytes.
+    ///
+    /// # Arguments
+    /// - `reader` - A mutable reference to a `BufReader` wrapping a `TcpStream`.
+    ///   This reader is used to read the incoming WebSocket request data.
+    ///
+    /// # Returns
+    /// - `Ok(Request)` - A `Request` object constructed from the received data.
+    ///   - If no data is read (`Ok(0)`), an empty `Request` object is returned.
+    ///   - If data is successfully read, the request body is set with the received bytes.
+    /// - `Err(RequestError::InvalidWebSocketRequest)` - If an error occurs while reading from the stream.
+    #[inline]
+    pub async fn from_ws_reader(reader: &mut BufReader<&mut TcpStream>) -> RequestNewResult {
+        let mut buffer = [0; 1024];
+        let mut request: Request = Request::default();
+        match reader.read(&mut buffer).await {
+            Ok(0) => Ok(request),
+            Ok(n) => {
+                request.set_body(&mut buffer[..n]);
+                return Ok(request);
+            }
+            Err(_) => Err(RequestError::InvalidWebSocketRequest),
+        }
     }
 
     /// Parse querys
