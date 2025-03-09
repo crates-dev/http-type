@@ -14,6 +14,7 @@ pub(crate) mod response;
 pub(crate) mod status_code;
 pub(crate) mod stream;
 pub(crate) mod upgrade_type;
+pub(crate) mod websocket_frame;
 
 pub use any::r#type::*;
 pub use arc_mutex::r#type::*;
@@ -32,6 +33,7 @@ pub use response::{error::Error as ResponseError, r#type::*};
 pub use status_code::r#type::*;
 pub use stream::r#type::*;
 pub use upgrade_type::r#type::*;
+pub use websocket_frame::r#type::*;
 
 pub(crate) use http_compress::*;
 pub(crate) use lombok_macros::*;
