@@ -1,3 +1,5 @@
+pub type StatusCodeUsize = usize;
+
 /// Enumeration of HTTP status codes representing various HTTP response statuses
 ///
 /// This enum includes common HTTP status codes that cover successful requests, client errors,
@@ -48,7 +50,6 @@ pub enum StatusCode {
     TemporaryRedirect,
     /// 308 Permanent Redirect
     PermanentRedirect,
-
     /// 400 Bad Request
     BadRequest,
     /// 401 Unauthorized
@@ -132,5 +133,3 @@ pub enum StatusCode {
     /// Unknown status code
     Unknown,
 }
-
-pub type StatusCodeUsize = usize;
