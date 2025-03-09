@@ -18,9 +18,9 @@ impl StatusCode {
     /// - `&self`: A reference to the `StatusCode` enum instance. This represents the specific variant of the `StatusCode` enum that the method is called on.
     ///
     /// # Return Value
-    /// - `u16`: The numeric HTTP status code associated with the `StatusCode` variant. For example:
+    /// - `StatusCodeUsize`: The numeric HTTP status code associated with the `StatusCode` variant. For example:
     #[inline]
-    pub fn code(&self) -> u16 {
+    pub fn code(&self) -> StatusCodeUsize {
         match self {
             Self::Continue => 100,
             Self::SwitchingProtocols => 101,
@@ -94,12 +94,12 @@ impl StatusCode {
     /// textual representation defined in the `StatusCode` enum.
     ///
     /// # Parameters
-    /// - `code`: A `usize` representing the HTTP status code to convert.
+    /// - `code`: A `StatusCodeUsize` representing the HTTP status code to convert.
     ///
     /// # Return Value
     /// - `String`: A string representing the textual description of the HTTP status code.
     #[inline]
-    pub fn phrase(code: usize) -> String {
+    pub fn phrase(code: StatusCodeUsize) -> String {
         match code {
             100 => Self::Continue.to_string(),
             101 => Self::SwitchingProtocols.to_string(),
