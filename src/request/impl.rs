@@ -89,6 +89,7 @@ impl Request {
         }
         let mut body: RequestBody = Vec::with_capacity(content_length);
         if content_length > 0 {
+            body.resize(content_length, 0);
             let _ = AsyncReadExt::read_exact(reader, &mut body).await;
         }
         let upgrade_type: UpgradeType = headers
@@ -111,7 +112,6 @@ impl Request {
     ///
     /// # Parameters
     /// - `stream`: A reference to a `&ArcRwLockStream` representing the incoming connection.
-    /// - `buffer_size`: Request buffer size
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
@@ -120,7 +120,6 @@ impl Request {
     pub async fn http_request_from_stream(stream: &ArcRwLockStream) -> RequestNewResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-
         Self::http_from_reader(&mut reader).await
     }
 
