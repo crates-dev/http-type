@@ -39,7 +39,7 @@ pub type RequestNewResult = Result<Request, RequestError>;
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the request.
 /// - `upgrade_type`: Upgrade type of the request.
-#[derive(Debug, Clone, Lombok, PartialEq, Eq)]
+#[derive(Debug, Clone, Lombok, PartialEq, Eq, DisplayDebug)]
 pub struct Request {
     #[set(skip)]
     pub(super) method: RequestMethod,

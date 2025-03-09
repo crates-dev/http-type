@@ -29,7 +29,7 @@ pub type ResponseResult = Result<(), ResponseError>;
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the response.
 /// - `response`: The serialized HTTP response including headers and body.
-#[derive(Debug, Clone, Lombok, PartialEq, Eq)]
+#[derive(Debug, Clone, Lombok, PartialEq, Eq, DisplayDebug)]
 pub struct Response {
     #[set(skip)]
     pub(super) version: ResponseVersion,
