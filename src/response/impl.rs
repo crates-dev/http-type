@@ -153,11 +153,8 @@ impl Response {
     }
 
     /// Builds the full HTTP response as a byte vector.
-    ///
-    /// # Returns
-    /// - The serialized HTTP response including headers and body.
     #[inline]
-    pub fn build(&mut self) -> ResponseData {
+    pub(super) fn build(&mut self) {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()));
         }
@@ -208,8 +205,13 @@ impl Response {
         response_string.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_string.into_bytes();
         response_bytes.extend_from_slice(&body);
-        self.set_response(response_bytes.clone());
-        response_bytes
+        self.set_response(response_bytes);
+    }
+
+    /// Builds the full HTTP response body as a byte vector.
+    #[inline]
+    pub(super) fn build_body(&mut self) {
+        self.set_response(self.get_body().clone());
     }
 
     /// Sends the HTTP response body over a TCP stream.
@@ -222,6 +224,7 @@ impl Response {
     /// - `Err`: If an error occurs during sending.
     #[inline]
     pub async fn send_body(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
+        self.build_body();
         let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
         stream
             .write_all(self.get_body())
