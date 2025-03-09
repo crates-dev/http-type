@@ -87,9 +87,8 @@ impl Request {
             }
             headers.insert(key, value);
         }
-        let mut body: RequestBody = Vec::with_capacity(content_length);
+        let mut body: RequestBody = vec![0; content_length];
         if content_length > 0 {
-            body.resize(content_length, 0);
             let _ = AsyncReadExt::read_exact(reader, &mut body).await;
         }
         let upgrade_type: UpgradeType = headers
@@ -164,9 +163,8 @@ impl Request {
         buffer_size: usize,
     ) -> RequestNewResult {
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
-        let mut temp_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
+        let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
         let mut full_frame: Vec<u8> = Vec::with_capacity(buffer_size);
-        temp_buffer.resize(buffer_size, 0);
         loop {
             let len: usize = match reader.read(&mut temp_buffer).await {
                 Ok(len) => len,
