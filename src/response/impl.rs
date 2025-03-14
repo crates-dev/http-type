@@ -211,22 +211,34 @@ impl Response {
     ///
     /// # Parameters
     /// - `stream`: A mutable reference to the `TcpStream` to send the response.
+    /// - `is_websocket`: Is websocket
     ///
     /// # Returns
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
     #[inline]
-    pub async fn send_body(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
+    pub async fn send_body(
+        &mut self,
+        stream_lock: &ArcRwLockStream,
+        is_websocket: bool,
+    ) -> ResponseResult {
         self.build_body();
-        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
-        stream
-            .write_all(self.get_body())
-            .await
-            .map_err(|err| Error::ResponseError(err.to_string()))?;
-        stream
-            .flush()
-            .await
-            .map_err(|err| Error::ResponseError(err.to_string()))?;
+        let body: &ResponseBody = self.get_body();
+        let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
+        let body_list: Vec<ResponseBody> = if is_websocket {
+            WebSocketFrame::create_response_frame_list(body)
+        } else {
+            vec![body.clone()]
+        };
+        for tmp_body in body_list {
+            let response_res: ResponseResult = stream
+                .write_all(&tmp_body)
+                .await
+                .map_err(|err| Error::ResponseError(err.to_string()));
+            if response_res.is_err() {
+                return response_res;
+            }
+        }
         Ok(())
     }
 
@@ -244,7 +256,7 @@ impl Response {
     /// - `ResponseResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
     #[inline]
     pub async fn close(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
+        let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
         stream
             .shutdown()
             .await
@@ -262,13 +274,9 @@ impl Response {
     #[inline]
     pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         self.build();
-        let mut stream: RwLockWriteGuard<'_, TcpStream> = stream_lock.get_write_lock().await;
+        let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
         stream
             .write_all(&self.get_response())
-            .await
-            .map_err(|err| Error::ResponseError(err.to_string()))?;
-        stream
-            .flush()
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
         Ok(())
