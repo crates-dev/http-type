@@ -235,10 +235,6 @@ impl Response {
                 .write_all(&tmp_body)
                 .await
                 .map_err(|err| Error::ResponseError(err.to_string()))?;
-            stream
-                .flush()
-                .await
-                .map_err(|err| Error::ResponseError(err.to_string()))?;
         }
         Ok(())
     }
@@ -278,10 +274,6 @@ impl Response {
         let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
         stream
             .write_all(&self.get_response())
-            .await
-            .map_err(|err| Error::ResponseError(err.to_string()))?;
-        stream
-            .flush()
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
         Ok(())
