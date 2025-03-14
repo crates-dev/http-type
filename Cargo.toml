@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "3.21.1"
+version = "3.22.0"
 edition = "2021"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -24,7 +24,7 @@ serde-xml-rs = "0.6.0"
 serde_json = "1.0.140"
 serde_urlencoded = "0.7.1"
 url = "2.5.4"
-tokio = { version = "1.44.0", features = ["full"] }
+tokio = { version = "1.44.1", features = ["full"] }
 http-compress = "2.3.4"
 
 [profile.dev]

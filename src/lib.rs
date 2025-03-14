@@ -17,8 +17,8 @@ pub(crate) mod upgrade_type;
 pub(crate) mod websocket_frame;
 
 pub use any::r#type::*;
-pub use arc_mutex::r#type::*;
-pub use arc_rwlock::r#type::*;
+pub use arc_mutex::{func::*, r#type::*};
+pub use arc_rwlock::{func::*, r#type::*};
 pub use body::r#type::*;
 pub use content_type::r#type::*;
 pub use file_extension::r#type::*;
