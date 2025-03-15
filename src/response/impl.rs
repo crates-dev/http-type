@@ -279,16 +279,16 @@ impl Response {
         Ok(())
     }
 
-    /// Shutdown the TCP stream.
+    /// Flush the TCP stream.
     ///
     /// - `stream_lock`: A reference to an `ArcRwLockStream` that manages the TCP stream.
     ///
     /// - Returns: A `ResponseResult` indicating success or failure.
     #[inline]
-    pub async fn shutdown(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
+    pub async fn flush(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
         stream
-            .shutdown()
+            .flush()
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
         Ok(())
