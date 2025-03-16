@@ -17,8 +17,6 @@ pub type RequestQuerysValue = String;
 pub type RequestQuerys = HashMap<RequestQuerysKey, RequestQuerysValue>;
 ///  RequestBody
 pub type RequestBody = Vec<u8>;
-/// RequestUpgradeType
-pub type RequestUpgradeType = UpgradeType;
 /// RequestHeaders key
 pub type RequestHeadersKey = String;
 /// RequestHeaders value
@@ -38,7 +36,6 @@ pub type RequestNewResult = Result<Request, RequestError>;
 /// - `query`: The query string of the request (e.g., ?key=value).
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the request.
-/// - `upgrade_type`: Upgrade type of the request.
 #[derive(Debug, Clone, Lombok, PartialEq, Eq, DisplayDebug)]
 pub struct Request {
     #[set(skip)]
@@ -53,6 +50,4 @@ pub struct Request {
     pub(super) headers: RequestHeaders,
     #[set(skip)]
     pub(super) body: RequestBody,
-    #[set(skip)]
-    pub(super) upgrade_type: RequestUpgradeType,
 }

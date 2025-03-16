@@ -1,8 +1,6 @@
 use super::error::Error as ResponseError;
 use crate::*;
 
-///  Response data
-pub type ResponseData = Vec<u8>;
 ///  Response body
 pub type ResponseBody = Vec<u8>;
 ///  Response headers key
@@ -28,7 +26,6 @@ pub type ResponseResult = Result<(), ResponseError>;
 /// - `reason_phrase`: The reason phrase corresponding to the status code (e.g., OK, Not Found).
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the response.
-/// - `response`: The serialized HTTP response including headers and body.
 #[derive(Debug, Clone, Lombok, PartialEq, Eq, DisplayDebug)]
 pub struct Response {
     #[set(skip)]
@@ -39,6 +36,4 @@ pub struct Response {
     pub(super) headers: ResponseHeaders,
     #[set(skip)]
     pub(super) body: ResponseBody,
-    #[set(super)]
-    pub(super) response: ResponseData,
 }

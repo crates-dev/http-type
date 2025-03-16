@@ -21,7 +21,6 @@ impl Response {
             reason_phrase: EMPTY_STR.to_owned(),
             headers: HashMap::new(),
             body: Vec::new(),
-            response: Vec::new(),
         }
     }
 
@@ -147,7 +146,7 @@ impl Response {
 
     /// Builds the full HTTP response as a byte vector.
     #[inline]
-    pub(super) fn build(&mut self) {
+    pub(super) fn build(&mut self) -> Vec<u8> {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()));
         }
@@ -198,13 +197,7 @@ impl Response {
         response_string.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_string.into_bytes();
         response_bytes.extend_from_slice(&body);
-        self.set_response(response_bytes);
-    }
-
-    /// Builds the full HTTP response body as a byte vector.
-    #[inline]
-    pub(super) fn build_body(&mut self) {
-        self.set_response(self.get_body().clone());
+        response_bytes
     }
 
     /// Sends the HTTP response body over a TCP stream.
@@ -222,7 +215,6 @@ impl Response {
         stream_lock: &ArcRwLockStream,
         is_websocket: bool,
     ) -> ResponseResult {
-        self.build_body();
         let body: &ResponseBody = self.get_body();
         let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
         let body_list: Vec<ResponseBody> = if is_websocket {
@@ -270,10 +262,10 @@ impl Response {
     /// - `Err`: If an error occurs during sending.
     #[inline]
     pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        self.build();
+        let data: Vec<u8> = self.build();
         let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
         stream
-            .write_all(&self.get_response())
+            .write_all(&data)
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
         Ok(())
@@ -292,5 +284,21 @@ impl Response {
             .await
             .map_err(|err| Error::ResponseError(err.to_string()))?;
         Ok(())
+    }
+
+    /// Converts the response to a formatted string representation.
+    ///
+    /// - Returns: A `String` containing formatted response details.
+    #[inline]
+    pub fn get_string(&self) -> String {
+        let body: &Vec<u8> = self.get_body();
+        format!(
+            "[Response] => [Version]: {}; [Status Code]: {}; [Reason]: {}; [Headers]: {:?}; [Body]: {};",
+            self.get_version(),
+            self.get_status_code(),
+            self.get_reason_phrase(),
+            self.get_headers(),
+            body_to_string(body),
+        )
     }
 }

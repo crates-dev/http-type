@@ -35,12 +35,17 @@ impl FromStr for UpgradeType {
 
 impl UpgradeType {
     #[inline]
+    pub fn is_http(&self) -> bool {
+        *self == Self::Http
+    }
+
+    #[inline]
     pub fn is_websocket(&self) -> bool {
         *self == Self::WebSocket
     }
 
     #[inline]
-    pub fn is_http(&self) -> bool {
-        *self == Self::Http
+    pub fn is_unknown(&self) -> bool {
+        !self.is_http() && !self.is_websocket()
     }
 }

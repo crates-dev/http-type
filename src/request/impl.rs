@@ -12,7 +12,6 @@ impl Default for Request {
             querys: HashMap::new(),
             headers: HashMap::new(),
             body: Vec::new(),
-            upgrade_type: UpgradeType::default(),
         }
     }
 }
@@ -91,10 +90,6 @@ impl Request {
         if content_length > 0 {
             let _ = AsyncReadExt::read_exact(reader, &mut body).await;
         }
-        let upgrade_type: UpgradeType = headers
-            .get(UPGRADE)
-            .and_then(|data| data.parse::<UpgradeType>().ok())
-            .unwrap_or_default();
         Ok(Request {
             method,
             host,
@@ -103,7 +98,6 @@ impl Request {
             querys,
             headers,
             body,
-            upgrade_type,
         })
     }
 
@@ -370,5 +364,36 @@ impl Request {
     ) -> &mut Self {
         self.querys.insert(key.into(), value.into());
         self
+    }
+
+    /// Converts the request to a formatted string representation.
+    ///
+    /// - Returns: A `String` containing formatted request details.
+    #[inline]
+    pub fn get_string(&self) -> String {
+        let body: &Vec<u8> = self.get_body();
+        format!(
+            "[Request] => [Method]: {}; [Host]: {}; [Version]: {}; [Path]: {}; [Querys]: {:?}; [Headers]: {:?}; [Body]: {};",
+            self.get_method(),
+            self.get_host(),
+            self.get_version(),
+            self.get_path(),
+            self.get_querys(),
+            self.get_headers(),
+            body_to_string(body),
+        )
+    }
+
+    /// Retrieves the upgrade type from the request headers.
+    ///
+    /// - Returns: The `UpgradeType` extracted from the `UPGRADE` header.
+    ///            If the header is missing or invalid, returns the default `UpgradeType`.
+    #[inline]
+    pub fn get_upgrade_type(&self) -> UpgradeType {
+        let upgrade_type: UpgradeType = self
+            .get_header(UPGRADE)
+            .and_then(|data| data.parse::<UpgradeType>().ok())
+            .unwrap_or_default();
+        upgrade_type
     }
 }
