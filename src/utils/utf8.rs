@@ -18,6 +18,6 @@ pub fn is_valid_utf8(data: &[u8]) -> bool {
 pub fn body_to_string(body: &[u8]) -> Cow<'_, str> {
     match std::str::from_utf8(body) {
         Ok(string_data) => Cow::Borrowed(string_data),
-        Err(_) => Cow::Owned(format!("binary data len:{}", body.len())),
+        Err(_) => Cow::Owned(format!("binary data len: {}", body.len())),
     }
 }

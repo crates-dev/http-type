@@ -34,7 +34,7 @@ pub use response::{error::Error as ResponseError, r#type::*};
 pub use status_code::r#type::*;
 pub use stream::r#type::*;
 pub use upgrade_type::r#type::*;
-pub use utils::utf8::*;
+pub use utils::{utf8::*, request::*};
 pub use websocket_frame::r#type::*;
 
 pub(crate) use http_compress::*;
