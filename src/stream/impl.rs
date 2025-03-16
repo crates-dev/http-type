@@ -8,7 +8,7 @@ impl ArcRwLockStream {
 
     #[inline]
     pub fn from_stream(stream: TcpStream) -> Self {
-        Self(Arc::new(RwLock::new(stream)))
+        Self(arc_rwlock(stream))
     }
 
     #[inline]
