@@ -1,4 +1,3 @@
-use super::error::Error;
 use crate::*;
 
 impl Default for Response {
@@ -145,10 +144,12 @@ impl Response {
     }
 
     /// Builds the full HTTP response as a byte vector.
+    /// # Returns
+    /// - `ResponseData`: response data
     #[inline]
-    pub(super) fn build(&mut self) -> Vec<u8> {
+    pub(super) fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
-            self.set_reason_phrase(StatusCode::phrase(*self.get_status_code()));
+            self.set_reason_phrase(HttpStatus::phrase(*self.get_status_code()));
         }
         let mut response_string: String = String::new();
         self.push_http_response_first_line(&mut response_string);
@@ -216,19 +217,31 @@ impl Response {
         is_websocket: bool,
     ) -> ResponseResult {
         let body: &ResponseBody = self.get_body();
-        let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
-        let body_list: Vec<ResponseBody> = if is_websocket {
-            WebSocketFrame::create_response_frame_list(body)
-        } else {
-            vec![body.clone()]
-        };
-        for tmp_body in body_list {
-            stream
-                .write_all(&tmp_body)
-                .await
-                .map_err(|err| Error::ResponseError(err.to_string()))?;
-        }
-        Ok(())
+        stream_lock.send_body(body, is_websocket).await
+    }
+
+    /// Sends the HTTP response over a TCP stream.
+    ///
+    /// # Parameters
+    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
+    ///
+    /// # Returns
+    /// - `Ok`: If the response is successfully sent.
+    /// - `Err`: If an error occurs during sending.
+    #[inline]
+    pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
+        let data: Vec<u8> = self.build();
+        stream_lock.send(&data).await
+    }
+
+    /// Flush the TCP stream.
+    ///
+    /// - `stream_lock`: A reference to an `ArcRwLockStream` that manages the TCP stream.
+    ///
+    /// - Returns: A `ResponseResult` indicating success or failure.
+    #[inline]
+    pub async fn flush(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
+        stream_lock.flush().await
     }
 
     /// Closes the stream after sending the response.
@@ -245,45 +258,7 @@ impl Response {
     /// - `ResponseResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
     #[inline]
     pub async fn close(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
-        stream
-            .shutdown()
-            .await
-            .map_err(|err| ResponseError::CloseError(err.to_string()))
-    }
-
-    /// Sends the HTTP response over a TCP stream.
-    ///
-    /// # Parameters
-    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
-    ///
-    /// # Returns
-    /// - `Ok`: If the response is successfully sent.
-    /// - `Err`: If an error occurs during sending.
-    #[inline]
-    pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        let data: Vec<u8> = self.build();
-        let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
-        stream
-            .write_all(&data)
-            .await
-            .map_err(|err| Error::ResponseError(err.to_string()))?;
-        Ok(())
-    }
-
-    /// Flush the TCP stream.
-    ///
-    /// - `stream_lock`: A reference to an `ArcRwLockStream` that manages the TCP stream.
-    ///
-    /// - Returns: A `ResponseResult` indicating success or failure.
-    #[inline]
-    pub async fn flush(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        let mut stream: RwLockWriteGuardTcpStream = stream_lock.get_write_lock().await;
-        stream
-            .flush()
-            .await
-            .map_err(|err| Error::ResponseError(err.to_string()))?;
-        Ok(())
+        stream_lock.close().await
     }
 
     /// Converts the response to a formatted string representation.

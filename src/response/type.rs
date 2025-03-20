@@ -1,4 +1,3 @@
-use super::error::Error as ResponseError;
 use crate::*;
 
 ///  Response body
@@ -17,6 +16,8 @@ pub type ResponseStatusCode = usize;
 pub type ResponseReasonPhrase = String;
 ///  Response result
 pub type ResponseResult = Result<(), ResponseError>;
+/// Response Data
+pub type ResponseData = Vec<u8>;
 
 /// Represents an HTTP response.
 ///

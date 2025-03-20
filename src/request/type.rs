@@ -1,4 +1,3 @@
-use super::error::Error as RequestError;
 use crate::*;
 
 /// RequestMethod

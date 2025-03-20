@@ -1,4 +1,3 @@
-use super::error::Error;
 use crate::*;
 
 impl Default for Request {
@@ -24,14 +23,14 @@ impl Request {
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
-    /// - `Err`: An `Error` if the request is invalid or cannot be read.
+    /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
     #[inline]
     pub async fn http_from_reader(reader: &mut BufReader<&mut TcpStream>) -> RequestNewResult {
         let mut request_line: String = String::new();
         let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         if parts.len() < 3 {
-            return Err(Error::InvalidHttpRequest);
+            return Err(RequestError::InvalidHttpRequest);
         }
         let method: RequestMethod = parts[0]
             .to_string()
@@ -108,7 +107,7 @@ impl Request {
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
-    /// - `Err`: An `Error` if the request is invalid or cannot be read.
+    /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
     #[inline]
     pub async fn http_request_from_stream(stream: &ArcRwLockStream) -> RequestNewResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
@@ -124,7 +123,7 @@ impl Request {
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
-    /// - `Err`: An `Error` if the request is invalid or cannot be read.
+    /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
     #[inline]
     pub async fn websocket_request_from_stream(
         stream: &ArcRwLockStream,

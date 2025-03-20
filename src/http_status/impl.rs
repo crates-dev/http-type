@@ -1,26 +1,26 @@
 use crate::*;
 
-/// The `StatusCode` enum represents the HTTP status codes.
+/// The `HttpStatus` enum represents the HTTP status codes.
 ///
 /// It maps common HTTP status codes to their respective meanings. It provides methods to retrieve
 /// the corresponding numeric code as well as the associated status text. Additionally, it implements
 /// conversion from a string representation of the status code.
-impl StatusCode {
+impl HttpStatus {
     /// Returns the numeric HTTP status code associated with this status code variant.
     ///
-    /// This method returns the corresponding HTTP numeric status code based on the `StatusCode` variant.
+    /// This method returns the corresponding HTTP numeric status code based on the `HttpStatus` variant.
     /// For example:
     /// - `Self::Ok` returns 200.
     /// - `Self::BadRequest` returns 400.
     /// - `Self::Unknown` returns 0 (the default for unrecognized status codes).
     ///
     /// # Parameters
-    /// - `&self`: A reference to the `StatusCode` enum instance. This represents the specific variant of the `StatusCode` enum that the method is called on.
+    /// - `&self`: A reference to the `HttpStatus` enum instance. This represents the specific variant of the `HttpStatus` enum that the method is called on.
     ///
     /// # Return Value
-    /// - `StatusCodeUsize`: The numeric HTTP status code associated with the `StatusCode` variant. For example:
+    /// - `ResponseStatusCode`: The numeric HTTP status code associated with the `HttpStatus` variant. For example:
     #[inline]
-    pub fn code(&self) -> StatusCodeUsize {
+    pub fn code(&self) -> ResponseStatusCode {
         match self {
             Self::Continue => 100,
             Self::SwitchingProtocols => 101,
@@ -91,15 +91,15 @@ impl StatusCode {
     /// Converts an HTTP status code to its corresponding textual description.
     ///
     /// This method matches a given numeric HTTP status code and returns the corresponding
-    /// textual representation defined in the `StatusCode` enum.
+    /// textual representation defined in the `HttpStatus` enum.
     ///
     /// # Parameters
-    /// - `code`: A `StatusCodeUsize` representing the HTTP status code to convert.
+    /// - `code`: A `ResponseStatusCode` representing the HTTP status code to convert.
     ///
     /// # Return Value
     /// - `String`: A string representing the textual description of the HTTP status code.
     #[inline]
-    pub fn phrase(code: StatusCodeUsize) -> String {
+    pub fn phrase(code: ResponseStatusCode) -> String {
         match code {
             100 => Self::Continue.to_string(),
             101 => Self::SwitchingProtocols.to_string(),
@@ -167,14 +167,25 @@ impl StatusCode {
         }
     }
 
+    /// Compares the current status code with a given string representation.
+    ///
+    /// This method checks if the given `code_str` matches either the numeric HTTP status code
+    /// returned by `code()` or the string representation of the status code variant.
+    /// The comparison is case-insensitive.
+    ///
+    /// # Parameters
+    /// - `&self`: A reference to the `HttpStatus` enum instance.
+    /// - `code_str`: A string slice containing the status code to compare against.
+    ///
+    /// # Return Value
+    /// - `bool`: Returns `true` if `code_str` matches the numeric code or the string representation of `self`, otherwise `false`.
     #[inline]
     pub fn same(&self, code_str: &str) -> bool {
-        self.code().to_string().eq_ignore_ascii_case(code_str)
-            || self.to_string().eq_ignore_ascii_case(code_str)
+        self.to_string().eq_ignore_ascii_case(code_str)
     }
 }
 
-impl Display for StatusCode {
+impl Display for HttpStatus {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
@@ -246,7 +257,7 @@ impl Display for StatusCode {
     }
 }
 
-impl FromStr for StatusCode {
+impl FromStr for HttpStatus {
     type Err = ();
 
     #[inline]
@@ -337,7 +348,7 @@ impl FromStr for StatusCode {
     }
 }
 
-impl Default for StatusCode {
+impl Default for HttpStatus {
     #[inline]
     fn default() -> Self {
         Self::Ok

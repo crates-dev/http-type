@@ -9,6 +9,7 @@ impl WebSocketFrame {
     /// # Returns
     /// - An Option containing a tuple (WebSocketFrame, usize), where the WebSocketFrame is the decoded frame and usize is the number of bytes consumed.
     ///   Returns None if the frame is incomplete.
+    #[inline]
     pub fn decode_websocket_frame_with_length(data: &[u8]) -> WebsocketFrameWithLengthOption {
         if data.len() < 2 {
             return None;
