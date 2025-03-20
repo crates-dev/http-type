@@ -1,7 +1,4 @@
-/// Enumeration of HTTP status codes representing various HTTP response statuses
-///
-/// This enum includes common HTTP status codes that cover successful requests, client errors,
-/// and server errors. Each variant represents a specific HTTP status code.
+/// Enumeration of HTTP status
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HttpStatus {
     /// 100 Continue
