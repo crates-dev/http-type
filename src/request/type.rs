@@ -1,28 +1,30 @@
 use crate::*;
 
-/// RequestMethod
+/// Request method
 pub type RequestMethod = Methods;
-/// RequestHost
+/// Request host
 pub type RequestHost = String;
-/// RequestVersion
+/// Request version
 pub type RequestVersion = HttpVersion;
-/// RequestPath
+/// Request path
 pub type RequestPath = String;
-/// RequestQuerys key
+/// Request querys key
 pub type RequestQuerysKey = String;
-/// RequestQuerys value
+/// Request querys value
 pub type RequestQuerysValue = String;
-/// RequestQuerys
+/// Request querys
 pub type RequestQuerys = HashMap<RequestQuerysKey, RequestQuerysValue>;
-///  RequestBody
+///  Request body
 pub type RequestBody = Vec<u8>;
-/// RequestHeaders key
+///  Request body string
+pub type RequestBodyString = String;
+/// Request headers key
 pub type RequestHeadersKey = String;
-/// RequestHeaders value
+/// Request headers value
 pub type RequestHeadersValue = String;
-/// RequestHeaders
+/// Request headers
 pub type RequestHeaders = HashMap<RequestHeadersKey, RequestHeadersValue>;
-/// RequestNewResult
+/// Request new result
 pub type RequestNewResult = Result<Request, RequestError>;
 
 /// Represents an HTTP request.

@@ -2,6 +2,8 @@ use crate::*;
 
 ///  Response body
 pub type ResponseBody = Vec<u8>;
+///  Response body string
+pub type ResponseBodyString = String;
 ///  Response headers key
 pub type ResponseHeadersKey = String;
 ///  Response headers value
@@ -16,8 +18,10 @@ pub type ResponseStatusCode = usize;
 pub type ResponseReasonPhrase = String;
 ///  Response result
 pub type ResponseResult = Result<(), ResponseError>;
-/// Response Data
+/// Response data
 pub type ResponseData = Vec<u8>;
+/// Response data string
+pub type ResponseDataString = String;
 
 /// Represents an HTTP response.
 ///
