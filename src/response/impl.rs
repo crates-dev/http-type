@@ -18,7 +18,7 @@ impl Response {
             version: HTTP_VERSION_1_1.to_owned(),
             status_code: 200,
             reason_phrase: EMPTY_STR.to_owned(),
-            headers: dash_map(),
+            headers: ResponseHeaders::new(),
             body: Vec::new(),
         }
     }
@@ -158,10 +158,7 @@ impl Response {
         let mut content_type_opt: Option<String> = None;
         let headers: &ResponseHeaders = self.get_headers();
         let mut unset_content_length: bool = false;
-
-        for header in headers.iter() {
-            let key: &str = header.key();
-            let value: &str = header.value();
+        for (key, value) in headers.iter() {
             if key.eq_ignore_ascii_case(CONTENT_LENGTH) {
                 continue;
             } else if key.eq_ignore_ascii_case(CONTENT_ENCODING) {

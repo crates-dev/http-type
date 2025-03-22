@@ -56,6 +56,7 @@ pub(crate) use serde::Serialize;
 pub(crate) use std::{
     any::Any,
     borrow::Cow,
+    collections::HashMap,
     error::Error as StdError,
     fmt::{self, Debug, Display},
     hash::Hash,
