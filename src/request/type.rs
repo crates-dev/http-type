@@ -26,6 +26,10 @@ pub type RequestHeadersValue = String;
 pub type RequestHeaders = HashMap<RequestHeadersKey, RequestHeadersValue>;
 /// Request new result
 pub type RequestNewResult = Result<Request, RequestError>;
+/// RwLockReadGuardRequest
+pub type RwLockReadGuardRequest<'a> = RwLockReadGuard<'a, Request>;
+/// RwLockWriteGuardRequest
+pub type RwLockWriteGuardRequest<'a> = RwLockWriteGuard<'a, Request>;
 
 /// Represents an HTTP request.
 ///

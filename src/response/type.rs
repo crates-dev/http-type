@@ -22,6 +22,10 @@ pub type ResponseResult = Result<(), ResponseError>;
 pub type ResponseData = Vec<u8>;
 /// Response data string
 pub type ResponseDataString = String;
+/// RwLockReadGuardResponse
+pub type RwLockReadGuardResponse<'a> = RwLockReadGuard<'a, Response>;
+/// RwLockWriteGuardResponse
+pub type RwLockWriteGuardResponse<'a> = RwLockWriteGuard<'a, Response>;
 
 /// Represents an HTTP response.
 ///
