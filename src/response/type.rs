@@ -9,7 +9,7 @@ pub type ResponseHeadersKey = String;
 ///  Response headers value
 pub type ResponseHeadersValue = String;
 ///  Response headers
-pub type ResponseHeaders = DashMap<ResponseHeadersKey, ResponseHeadersValue>;
+pub type ResponseHeaders = DashMap<ResponseHeadersKey, ResponseHeadersValue, RandomState>;
 /// Response version
 pub type ResponseVersion = String;
 /// Response status code

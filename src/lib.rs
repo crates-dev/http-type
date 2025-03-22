@@ -35,6 +35,7 @@ pub use utils::{request::*, utf8::*};
 pub use websocket_frame::r#type::*;
 
 pub use ::rayon::prelude::*;
+pub use ahash;
 pub use dash_map::func::*;
 pub use dashmap::*;
 pub use futures;
@@ -51,11 +52,11 @@ pub use std_macro_extensions::*;
 pub use thread::func::*;
 pub use tokio;
 
+pub(crate) use ahash::RandomState;
 pub(crate) use serde::Serialize;
 pub(crate) use std::{
     any::Any,
     borrow::Cow,
-    collections::hash_map::RandomState,
     error::Error as StdError,
     fmt::{self, Debug, Display},
     hash::Hash,

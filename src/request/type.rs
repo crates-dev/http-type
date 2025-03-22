@@ -13,7 +13,7 @@ pub type RequestQuerysKey = String;
 /// Request querys value
 pub type RequestQuerysValue = String;
 /// Request querys
-pub type RequestQuerys = DashMap<RequestQuerysKey, RequestQuerysValue>;
+pub type RequestQuerys = DashMap<RequestQuerysKey, RequestQuerysValue, RandomState>;
 ///  Request body
 pub type RequestBody = Vec<u8>;
 ///  Request body string
@@ -23,7 +23,7 @@ pub type RequestHeadersKey = String;
 /// Request headers value
 pub type RequestHeadersValue = String;
 /// Request headers
-pub type RequestHeaders = DashMap<RequestHeadersKey, RequestHeadersValue>;
+pub type RequestHeaders = DashMap<RequestHeadersKey, RequestHeadersValue, RandomState>;
 /// Request new result
 pub type RequestNewResult = Result<Request, RequestError>;
 

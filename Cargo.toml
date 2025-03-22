@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "3.35.0"
+version = "3.36.0"
 edition = "2024"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -33,6 +33,7 @@ simd-json = "0.15.0"
 futures = "0.3.31"
 std-macro-extensions = "0.22.0"
 num_cpus = "1.16.0"
+ahash = "0.8.11"
 
 [profile.dev]
 incremental = false
