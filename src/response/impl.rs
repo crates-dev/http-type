@@ -18,7 +18,7 @@ impl Response {
             version: HTTP_VERSION_1_1.to_owned(),
             status_code: 200,
             reason_phrase: EMPTY_STR.to_owned(),
-            headers: HashMap::new(),
+            headers: DashMap::new(),
             body: Vec::new(),
         }
     }
@@ -154,24 +154,27 @@ impl Response {
         let mut response_string: String = String::new();
         self.push_http_response_first_line(&mut response_string);
         let mut compress_type_opt: Option<Compress> = None;
-        let mut connection_opt: Option<&str> = None;
-        let mut content_type_opt: Option<&str> = None;
+        let mut connection_opt: Option<String> = None;
+        let mut content_type_opt: Option<String> = None;
         let headers: &ResponseHeaders = self.get_headers();
         let mut unset_content_length: bool = false;
-        for (key, value) in headers {
+
+        for header in headers.iter() {
+            let key: &str = header.key();
+            let value: &str = header.value();
             if key.eq_ignore_ascii_case(CONTENT_LENGTH) {
                 continue;
             } else if key.eq_ignore_ascii_case(CONTENT_ENCODING) {
                 compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
             } else if key.eq_ignore_ascii_case(CONNECTION) {
-                connection_opt = Some(value);
+                connection_opt = Some(value.to_owned());
             } else if key.eq_ignore_ascii_case(CONTENT_TYPE) {
-                content_type_opt = Some(value);
+                content_type_opt = Some(value.to_owned());
                 if value.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
                     unset_content_length = true;
                 }
             }
-            Self::push_header(&mut response_string, key, &value);
+            Self::push_header(&mut response_string, &key, value);
         }
         if connection_opt.is_none() {
             Self::push_header(&mut response_string, CONNECTION, CONNECTION_KEEP_ALIVE);

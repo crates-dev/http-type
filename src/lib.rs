@@ -3,7 +3,6 @@ pub(crate) mod arc_mutex;
 pub(crate) mod arc_rwlock;
 pub(crate) mod content_type;
 pub(crate) mod file_extension;
-pub(crate) mod header;
 pub(crate) mod http_status;
 pub(crate) mod http_url;
 pub(crate) mod http_version;
@@ -16,17 +15,19 @@ pub(crate) mod upgrade_type;
 pub(crate) mod utils;
 pub(crate) mod websocket_frame;
 
+pub use ::rayon::prelude::*;
 pub use any::r#type::*;
 pub use arc_mutex::{func::*, r#type::*};
 pub use arc_rwlock::{func::*, r#type::*};
 pub use content_type::r#type::*;
+pub use dashmap::*;
 pub use file_extension::r#type::*;
-pub use header::r#type::*;
 pub use http_constant::*;
 pub use http_status::r#type::*;
 pub use http_url::{error::Error as HttpUrlError, r#type::*};
 pub use http_version::r#type::*;
 pub use methods::r#type::*;
+pub use once_cell;
 pub use protocol::r#type::*;
 pub use request::{error::Error as RequestError, r#type::*};
 pub use response::{error::Error as ResponseError, r#type::*};
@@ -43,7 +44,6 @@ pub(crate) use serde_xml_rs;
 pub(crate) use std::{
     any::Any,
     borrow::Cow,
-    collections::HashMap,
     error::Error as StdError,
     fmt::{self, Debug, Display},
     net::{IpAddr, SocketAddr},

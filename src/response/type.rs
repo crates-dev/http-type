@@ -9,7 +9,7 @@ pub type ResponseHeadersKey = String;
 ///  Response headers value
 pub type ResponseHeadersValue = String;
 ///  Response headers
-pub type ResponseHeaders = HashMap<ResponseHeadersKey, ResponseHeadersValue>;
+pub type ResponseHeaders = DashMap<ResponseHeadersKey, ResponseHeadersValue>;
 /// Response version
 pub type ResponseVersion = String;
 /// Response status code
@@ -31,7 +31,7 @@ pub type ResponseDataString = String;
 /// - `reason_phrase`: The reason phrase corresponding to the status code.
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the response.
-#[derive(Debug, Clone, Lombok, PartialEq, Eq, DisplayDebug)]
+#[derive(Debug, Clone, Lombok, DisplayDebug)]
 pub struct Response {
     #[set(skip)]
     pub(super) version: ResponseVersion,
