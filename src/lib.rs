@@ -2,6 +2,7 @@ pub(crate) mod any;
 pub(crate) mod arc_mutex;
 pub(crate) mod arc_rwlock;
 pub(crate) mod content_type;
+pub(crate) mod dash_map;
 pub(crate) mod file_extension;
 pub(crate) mod http_status;
 pub(crate) mod http_url;
@@ -11,6 +12,7 @@ pub(crate) mod protocol;
 pub(crate) mod request;
 pub(crate) mod response;
 pub(crate) mod stream;
+pub(crate) mod thread;
 pub(crate) mod upgrade_type;
 pub(crate) mod utils;
 pub(crate) mod websocket_frame;
@@ -33,25 +35,30 @@ pub use utils::{request::*, utf8::*};
 pub use websocket_frame::r#type::*;
 
 pub use ::rayon::prelude::*;
+pub use dash_map::func::*;
 pub use dashmap::*;
 pub use futures;
 pub use http_compress::*;
 pub use http_constant::*;
 pub use lombok_macros::*;
+pub use num_cpus;
 pub use once_cell;
 pub use serde;
 pub use serde_json;
 pub use serde_xml_rs;
 pub use simd_json;
 pub use std_macro_extensions::*;
+pub use thread::func::*;
 pub use tokio;
 
 pub(crate) use serde::Serialize;
 pub(crate) use std::{
     any::Any,
     borrow::Cow,
+    collections::hash_map::RandomState,
     error::Error as StdError,
     fmt::{self, Debug, Display},
+    hash::Hash,
     net::{IpAddr, SocketAddr},
     str::FromStr,
     str::SplitN,

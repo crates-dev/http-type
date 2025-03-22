@@ -8,8 +8,8 @@ impl Default for Request {
             host: String::new(),
             version: HttpVersion::default(),
             path: String::new(),
-            querys: DashMap::new(),
-            headers: DashMap::new(),
+            querys: dash_map(),
+            headers: dash_map(),
             body: Vec::new(),
         }
     }
@@ -61,7 +61,7 @@ impl Request {
         } else {
             full_path
         };
-        let headers: RequestHeaders = DashMap::new();
+        let headers: RequestHeaders = dash_map();
         let mut host: RequestHost = EMPTY_STR.to_owned();
         let mut content_length: usize = 0;
         loop {
@@ -191,7 +191,7 @@ impl Request {
     /// - RequestQuerys
     #[inline]
     fn parse_querys(query: &str) -> RequestQuerys {
-        let query_map: RequestQuerys = DashMap::new();
+        let query_map: RequestQuerys = dash_map();
         for pair in query.split(AND) {
             let mut parts: SplitN<'_, &str> = pair.splitn(2, EQUAL);
             let key: String = parts.next().unwrap_or_default().to_string();
