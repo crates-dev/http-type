@@ -21,6 +21,7 @@ pub use any::r#type::*;
 pub use arc_mutex::{func::*, r#type::*};
 pub use arc_rwlock::{func::*, r#type::*};
 pub use content_type::r#type::*;
+pub use dash_map::{func::*, r#type::*};
 pub use file_extension::r#type::*;
 pub use http_status::r#type::*;
 pub use http_url::{error::Error as HttpUrlError, r#type::*};
@@ -36,7 +37,6 @@ pub use websocket_frame::r#type::*;
 
 pub use ::rayon::prelude::*;
 pub use ahash;
-pub use dash_map::func::*;
 pub use dashmap::*;
 pub use futures;
 pub use http_compress::*;
