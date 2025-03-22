@@ -10,6 +10,7 @@ pub(crate) mod http_url;
 pub(crate) mod http_version;
 pub(crate) mod methods;
 pub(crate) mod protocol;
+pub(crate) mod rc_rwlock;
 pub(crate) mod request;
 pub(crate) mod response;
 pub(crate) mod stream;
@@ -30,6 +31,7 @@ pub use http_url::{error::Error as HttpUrlError, r#type::*};
 pub use http_version::r#type::*;
 pub use methods::r#type::*;
 pub use protocol::r#type::*;
+pub use rc_rwlock::{func::*, r#type::*};
 pub use request::{error::Error as RequestError, r#type::*};
 pub use response::{error::Error as ResponseError, r#type::*};
 pub use stream::r#type::*;
@@ -65,6 +67,7 @@ pub(crate) use std::{
     fmt::{self, Debug, Display},
     hash::Hash,
     net::{IpAddr, SocketAddr},
+    rc::Rc,
     str::FromStr,
     str::SplitN,
     sync::Arc,
