@@ -1,6 +1,7 @@
 pub(crate) mod any;
 pub(crate) mod arc_mutex;
 pub(crate) mod arc_rwlock;
+pub(crate) mod box_rwlock;
 pub(crate) mod content_type;
 pub(crate) mod dash_map;
 pub(crate) mod file_extension;
@@ -20,6 +21,7 @@ pub(crate) mod websocket_frame;
 pub use any::r#type::*;
 pub use arc_mutex::{func::*, r#type::*};
 pub use arc_rwlock::{func::*, r#type::*};
+pub use box_rwlock::{func::*, r#type::*};
 pub use content_type::r#type::*;
 pub use dash_map::{func::*, r#type::*};
 pub use file_extension::r#type::*;
