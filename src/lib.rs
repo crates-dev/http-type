@@ -52,6 +52,7 @@ pub use simd_json;
 pub use std_macro_extensions::*;
 pub use thread::func::*;
 pub use tokio;
+pub use urlencoding;
 
 pub(crate) use serde::Serialize;
 pub(crate) use std::{
