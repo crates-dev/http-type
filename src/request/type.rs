@@ -13,7 +13,7 @@ pub type RequestQuerysKey = String;
 /// Request querys value
 pub type RequestQuerysValue = String;
 /// Request querys
-pub type RequestQuerys = HashMap<RequestQuerysKey, RequestQuerysValue>;
+pub type RequestQuerys = DashMapRandomState<RequestQuerysKey, RequestQuerysValue>;
 ///  Request body
 pub type RequestBody = Vec<u8>;
 ///  Request body string
@@ -23,7 +23,7 @@ pub type RequestHeadersKey = String;
 /// Request headers value
 pub type RequestHeadersValue = String;
 /// Request headers
-pub type RequestHeaders = HashMap<RequestHeadersKey, RequestHeadersValue>;
+pub type RequestHeaders = DashMapRandomState<RequestHeadersKey, RequestHeadersValue>;
 /// Request new result
 pub type RequestNewResult = Result<Request, RequestError>;
 /// RwLockReadGuardRequest

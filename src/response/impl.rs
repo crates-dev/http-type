@@ -18,7 +18,7 @@ impl Response {
             version: HTTP_VERSION_1_1.to_owned(),
             status_code: 200,
             reason_phrase: EMPTY_STR.to_owned(),
-            headers: ResponseHeaders::new(),
+            headers: dash_map(),
             body: Vec::new(),
         }
     }
@@ -158,10 +158,13 @@ impl Response {
         let mut content_type_opt: Option<String> = None;
         let headers: &ResponseHeaders = self.get_headers();
         let mut unset_content_length: bool = false;
-        for (key, value) in headers.iter() {
+        for tem_header in headers.iter() {
+            let key: &String = tem_header.key();
             if key.eq_ignore_ascii_case(CONTENT_LENGTH) {
                 continue;
-            } else if key.eq_ignore_ascii_case(CONTENT_ENCODING) {
+            }
+            let value: &String = tem_header.value();
+            if key.eq_ignore_ascii_case(CONTENT_ENCODING) {
                 compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
             } else if key.eq_ignore_ascii_case(CONNECTION) {
                 connection_opt = Some(value.to_owned());
