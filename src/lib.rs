@@ -80,4 +80,3 @@ pub(crate) use tokio::{
     net::TcpStream,
     sync::{Mutex, MutexGuard, RwLock, RwLockReadGuard, RwLockWriteGuard},
 };
-pub(crate) use twox_hash::XxHash3_64;
