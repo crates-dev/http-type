@@ -56,9 +56,10 @@ pub use simd_json;
 pub use std_macro_extensions::*;
 pub use thread::func::*;
 pub use tokio;
+pub use twox_hash;
 pub use urlencoding;
 
-pub(crate) use ahash::RandomState;
+pub(crate) use core::hash::BuildHasherDefault;
 pub(crate) use serde::Serialize;
 pub(crate) use std::{
     any::Any,
@@ -77,3 +78,4 @@ pub(crate) use tokio::{
     net::TcpStream,
     sync::{Mutex, MutexGuard, RwLock, RwLockReadGuard, RwLockWriteGuard},
 };
+pub(crate) use twox_hash::XxHash3_64;
