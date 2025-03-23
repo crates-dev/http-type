@@ -19,7 +19,6 @@ impl HttpStatus {
     ///
     /// # Return Value
     /// - `ResponseStatusCode`: The numeric HTTP status code associated with the `HttpStatus` variant. For example:
-    #[inline]
     pub fn code(&self) -> ResponseStatusCode {
         match self {
             Self::Continue => 100,
@@ -98,7 +97,6 @@ impl HttpStatus {
     ///
     /// # Return Value
     /// - `String`: A string representing the textual description of the HTTP status code.
-    #[inline]
     pub fn phrase(code: ResponseStatusCode) -> String {
         match code {
             100 => Self::Continue.to_string(),
@@ -179,14 +177,12 @@ impl HttpStatus {
     ///
     /// # Return Value
     /// - `bool`: Returns `true` if `code_str` matches the numeric code or the string representation of `self`, otherwise `false`.
-    #[inline]
     pub fn same(&self, code_str: &str) -> bool {
         self.to_string().eq_ignore_ascii_case(code_str)
     }
 }
 
 impl Display for HttpStatus {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::Continue => "Continue",
@@ -260,7 +256,6 @@ impl Display for HttpStatus {
 impl FromStr for HttpStatus {
     type Err = ();
 
-    #[inline]
     fn from_str(code_str: &str) -> Result<Self, Self::Err> {
         match code_str {
             _code_str if Self::Continue.same(_code_str) => Ok(Self::Continue),
@@ -349,7 +344,6 @@ impl FromStr for HttpStatus {
 }
 
 impl Default for HttpStatus {
-    #[inline]
     fn default() -> Self {
         Self::Ok
     }

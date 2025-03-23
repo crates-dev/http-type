@@ -1,14 +1,12 @@
 use crate::*;
 
 impl Default for HttpVersion {
-    #[inline]
     fn default() -> Self {
         Self::Unknown(String::new())
     }
 }
 
 impl fmt::Display for HttpVersion {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let version_str = match self {
             Self::HTTP0_9 => HTTP_VERSION_0_9,
@@ -25,7 +23,6 @@ impl fmt::Display for HttpVersion {
 impl FromStr for HttpVersion {
     type Err = String;
 
-    #[inline]
     fn from_str(version_str: &str) -> Result<Self, Self::Err> {
         match version_str {
             version_0_9 if version_0_9 == HTTP_VERSION_0_9 => Ok(Self::HTTP0_9),
@@ -40,43 +37,36 @@ impl FromStr for HttpVersion {
 
 impl HttpVersion {
     /// Checks if the current version is HTTP/0.9.
-    #[inline]
     pub fn is_http0_9(&self) -> bool {
         matches!(self, Self::HTTP0_9)
     }
 
     /// Checks if the current version is HTTP/1.0.
-    #[inline]
     pub fn is_http1_0(&self) -> bool {
         matches!(self, Self::HTTP1_0)
     }
 
     /// Checks if the current version is HTTP/1.1.
-    #[inline]
     pub fn is_http1_1(&self) -> bool {
         matches!(self, Self::HTTP1_1)
     }
 
     /// Checks if the current version is HTTP/2.
-    #[inline]
     pub fn is_http2(&self) -> bool {
         matches!(self, Self::HTTP2)
     }
 
     /// Checks if the current version is HTTP/3.
-    #[inline]
     pub fn is_http3(&self) -> bool {
         matches!(self, Self::HTTP3)
     }
 
     /// Checks if the current version is unknown.
-    #[inline]
     pub fn is_unknown(&self) -> bool {
         matches!(self, Self::Unknown(_))
     }
 
     /// Checks if the current version is HTTP/1.1 or higher.
-    #[inline]
     pub fn is_http1_1_or_higher(&self) -> bool {
         match self {
             Self::HTTP1_1 | Self::HTTP2 | Self::HTTP3 => true,
@@ -85,7 +75,6 @@ impl HttpVersion {
     }
 
     /// Checks if the current version is http.
-    #[inline]
     pub fn is_http(&self) -> bool {
         !self.is_unknown()
     }

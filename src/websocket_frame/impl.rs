@@ -9,7 +9,6 @@ impl WebSocketFrame {
     /// # Returns
     /// - An Option containing a tuple (WebSocketFrame, usize), where the WebSocketFrame is the decoded frame and usize is the number of bytes consumed.
     ///   Returns None if the frame is incomplete.
-    #[inline]
     pub fn decode_websocket_frame_with_length(data: &[u8]) -> WebsocketFrameWithLengthOption {
         if data.len() < 2 {
             return None;
@@ -67,7 +66,6 @@ impl WebSocketFrame {
     ///
     /// - `body`: A reference to a response body (payload) as a byte slice.
     /// - Returns: A vector of response bodies (frames) representing the framed data.
-    #[inline]
     pub fn create_response_frame_list(body: &ResponseBody) -> Vec<ResponseBody> {
         let total_len: usize = body.len();
         let mut offset: usize = 0;
@@ -111,7 +109,6 @@ impl WebSocketFrame {
     ///
     /// - `data`: A byte slice containing the input data to be hashed.
     /// - Returns: A 20-byte array representing the SHA-1 hash of the input data.
-    #[inline]
     pub fn sha1(data: &[u8]) -> [u8; 20] {
         let mut hash_state: [u32; 5] = HASH_STATE;
         let mut padded_data: Vec<u8> = Vec::from(data);
@@ -175,7 +172,6 @@ impl WebSocketFrame {
     ///
     /// - `key`: A string slice containing the client-provided key.
     /// - Returns: A string representing the generated WebSocket accept key.
-    #[inline]
     pub fn generate_accept_key(key: &str) -> String {
         let mut data: [u8; 60] = [0u8; 60];
         data[..24].copy_from_slice(&key.as_bytes()[..24.min(key.len())]);
@@ -188,7 +184,6 @@ impl WebSocketFrame {
     ///
     /// - `data`: A byte slice containing the data to encode in base64.
     /// - Returns: A string with the base64 encoded representation of the input data.
-    #[inline]
     pub fn base64_encode(data: &[u8]) -> String {
         let mut encoded_data: Vec<u8> = Vec::with_capacity((data.len() + 2) / 3 * 4);
         for chunk in data.chunks(3) {

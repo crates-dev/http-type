@@ -3,7 +3,6 @@ use crate::*;
 use url::Url as UrlParser;
 
 impl Default for HttpUrlComponents {
-    #[inline]
     fn default() -> Self {
         HttpUrlComponents {
             protocol: Protocol::Unknown(String::new()),
@@ -29,7 +28,6 @@ impl HttpUrlComponents {
     /// # Returns
     /// Returns a `Result` containing either a `HttpUrlComponents ` instance populated with the
     /// parsed components or an `Error::InvalidUrl` if the parsing fails.
-    #[inline]
     pub fn parse(url_str: &str) -> Result<Self, Error> {
         let parsed_url: UrlParser = UrlParser::parse(url_str).map_err(|_| Error::InvalidUrl)?;
         let res: Self = Self {

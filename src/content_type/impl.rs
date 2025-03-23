@@ -13,7 +13,6 @@ impl ContentType {
     /// # Returns
     /// A string containing the serialized JSON representation of the provided data.
     /// If serialization fails, it returns an empty JSON object (`{}`).
-    #[inline]
     fn get_application_json<T: Serialize + Display>(data: &T) -> String {
         serde_json::to_string(data).unwrap_or_else(|_| String::from("{}"))
     }
@@ -30,7 +29,6 @@ impl ContentType {
     /// # Returns
     /// A string containing the serialized XML representation of the provided data.
     /// If serialization fails, it returns an empty XML root element (`<root></root>`).
-    #[inline]
     fn get_application_xml<T: Serialize + Display>(data: &T) -> String {
         serde_xml_rs::to_string(data).unwrap_or_else(|_| String::from("<root></root>"))
     }
@@ -46,7 +44,6 @@ impl ContentType {
     ///
     /// # Returns
     /// A plain text string representing the provided data, formatted with the `Debug` trait.
-    #[inline]
     fn get_text_plain<T: Serialize + Debug + Clone + Default + Display>(data: &T) -> String {
         data.to_string()
     }
@@ -62,7 +59,6 @@ impl ContentType {
     ///
     /// # Returns
     /// A string containing the HTML representation of the provided data, inside a table row.
-    #[inline]
     fn get_text_html<T: Serialize + Debug + Clone + Default>(data: &T) -> String {
         let mut html: String = String::from("<table>");
         html.push_str(&format!("<tr><td>{:?}</td></tr>", data));
@@ -82,7 +78,6 @@ impl ContentType {
     /// # Returns
     /// A string containing the URL-encoded representation of the provided data.
     /// If serialization fails, it returns an empty string.
-    #[inline]
     fn get_form_url_encoded<T: Serialize + Display>(data: &T) -> String {
         serde_urlencoded::to_string(data).unwrap_or_else(|_| String::from(""))
     }
@@ -98,7 +93,6 @@ impl ContentType {
     ///
     /// # Returns
     /// A string containing the hexadecimal encoding of the provided data.
-    #[inline]
     fn get_binary<T: Serialize + Debug + Clone + Default + Display>(data: &T) -> String {
         hex::encode(data.to_string())
     }
@@ -116,7 +110,6 @@ impl ContentType {
     ///
     /// # Returns
     /// A string containing the formatted body based on the content type, such as JSON, XML, plain text, HTML, etc.
-    #[inline]
     pub fn get_body_string<T: Serialize + Debug + Clone + Default + Display>(
         &self,
         data: &T,
@@ -135,7 +128,6 @@ impl ContentType {
 impl FromStr for ContentType {
     type Err = ();
 
-    #[inline]
     fn from_str(data: &str) -> Result<Self, Self::Err> {
         match data.to_ascii_lowercase() {
             _data if _data == APPLICATION_JSON => Ok(Self::ApplicationJson),
@@ -149,7 +141,6 @@ impl FromStr for ContentType {
 }
 
 impl Default for ContentType {
-    #[inline]
     fn default() -> Self {
         Self::Unknown
     }

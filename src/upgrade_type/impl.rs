@@ -1,14 +1,12 @@
 use crate::*;
 
 impl Default for UpgradeType {
-    #[inline]
     fn default() -> Self {
         Self::Unknown(String::new())
     }
 }
 
 impl fmt::Display for UpgradeType {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             UpgradeType::Http => write!(f, "{}", HTTP_LOWERCASE),
@@ -21,7 +19,6 @@ impl fmt::Display for UpgradeType {
 impl FromStr for UpgradeType {
     type Err = ();
 
-    #[inline]
     fn from_str(from_str: &str) -> Result<Self, Self::Err> {
         match from_str {
             tmp_from_str if tmp_from_str == HTTP_LOWERCASE => Ok(UpgradeType::Http),
@@ -37,7 +34,6 @@ impl UpgradeType {
     /// - `self` - The current instance of the enum.
     ///
     /// - Returns `true` if `self` is `Self::Http`, otherwise `false`.
-    #[inline]
     pub fn is_http(&self) -> bool {
         *self == Self::Http
     }
@@ -47,7 +43,6 @@ impl UpgradeType {
     /// - `self` - The current instance of the enum.
     ///
     /// - Returns `true` if `self` is `Self::WebSocket`, otherwise `false`.
-    #[inline]
     pub fn is_websocket(&self) -> bool {
         *self == Self::WebSocket
     }
@@ -57,7 +52,6 @@ impl UpgradeType {
     /// - `self` - The current instance of the enum.
     ///
     /// - Returns `true` if `self` is neither `Self::Http` nor `Self::WebSocket`, otherwise `false`.
-    #[inline]
     pub fn is_unknown(&self) -> bool {
         !self.is_http() && !self.is_websocket()
     }

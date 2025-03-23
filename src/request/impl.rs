@@ -1,7 +1,6 @@
 use crate::*;
 
 impl Default for Request {
-    #[inline]
     fn default() -> Self {
         Self {
             method: Methods::default(),
@@ -25,7 +24,6 @@ impl Request {
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
-    #[inline]
     pub async fn http_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
@@ -113,7 +111,6 @@ impl Request {
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
-    #[inline]
     pub async fn http_request_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
@@ -132,7 +129,6 @@ impl Request {
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
-    #[inline]
     pub async fn websocket_request_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
@@ -158,7 +154,6 @@ impl Request {
     ///   - If no data is read (`Ok(0)`), an empty `Request` object is returned.
     ///   - If data is successfully read, the request body is set with the received bytes.
     /// - `Err(RequestError::InvalidWebSocketRequest)` - If an error occurs while reading from the stream.
-    #[inline]
     pub async fn websocket_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
@@ -197,7 +192,6 @@ impl Request {
     ///
     /// # Returns
     /// - RequestQuerys
-    #[inline]
     fn parse_querys(query: &str) -> RequestQuerys {
         let mut query_map: RequestQuerys = hash_map_xxhash3_64();
         for pair in query.split(AND) {
@@ -219,7 +213,6 @@ impl Request {
     /// # Returns
     /// - `Option<RequestQuerysValue>`: Returns `Some(value)` if the key exists in the query parameters,
     ///   or `None` if the key does not exist.
-    #[inline]
     pub fn get_query<K>(&self, key: K) -> Option<RequestQuerysValue>
     where
         K: Into<RequestQuerysKey>,
@@ -237,7 +230,6 @@ impl Request {
     /// # Returns
     /// - `Option<RequestHeadersValue>`: Returns `Some(value)` if the key exists in the request headers,
     ///   or `None` if the key does not exist.
-    #[inline]
     pub fn get_header<K>(&self, key: K) -> Option<RequestHeadersValue>
     where
         K: Into<RequestHeadersKey>,
@@ -258,7 +250,6 @@ impl Request {
     ///
     /// # Returns
     /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
-    #[inline]
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<String>,
@@ -292,7 +283,6 @@ impl Request {
     ///
     /// # Return Value
     /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    #[inline]
     pub fn set_body<T: Into<RequestBody>>(&mut self, body: T) -> &mut Self {
         self.body = body.into();
         self
@@ -311,7 +301,6 @@ impl Request {
     ///
     /// # Return Value
     /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    #[inline]
     pub fn set_method<T: Into<RequestMethod>>(&mut self, method: T) -> &mut Self {
         self.method = method.into();
         self
@@ -330,7 +319,6 @@ impl Request {
     ///
     /// # Return Value
     /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    #[inline]
     pub fn set_host<T: Into<RequestHost>>(&mut self, host: T) -> &mut Self {
         self.host = host.into();
         self
@@ -349,7 +337,6 @@ impl Request {
     ///
     /// # Return Value
     /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    #[inline]
     pub fn set_path<T: Into<RequestPath>>(&mut self, path: T) -> &mut Self {
         self.path = path.into();
         self
@@ -363,7 +350,6 @@ impl Request {
     ///
     /// # Returns
     /// - Returns a mutable reference to the current instance (`Self`), allowing for method chaining.
-    #[inline]
     pub fn set_query<K: Into<RequestQuerysKey>, V: Into<RequestQuerysValue>>(
         &mut self,
         key: K,
@@ -376,7 +362,6 @@ impl Request {
     /// Converts the request to a formatted string representation.
     ///
     /// - Returns: A `String` containing formatted request details.
-    #[inline]
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
         format!(
@@ -395,7 +380,6 @@ impl Request {
     ///
     /// - Returns: The `UpgradeType` extracted from the `UPGRADE` header.
     ///            If the header is missing or invalid, returns the default `UpgradeType`.
-    #[inline]
     pub fn get_upgrade_type(&self) -> UpgradeType {
         let upgrade_type: UpgradeType = self
             .get_header(UPGRADE)

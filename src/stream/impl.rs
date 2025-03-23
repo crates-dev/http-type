@@ -1,22 +1,18 @@
 use crate::*;
 
 impl ArcRwLockStream {
-    #[inline]
     pub fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
         Self(arc_rw_lock_stream)
     }
 
-    #[inline]
     pub fn from_stream(stream: TcpStream) -> Self {
         Self(arc_rwlock(stream))
     }
 
-    #[inline]
     pub async fn get_read_lock(&self) -> RwLockReadGuardTcpStream {
         self.0.read().await
     }
 
-    #[inline]
     pub async fn get_write_lock(&self) -> RwLockWriteGuardTcpStream {
         self.0.write().await
     }
@@ -29,7 +25,6 @@ impl ArcRwLockStream {
     /// # Returns
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    #[inline]
     pub async fn send(&self, data: &ResponseData) -> ResponseResult {
         let mut stream: RwLockWriteGuardTcpStream = self.get_write_lock().await;
         stream
@@ -48,7 +43,6 @@ impl ArcRwLockStream {
     /// # Returns
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    #[inline]
     pub async fn send_body(&self, body: &ResponseBody, is_websocket: bool) -> ResponseResult {
         let mut stream: RwLockWriteGuardTcpStream = self.get_write_lock().await;
         let body_list: Vec<ResponseBody> = if is_websocket {
@@ -68,7 +62,6 @@ impl ArcRwLockStream {
     /// Flush the TCP stream.    
     ///
     /// - Returns: A `ResponseResult` indicating success or failure.
-    #[inline]
     pub async fn flush(&self) -> ResponseResult {
         let mut stream: RwLockWriteGuardTcpStream = self.get_write_lock().await;
         stream
@@ -87,7 +80,6 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     /// - `ResponseResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
-    #[inline]
     pub async fn close(&self) -> ResponseResult {
         let mut stream: RwLockWriteGuardTcpStream = self.get_write_lock().await;
         stream

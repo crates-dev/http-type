@@ -1,7 +1,6 @@
 use crate::*;
 
 impl Default for Response {
-    #[inline]
     fn default() -> Self {
         Self::new()
     }
@@ -12,7 +11,6 @@ impl Response {
     ///
     /// # Returns
     /// - An initialized `Response` with default values.
-    #[inline]
     pub fn new() -> Self {
         Response {
             version: HTTP_VERSION_1_1.to_owned(),
@@ -31,7 +29,6 @@ impl Response {
     /// # Returns
     /// - `Option<ResponseHeadersValue>`: Returns `Some(value)` if the key exists in the response headers,
     ///   or `None` if the key does not exist.
-    #[inline]
     pub fn get_header<K>(&self, key: K) -> Option<ResponseHeadersValue>
     where
         K: Into<ResponseHeadersKey>,
@@ -52,7 +49,6 @@ impl Response {
     ///
     /// # Returns
     /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
-    #[inline]
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -86,7 +82,6 @@ impl Response {
     ///
     /// # Return Value
     /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    #[inline]
     pub fn set_body<T: Into<ResponseBody>>(&mut self, body: T) -> &mut Self {
         self.body = body.into();
         self
@@ -105,7 +100,6 @@ impl Response {
     ///
     /// # Return Value
     /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    #[inline]
     pub fn set_reason_phrase<T: Into<ResponseReasonPhrase>>(
         &mut self,
         reason_phrase: T,
@@ -120,7 +114,6 @@ impl Response {
     /// - `response_string`: A mutable reference to the string where the header will be added.
     /// - `key`: The header key as a string slice (`&str`).
     /// - `value`: The header value as a string slice (`&str`).
-    #[inline]
     pub(super) fn push_header(response_string: &mut String, key: &str, value: &str) {
         response_string.push_str(&format!("{}{}{}{}", key, COLON_SPACE, value, HTTP_BR));
     }
@@ -130,7 +123,6 @@ impl Response {
     ///
     /// # Parameters
     /// - `response_string`: A mutable reference to the string where the first line will be added.
-    #[inline]
     pub(super) fn push_http_response_first_line(&self, response_string: &mut String) {
         response_string.push_str(&format!(
             "{}{}{}{}{}{}",
@@ -146,7 +138,6 @@ impl Response {
     /// Builds the full HTTP response as a byte vector.
     /// # Returns
     /// - `ResponseData`: response data
-    #[inline]
     pub(super) fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(HttpStatus::phrase(*self.get_status_code()));
@@ -214,7 +205,6 @@ impl Response {
     /// # Returns
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    #[inline]
     pub async fn send_body(
         &mut self,
         stream_lock: &ArcRwLockStream,
@@ -232,7 +222,6 @@ impl Response {
     /// # Returns
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    #[inline]
     pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         let data: Vec<u8> = self.build();
         stream_lock.send(&data).await
@@ -243,7 +232,6 @@ impl Response {
     /// - `stream_lock`: A reference to an `ArcRwLockStream` that manages the TCP stream.
     ///
     /// - Returns: A `ResponseResult` indicating success or failure.
-    #[inline]
     pub async fn flush(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         stream_lock.flush().await
     }
@@ -260,7 +248,6 @@ impl Response {
     ///
     /// # Returns
     /// - `ResponseResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
-    #[inline]
     pub async fn close(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
         stream_lock.close().await
     }
@@ -268,7 +255,6 @@ impl Response {
     /// Converts the response to a formatted string representation.
     ///
     /// - Returns: A `String` containing formatted response details.
-    #[inline]
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
         format!(

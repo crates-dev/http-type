@@ -15,7 +15,6 @@ pub enum Error {
 impl StdError for Error {}
 
 impl Display for Error {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::InvalidUrl => write!(f, "Invalid URL"),

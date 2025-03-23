@@ -1,25 +1,21 @@
 use crate::*;
 
 impl Default for FileExtension {
-    #[inline]
     fn default() -> Self {
         Self::FileExtensionEmpty
     }
 }
 
 impl FileExtension {
-    #[inline]
     pub fn parse(file_extension: &str) -> Self {
         file_extension.parse::<Self>().unwrap_or_default()
     }
 
-    #[inline]
     pub fn get_extension_name(full_path: &str) -> String {
         let ext_name: String = full_path.split(POINT).last().unwrap_or_default().to_owned();
         ext_name
     }
 
-    #[inline]
     pub fn get_content_type(&self) -> &'static str {
         match self {
             Self::FileExtension123 => APPLICATION_VND_LOTUS_1_2_3,
@@ -1056,7 +1052,6 @@ impl FileExtension {
 impl FromStr for FileExtension {
     type Err = ();
 
-    #[inline]
     fn from_str(data: &str) -> Result<Self, Self::Err> {
         match data {
             _data if _data == FILE_EXTENSION_123 => Ok(Self::FileExtension123),
@@ -2076,7 +2071,6 @@ impl FromStr for FileExtension {
 }
 
 impl Display for FileExtension {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let version_str = match self {
             Self::FileExtension123 => FILE_EXTENSION_123,
