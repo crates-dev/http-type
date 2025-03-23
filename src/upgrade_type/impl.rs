@@ -11,7 +11,7 @@ impl fmt::Display for UpgradeType {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            UpgradeType::Http => write!(f, "{}", HTTP),
+            UpgradeType::Http => write!(f, "{}", HTTP_LOWERCASE),
             UpgradeType::WebSocket => write!(f, "{}", WEBSOCKET),
             UpgradeType::Unknown(tmp_str) => write!(f, "{}", tmp_str),
         }
@@ -24,10 +24,8 @@ impl FromStr for UpgradeType {
     #[inline]
     fn from_str(from_str: &str) -> Result<Self, Self::Err> {
         match from_str {
-            tmp_from_str if tmp_from_str.eq_ignore_ascii_case(HTTP) => Ok(UpgradeType::Http),
-            tmp_from_str if tmp_from_str.eq_ignore_ascii_case(WEBSOCKET) => {
-                Ok(UpgradeType::WebSocket)
-            }
+            tmp_from_str if tmp_from_str == HTTP_LOWERCASE => Ok(UpgradeType::Http),
+            tmp_from_str if tmp_from_str == WEBSOCKET => Ok(UpgradeType::WebSocket),
             _ => Ok(UpgradeType::Unknown(from_str.to_string())),
         }
     }

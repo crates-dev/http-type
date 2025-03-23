@@ -137,12 +137,12 @@ impl FromStr for ContentType {
 
     #[inline]
     fn from_str(data: &str) -> Result<Self, Self::Err> {
-        match data {
-            _data if _data.eq_ignore_ascii_case(APPLICATION_JSON) => Ok(Self::ApplicationJson),
-            _data if _data.eq_ignore_ascii_case(APPLICATION_XML) => Ok(Self::ApplicationXml),
-            _data if _data.eq_ignore_ascii_case(TEXT_PLAIN) => Ok(Self::TextPlain),
-            _data if _data.eq_ignore_ascii_case(TEXT_HTML) => Ok(Self::TextHtml),
-            _data if _data.eq_ignore_ascii_case(FORM_URLENCODED) => Ok(Self::FormUrlEncoded),
+        match data.to_ascii_lowercase() {
+            _data if _data == APPLICATION_JSON => Ok(Self::ApplicationJson),
+            _data if _data == APPLICATION_XML => Ok(Self::ApplicationXml),
+            _data if _data == TEXT_PLAIN => Ok(Self::TextPlain),
+            _data if _data == TEXT_HTML => Ok(Self::TextHtml),
+            _data if _data == FORM_URLENCODED => Ok(Self::FormUrlEncoded),
             _ => Ok(Self::Unknown),
         }
     }

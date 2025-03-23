@@ -1,3 +1,3 @@
 use crate::*;
 
-pub type DashMapRandomState<K, V> = DashMap<K, V, BuildHasherDefault<XxHash3_64>>;
+pub type DashMapXxHash3_64<K, V> = DashMap<K, V, BuildHasherDefault<XxHash3_64>>;

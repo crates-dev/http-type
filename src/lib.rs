@@ -5,6 +5,7 @@ pub(crate) mod box_rwlock;
 pub(crate) mod content_type;
 pub(crate) mod dash_map;
 pub(crate) mod file_extension;
+pub(crate) mod hash_map;
 pub(crate) mod http_status;
 pub(crate) mod http_url;
 pub(crate) mod http_version;
@@ -25,7 +26,9 @@ pub use arc_rwlock::{func::*, r#type::*};
 pub use box_rwlock::{func::*, r#type::*};
 pub use content_type::r#type::*;
 pub use dash_map::{func::*, r#type::*};
+pub use dashmap::DashMap;
 pub use file_extension::r#type::*;
+pub use hash_map::{func::*, r#type::*};
 pub use http_status::r#type::*;
 pub use http_url::{error::Error as HttpUrlError, r#type::*};
 pub use http_version::r#type::*;
@@ -39,9 +42,7 @@ pub use upgrade_type::r#type::*;
 pub use utils::{request::*, utf8::*};
 pub use websocket_frame::r#type::*;
 
-pub use ::rayon::prelude::*;
 pub use ahash;
-pub use dashmap::*;
 pub use futures;
 pub use http_compress::*;
 pub use http_constant::*;
@@ -64,6 +65,7 @@ pub(crate) use serde::Serialize;
 pub(crate) use std::{
     any::Any,
     borrow::Cow,
+    collections::HashMap,
     error::Error as StdError,
     fmt::{self, Debug, Display},
     hash::Hash,

@@ -18,7 +18,7 @@ impl Response {
             version: HTTP_VERSION_1_1.to_owned(),
             status_code: 200,
             reason_phrase: EMPTY_STR.to_owned(),
-            headers: dash_map(),
+            headers: hash_map_xxhash3_64(),
             body: Vec::new(),
         }
     }
@@ -156,21 +156,22 @@ impl Response {
         let mut compress_type_opt: Option<Compress> = None;
         let mut connection_opt: Option<String> = None;
         let mut content_type_opt: Option<String> = None;
-        let headers: &ResponseHeaders = self.get_headers();
+        let headers: ResponseHeaders = self
+            .get_mut_headers()
+            .drain()
+            .map(|(key, value)| (key.to_lowercase(), value))
+            .collect();
         let mut unset_content_length: bool = false;
-        for tem_header in headers.iter() {
-            let key: &String = tem_header.key();
-            if key.eq_ignore_ascii_case(CONTENT_LENGTH) {
+        for (key, value) in headers.iter() {
+            if key == CONTENT_LENGTH {
                 continue;
-            }
-            let value: &String = tem_header.value();
-            if key.eq_ignore_ascii_case(CONTENT_ENCODING) {
+            } else if key == CONTENT_ENCODING {
                 compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
-            } else if key.eq_ignore_ascii_case(CONNECTION) {
+            } else if key == CONNECTION {
                 connection_opt = Some(value.to_owned());
-            } else if key.eq_ignore_ascii_case(CONTENT_TYPE) {
+            } else if key == CONTENT_TYPE {
                 content_type_opt = Some(value.to_owned());
-                if value.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
+                if value.to_ascii_lowercase() == TEXT_EVENT_STREAM {
                     unset_content_length = true;
                 }
             }

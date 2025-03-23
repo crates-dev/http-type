@@ -1,7 +1,6 @@
 use crate::*;
 
 #[inline]
-pub fn dash_map<K: Eq + Hash, V>() -> DashMapRandomState<K, V> {
-    let thread_count: usize = get_thread_count();
-    DashMap::with_capacity_and_hasher(thread_count, BuildHasherDefault::default())
+pub fn dash_map<K: Eq + Hash, V>() -> DashMapXxHash3_64<K, V> {
+    DashMap::with_hasher(BuildHasherDefault::default())
 }

@@ -8,8 +8,8 @@ impl Default for Request {
             host: String::new(),
             version: HttpVersion::default(),
             path: String::new(),
-            querys: dash_map(),
-            headers: dash_map(),
+            querys: hash_map_xxhash3_64(),
+            headers: hash_map_xxhash3_64(),
             body: Vec::new(),
         }
     }
@@ -20,13 +20,17 @@ impl Request {
     ///
     /// # Parameters
     /// - `reader`: A mut reference to a `&mut BufReader<&mut TcpStream>`
+    /// - `buffer_size`: Request buffer size
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
     #[inline]
-    pub async fn http_from_reader(reader: &mut BufReader<&mut TcpStream>) -> RequestNewResult {
-        let mut request_line: String = String::new();
+    pub async fn http_from_reader(
+        reader: &mut BufReader<&mut TcpStream>,
+        buffer_size: usize,
+    ) -> RequestNewResult {
+        let mut request_line: String = String::with_capacity(buffer_size);
         let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         if parts.len() < 3 {
@@ -61,11 +65,11 @@ impl Request {
         } else {
             full_path
         };
-        let headers: RequestHeaders = dash_map();
+        let mut headers: RequestHeaders = hash_map_xxhash3_64();
         let mut host: RequestHost = EMPTY_STR.to_owned();
         let mut content_length: usize = 0;
         loop {
-            let mut header_line: String = String::new();
+            let mut header_line: String = String::with_capacity(buffer_size);
             let _ = AsyncBufReadExt::read_line(reader, &mut header_line).await;
             let header_line: &str = header_line.trim();
             if header_line.is_empty() {
@@ -75,12 +79,12 @@ impl Request {
             if parts.len() != 2 {
                 continue;
             }
-            let key: String = parts[0].trim().to_string();
+            let key: String = parts[0].trim().to_ascii_lowercase();
             let value: String = parts[1].trim().to_string();
-            if key.eq_ignore_ascii_case(HOST) {
+            if key == HOST {
                 host = value.to_string();
             }
-            if key.eq_ignore_ascii_case(CONTENT_LENGTH) {
+            if key == CONTENT_LENGTH {
                 content_length = value.parse().unwrap_or(0);
             }
             headers.insert(key, value);
@@ -104,15 +108,19 @@ impl Request {
     ///
     /// # Parameters
     /// - `stream`: A reference to a `&ArcRwLockStream` representing the incoming connection.
+    /// - `buffer_size`: Request buffer size
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
     #[inline]
-    pub async fn http_request_from_stream(stream: &ArcRwLockStream) -> RequestNewResult {
+    pub async fn http_request_from_stream(
+        stream: &ArcRwLockStream,
+        buffer_size: usize,
+    ) -> RequestNewResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::http_from_reader(&mut reader).await
+        Self::http_from_reader(&mut reader, buffer_size).await
     }
 
     /// Creates a new `Request` object from a TCP stream.
@@ -191,7 +199,7 @@ impl Request {
     /// - RequestQuerys
     #[inline]
     fn parse_querys(query: &str) -> RequestQuerys {
-        let query_map: RequestQuerys = dash_map();
+        let mut query_map: RequestQuerys = hash_map_xxhash3_64();
         for pair in query.split(AND) {
             let mut parts: SplitN<'_, &str> = pair.splitn(2, EQUAL);
             let key: String = parts.next().unwrap_or_default().to_string();

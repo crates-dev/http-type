@@ -50,11 +50,9 @@ impl Protocol {
 impl Display for Protocol {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let http: String = HTTP.to_lowercase();
-        let https: String = HTTPS.to_lowercase();
         let res: &str = match self {
-            Self::HTTP => http.as_str(),
-            Self::HTTPS => https.as_str(),
+            Self::HTTP => HTTP_LOWERCASE,
+            Self::HTTPS => HTTPS_LOWERCASE,
             Self::Unknown(protocol) => protocol,
         };
         write!(f, "{}", res)
@@ -67,8 +65,8 @@ impl FromStr for Protocol {
     #[inline]
     fn from_str(data: &str) -> Result<Self, Self::Err> {
         match data {
-            _data if _data.eq_ignore_ascii_case(HTTP) => Ok(Self::HTTP),
-            _data if _data.eq_ignore_ascii_case(HTTPS) => Ok(Self::HTTPS),
+            _data if _data == HTTP_LOWERCASE => Ok(Self::HTTP),
+            _data if _data == HTTPS_LOWERCASE => Ok(Self::HTTPS),
             _ => Ok(Self::Unknown(data.to_string())),
         }
     }
