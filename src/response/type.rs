@@ -26,6 +26,8 @@ pub type ResponseDataString = String;
 pub type RwLockReadGuardResponse<'a> = RwLockReadGuard<'a, Response>;
 /// RwLockWriteGuardResponse
 pub type RwLockWriteGuardResponse<'a> = RwLockWriteGuard<'a, Response>;
+/// OptionResponseHeadersValue
+pub type OptionResponseHeadersValue = Option<ResponseHeadersValue>;
 
 /// Represents an HTTP response.
 ///

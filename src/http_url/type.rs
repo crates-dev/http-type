@@ -1,4 +1,4 @@
-use crate::protocol::r#type::Protocol;
+use crate::*;
 
 /// A struct representing a parsed URL with various components.
 ///
@@ -19,9 +19,9 @@ use crate::protocol::r#type::Protocol;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HttpUrlComponents {
     pub protocol: Protocol,
-    pub host: Option<String>,
-    pub port: Option<u16>,
-    pub path: Option<String>,
-    pub query: Option<String>,
-    pub fragment: Option<String>,
+    pub host: OptionString,
+    pub port: OptionU16,
+    pub path: OptionString,
+    pub query: OptionString,
+    pub fragment: OptionString,
 }

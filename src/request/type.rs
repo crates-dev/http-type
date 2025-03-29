@@ -30,6 +30,10 @@ pub type RequestNewResult = Result<Request, RequestError>;
 pub type RwLockReadGuardRequest<'a> = RwLockReadGuard<'a, Request>;
 /// RwLockWriteGuardRequest
 pub type RwLockWriteGuardRequest<'a> = RwLockWriteGuard<'a, Request>;
+/// OptionRequestQuerysValue
+pub type OptionRequestQuerysValue = Option<RequestQuerysValue>;
+/// OptionRequestHeadersValue
+pub type OptionRequestHeadersValue = Option<RequestHeadersValue>;
 
 /// Represents an HTTP request.
 ///

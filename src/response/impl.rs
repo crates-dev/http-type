@@ -27,9 +27,9 @@ impl Response {
     /// - `key`: The header's key, which can be of any type that implements `Into<ResponseHeadersKey>`.
     ///
     /// # Returns
-    /// - `Option<ResponseHeadersValue>`: Returns `Some(value)` if the key exists in the response headers,
+    /// - `OptionResponseHeadersValue`: Returns `Some(value)` if the key exists in the response headers,
     ///   or `None` if the key does not exist.
-    pub fn get_header<K>(&self, key: K) -> Option<ResponseHeadersValue>
+    pub fn get_header<K>(&self, key: K) -> OptionResponseHeadersValue
     where
         K: Into<ResponseHeadersKey>,
     {
@@ -144,9 +144,9 @@ impl Response {
         }
         let mut response_string: String = String::new();
         self.push_http_response_first_line(&mut response_string);
-        let mut compress_type_opt: Option<Compress> = None;
-        let mut connection_opt: Option<String> = None;
-        let mut content_type_opt: Option<String> = None;
+        let mut compress_type_opt: OptionCompress = None;
+        let mut connection_opt: OptionString = None;
+        let mut content_type_opt: OptionString = None;
         let headers: ResponseHeaders = self
             .get_mut_headers()
             .drain()

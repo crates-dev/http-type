@@ -43,8 +43,8 @@ impl Request {
             .to_string()
             .parse::<RequestVersion>()
             .unwrap_or_default();
-        let hash_index: Option<usize> = full_path.find(HASH_SYMBOL);
-        let query_index: Option<usize> = full_path.find(QUERY_SYMBOL);
+        let hash_index: OptionUsize = full_path.find(HASH_SYMBOL);
+        let query_index: OptionUsize = full_path.find(QUERY_SYMBOL);
         let query_string: String = query_index.map_or(EMPTY_STR.to_owned(), |i| {
             let temp: String = full_path[i + 1..].to_string();
             if hash_index.is_none() || hash_index.unwrap() <= i {
@@ -211,9 +211,9 @@ impl Request {
     /// - `key`: The query parameter's key, which can be of any type that implements `Into<RequestQuerysKey>`.
     ///
     /// # Returns
-    /// - `Option<RequestQuerysValue>`: Returns `Some(value)` if the key exists in the query parameters,
+    /// - `OptionRequestQuerysValue`: Returns `Some(value)` if the key exists in the query parameters,
     ///   or `None` if the key does not exist.
-    pub fn get_query<K>(&self, key: K) -> Option<RequestQuerysValue>
+    pub fn get_query<K>(&self, key: K) -> OptionRequestQuerysValue
     where
         K: Into<RequestQuerysKey>,
     {
@@ -228,9 +228,9 @@ impl Request {
     /// - `key`: The header's key, which can be of any type that implements `Into<RequestHeadersKey>`.
     ///
     /// # Returns
-    /// - `Option<RequestHeadersValue>`: Returns `Some(value)` if the key exists in the request headers,
+    /// - `OptionRequestHeadersValue`: Returns `Some(value)` if the key exists in the request headers,
     ///   or `None` if the key does not exist.
-    pub fn get_header<K>(&self, key: K) -> Option<RequestHeadersValue>
+    pub fn get_header<K>(&self, key: K) -> OptionRequestHeadersValue
     where
         K: Into<RequestHeadersKey>,
     {
