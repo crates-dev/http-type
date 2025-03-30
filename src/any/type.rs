@@ -8,3 +8,6 @@ pub type BoxAnySync = Box<dyn Any + Sync>;
 pub type ArcAnySync = Arc<dyn Any + Sync>;
 pub type BoxAnySendSync = Box<dyn Any + Send + Sync>;
 pub type ArcAnySendSync = Arc<dyn Any + Send + Sync>;
+pub type DynAnySend = Box<dyn Any + Send>;
+pub type DynAnySync = Box<dyn Any + Sync>;
+pub type DynAnySendSync = Box<dyn Any + Send + Sync>;
