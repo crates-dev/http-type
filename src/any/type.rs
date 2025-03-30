@@ -1,13 +1,24 @@
 use crate::*;
 
 pub type BoxAny = Box<dyn Any>;
+pub type OptionBoxAny = Option<Box<dyn Any>>;
 pub type ArcAny = Arc<dyn Any>;
+pub type OptionArcAny = Option<Arc<dyn Any>>;
 pub type BoxAnySend = Box<dyn Any + Send>;
+pub type OptionBoxAnySend = Option<Box<dyn Any + Send>>;
 pub type ArcAnySend = Arc<dyn Any + Send>;
+pub type OptionArcAnySend = Option<Arc<dyn Any + Send>>;
 pub type BoxAnySync = Box<dyn Any + Sync>;
+pub type OptionBoxAnySync = Option<Box<dyn Any + Sync>>;
 pub type ArcAnySync = Arc<dyn Any + Sync>;
+pub type OptionArcAnySync = Option<Arc<dyn Any + Sync>>;
 pub type BoxAnySendSync = Box<dyn Any + Send + Sync>;
+pub type OptionBoxAnySendSync = Option<Box<dyn Any + Send + Sync>>;
 pub type ArcAnySendSync = Arc<dyn Any + Send + Sync>;
+pub type OptionArcAnySendSync = Option<Arc<dyn Any + Send + Sync>>;
 pub type DynAnySend = Box<dyn Any + Send>;
+pub type OptionDynAnySend = Option<Box<dyn Any + Send>>;
 pub type DynAnySync = Box<dyn Any + Sync>;
+pub type OptionDynAnySync = Option<Box<dyn Any + Sync>>;
 pub type DynAnySendSync = Box<dyn Any + Send + Sync>;
+pub type OptionDynAnySendSync = Option<Box<dyn Any + Send + Sync>>;
