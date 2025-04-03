@@ -12,9 +12,16 @@ pub(crate) mod http_version;
 pub(crate) mod methods;
 pub(crate) mod option_bool;
 pub(crate) mod option_compress;
+pub(crate) mod option_duration;
+pub(crate) mod option_i128;
+pub(crate) mod option_i32;
+pub(crate) mod option_i64;
 pub(crate) mod option_str;
 pub(crate) mod option_string;
+pub(crate) mod option_u128;
 pub(crate) mod option_u16;
+pub(crate) mod option_u32;
+pub(crate) mod option_u64;
 pub(crate) mod option_usize;
 pub(crate) mod option_vec_u8;
 pub(crate) mod protocol;
@@ -42,9 +49,16 @@ pub use http_version::r#type::*;
 pub use methods::r#type::*;
 pub use option_bool::r#type::*;
 pub use option_compress::r#type::*;
+pub use option_duration::r#type::*;
+pub use option_i32::r#type::*;
+pub use option_i64::r#type::*;
+pub use option_i128::r#type::*;
 pub use option_str::r#type::*;
 pub use option_string::r#type::*;
 pub use option_u16::r#type::*;
+pub use option_u32::r#type::*;
+pub use option_u64::r#type::*;
+pub use option_u128::r#type::*;
 pub use option_usize::r#type::*;
 pub use option_vec_u8::r#type::*;
 pub use protocol::r#type::*;
@@ -88,6 +102,7 @@ pub(crate) use std::{
     str::FromStr,
     str::SplitN,
     sync::Arc,
+    time::Duration,
 };
 pub(crate) use tokio::{
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
