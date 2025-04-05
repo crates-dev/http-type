@@ -80,9 +80,8 @@ impl Request {
             let key: String = parts[0].trim().to_ascii_lowercase();
             let value: String = parts[1].trim().to_string();
             if key == HOST {
-                host = value.to_string();
-            }
-            if key == CONTENT_LENGTH {
+                host = value.clone();
+            } else if key == CONTENT_LENGTH {
                 content_length = value.parse().unwrap_or(0);
             }
             headers.insert(key, value);
@@ -387,5 +386,42 @@ impl Request {
             .and_then(|data| data.parse::<UpgradeType>().ok())
             .unwrap_or_default();
         upgrade_type
+    }
+
+    /// Determines if keep-alive connection should be enabled for this request.
+    ///
+    /// This function checks the Connection header and HTTP version to determine if
+    /// keep-alive should be enabled. The logic is as follows:
+    ///
+    /// 1. If Connection header exists:
+    ///    - Returns true if header value is "keep-alive"
+    ///    - Returns false if header value is "close"
+    /// 2. If no Connection header:
+    ///    - Returns true if HTTP version is 1.1 or higher
+    ///    - Returns false otherwise
+    ///
+    /// # Returns
+    /// - `bool`: true if keep-alive should be enabled, false otherwise
+    pub fn is_enable_keep_alive(&self) -> bool {
+        if let Some(connection_value) = self.get_header(CONNECTION) {
+            let connection_value_lowercase: String = connection_value.to_ascii_lowercase();
+            if connection_value_lowercase == CONNECTION_KEEP_ALIVE {
+                return true;
+            } else if connection_value_lowercase == CONNECTION_CLOSE {
+                return false;
+            }
+        }
+        self.get_version().is_http1_1_or_higher()
+    }
+
+    /// Determines if keep-alive connection should be disabled for this request.
+    ///
+    /// This is the inverse of `is_enable_keep_alive()`. It returns true when
+    /// keep-alive should be disabled, and false when it should be enabled.
+    ///
+    /// # Returns
+    /// - `bool`: true if keep-alive should be disabled, false otherwise
+    pub fn is_disable_keep_alive(&self) -> bool {
+        !self.is_enable_keep_alive()
     }
 }
