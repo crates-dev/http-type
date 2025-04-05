@@ -102,6 +102,7 @@ pub(crate) use std::{
     str::FromStr,
     str::SplitN,
     sync::Arc,
+    thread::available_parallelism,
     time::Duration,
 };
 pub(crate) use tokio::{

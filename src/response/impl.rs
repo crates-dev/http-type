@@ -210,8 +210,7 @@ impl Response {
         stream_lock: &ArcRwLockStream,
         is_websocket: bool,
     ) -> ResponseResult {
-        let body: &ResponseBody = self.get_body();
-        stream_lock.send_body(body, is_websocket).await
+        stream_lock.send_body(self.get_body(), is_websocket).await
     }
 
     /// Sends the HTTP response over a TCP stream.
@@ -223,8 +222,7 @@ impl Response {
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
     pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        let data: Vec<u8> = self.build();
-        stream_lock.send(&data).await
+        stream_lock.send(&self.build()).await
     }
 
     /// Flush the TCP stream.

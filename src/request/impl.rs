@@ -197,10 +197,11 @@ impl Request {
         for pair in query.split(AND) {
             let mut parts: SplitN<'_, &str> = pair.splitn(2, EQUAL);
             let key: String = parts.next().unwrap_or_default().to_string();
-            let value: String = parts.next().unwrap_or_default().to_string();
-            if !key.is_empty() {
-                query_map.insert(key, value);
+            if key.is_empty() {
+                continue;
             }
+            let value: String = parts.next().unwrap_or_default().to_string();
+            query_map.insert(key, value);
         }
         query_map
     }
