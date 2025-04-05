@@ -27,7 +27,7 @@ impl Request {
     pub async fn http_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
-    ) -> RequestNewResult {
+    ) -> RequestReaderHandleResult {
         let mut request_line: String = String::with_capacity(buffer_size);
         let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
@@ -114,7 +114,7 @@ impl Request {
     pub async fn http_request_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
-    ) -> RequestNewResult {
+    ) -> RequestReaderHandleResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
         Self::http_from_reader(&mut reader, buffer_size).await
@@ -132,7 +132,7 @@ impl Request {
     pub async fn websocket_request_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
-    ) -> RequestNewResult {
+    ) -> RequestReaderHandleResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
         Self::websocket_from_reader(&mut reader, buffer_size).await
@@ -157,7 +157,7 @@ impl Request {
     pub async fn websocket_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
-    ) -> RequestNewResult {
+    ) -> RequestReaderHandleResult {
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
         let mut full_frame: Vec<u8> = Vec::with_capacity(buffer_size);

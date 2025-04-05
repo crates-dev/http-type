@@ -24,8 +24,8 @@ pub type RequestHeadersKey = String;
 pub type RequestHeadersValue = String;
 /// Request headers
 pub type RequestHeaders = HashMapXxHash3_64<RequestHeadersKey, RequestHeadersValue>;
-/// Request new result
-pub type RequestNewResult = Result<Request, RequestError>;
+/// Request reader handle result
+pub type RequestReaderHandleResult = Result<Request, RequestError>;
 /// RwLockReadGuardRequest
 pub type RwLockReadGuardRequest<'a> = RwLockReadGuard<'a, Request>;
 /// RwLockWriteGuardRequest
