@@ -166,7 +166,7 @@ impl Response {
                     unset_content_length = true;
                 }
             }
-            Self::push_header(&mut response_string, &key, value);
+            Self::push_header(&mut response_string, key, value);
         }
         if connection_opt.is_none() {
             Self::push_header(&mut response_string, CONNECTION, CONNECTION_KEEP_ALIVE);
