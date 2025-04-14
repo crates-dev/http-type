@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "3.62.0"
+version = "3.63.0"
 edition = "2024"
 authors = ["ltpp-universe <root@ltpp.vip>"] 
 license = "MIT"
@@ -17,7 +17,7 @@ exclude = [
 
 [dependencies]
 hex = "0.4.3"
-http-constant = "1.41.0"
+http-constant = "1.42.0"
 lombok-macros = "1.10.0"
 serde = "1.0.219"
 serde-xml-rs = "0.6.0"
