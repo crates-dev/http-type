@@ -1,4 +1,3 @@
-use super::error::Error;
 use crate::*;
 use url::Url as UrlParser;
 
@@ -28,8 +27,9 @@ impl HttpUrlComponents {
     /// # Returns
     /// Returns a `Result` containing either a `HttpUrlComponents ` instance populated with the
     /// parsed components or an `Error::InvalidUrl` if the parsing fails.
-    pub fn parse(url_str: &str) -> Result<Self, Error> {
-        let parsed_url: UrlParser = UrlParser::parse(url_str).map_err(|_| Error::InvalidUrl)?;
+    pub fn parse(url_str: &str) -> Result<Self, HttpUrlError> {
+        let parsed_url: UrlParser =
+            UrlParser::parse(url_str).map_err(|_| HttpUrlError::InvalidUrl)?;
         let res: Self = Self {
             protocol: parsed_url
                 .scheme()

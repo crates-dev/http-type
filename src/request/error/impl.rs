@@ -1,29 +1,8 @@
 use crate::*;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Error {
-    HttpReadError,
-    InvalidHttpRequest,
-    InvalidWebSocketRequest,
-    InvalidUrl,
-    TcpStreamConnectError,
-    RequestError,
-    MethodsNotSupport,
-    ReadConnectionError,
-    TlsConnectorBuildError,
-    SetReadTimeoutError,
-    SetWriteTimeoutError,
-    TlsStreamConnectError,
-    MaxRedirectTimes,
-    RedirectUrlDeadLoop,
-    RedirectInvalidUrl,
-    NeedOpenRedirect,
-    Unknown,
-}
+impl StdError for RequestError {}
 
-impl StdError for Error {}
-
-impl Display for Error {
+impl Display for RequestError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::HttpReadError => write!(f, "Http read error"),

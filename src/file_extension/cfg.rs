@@ -1,6 +1,6 @@
 #[test]
 fn test_enum_to_string() {
-    use super::r#type::*;
+    use super::r#enum::*;
     use http_constant::*;
     assert_eq!(
         FileExtension::FileExtension123.to_string(),
@@ -10,7 +10,7 @@ fn test_enum_to_string() {
 
 #[test]
 fn test_get_content_type() {
-    use super::r#type::*;
+    use super::r#enum::*;
     use http_constant::*;
     assert_eq!(
         FileExtension::FileExtension123.get_content_type(),
@@ -20,7 +20,7 @@ fn test_get_content_type() {
 
 #[test]
 fn test_parse() {
-    use super::r#type::*;
+    use super::r#enum::*;
     use http_constant::*;
     assert_eq!(
         FileExtension::parse(FILE_EXTENSION_123),

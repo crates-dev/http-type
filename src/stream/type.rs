@@ -14,6 +14,3 @@ pub type SocketPort = u16;
 pub type OptionSocketHost = Option<SocketHost>;
 pub type OptionSocketPort = Option<SocketPort>;
 pub type OptionSocketAddr = Option<SocketAddr>;
-
-#[derive(Clone, Debug)]
-pub struct ArcRwLockStream(pub(super) ArcRwLock<TcpStream>);
