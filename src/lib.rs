@@ -90,6 +90,8 @@ pub use urlencoding;
 
 pub(crate) use core::hash::BuildHasherDefault;
 pub(crate) use serde::Serialize;
+pub(crate) use serde::de::DeserializeOwned;
+pub(crate) use serde_json::Error as SerdeJsonError;
 pub(crate) use std::{
     any::Any,
     borrow::Cow,

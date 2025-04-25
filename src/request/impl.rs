@@ -239,6 +239,35 @@ impl Request {
             .and_then(|data| Some(data.clone()))
     }
 
+    /// Retrieves the body content of the object as a UTF-8 encoded string.
+    ///
+    /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` into a string.
+    /// If the byte slice contains invalid UTF-8 sequences, they will be replaced with the Unicode replacement character (�).
+    ///
+    /// # Returns
+    /// A `String` containing the body content.
+    pub fn get_body_string(&self) -> String {
+        String::from_utf8_lossy(self.get_body()).into_owned()
+    }
+
+    /// Deserializes the body content of the object into a specified type `T`.
+    ///
+    /// This method first retrieves the body content as a UTF-8 encoded string using `self.get_body()`.
+    /// It then attempts to deserialize the string into the specified type `T` using `serde_json::from_str`.
+    ///
+    /// # Type Parameters
+    /// - `T`: The target type to deserialize into. It must implement the `DeserializeOwned` trait.
+    ///
+    /// # Returns
+    /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
+    /// - `Err(serde_json::Error)`: An error if the deserialization fails (e.g., invalid JSON format or type mismatch).
+    pub fn get_body_json<T>(&self) -> Result<T, SerdeJsonError>
+    where
+        T: DeserializeOwned,
+    {
+        json_parse_from_slice(self.get_body())
+    }
+
     /// Adds a header to the request.
     ///
     /// This function inserts a key-value pair into the request headers.
