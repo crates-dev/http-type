@@ -60,7 +60,7 @@ impl Response {
     /// # Returns
     /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
     /// - `Err(serde_json::Error)`: An error if the deserialization fails (e.g., invalid JSON format or type mismatch).
-    pub fn get_body_json<T>(&self) -> Result<T, SerdeJsonError>
+    pub fn get_body_json<T>(&self) -> ResultSerdeJsonError<T>
     where
         T: DeserializeOwned,
     {

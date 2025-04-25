@@ -8,7 +8,7 @@ use crate::*;
 /// # Returns
 /// - `Ok(T)` if parsing succeeds, where T is the deserialized value
 /// - `Err(SerdeJsonError)` if parsing fails
-pub fn json_parse_from_slice<T>(data: &[u8]) -> Result<T, SerdeJsonError>
+pub fn json_parse_from_slice<T>(data: &[u8]) -> ResultSerdeJsonError<T>
 where
     T: DeserializeOwned,
 {
@@ -23,7 +23,7 @@ where
 /// # Returns
 /// - `Ok(T)` if parsing succeeds, where T is the deserialized value
 /// - `Err(SerdeJsonError)` if parsing fails
-pub fn json_parse_from_str<T>(data: &str) -> Result<T, SerdeJsonError>
+pub fn json_parse_from_str<T>(data: &str) -> ResultSerdeJsonError<T>
 where
     T: DeserializeOwned,
 {
@@ -38,7 +38,7 @@ where
 /// # Returns
 /// - `Ok(String)` containing the JSON text if serialization succeeds
 /// - `Err(SerdeJsonError)` if serialization fails
-pub fn json_stringify<T>(data: &T) -> Result<String, SerdeJsonError>
+pub fn json_stringify<T>(data: &T) -> ResultSerdeJsonError<String>
 where
     T: ?Sized + Serialize,
 {
