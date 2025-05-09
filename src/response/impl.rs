@@ -16,7 +16,7 @@ impl Response {
             version: HTTP_VERSION_1_1.to_owned(),
             status_code: 200,
             reason_phrase: EMPTY_STR.to_owned(),
-            headers: hash_map_xxhash3_64(),
+            headers: hash_map_xx_hash3_64(),
             body: Vec::new(),
         }
     }
