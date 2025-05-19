@@ -37,7 +37,7 @@ pub type OptionResponseHeadersValue = Option<ResponseHeadersValue>;
 /// - `reason_phrase`: The reason phrase corresponding to the status code.
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the response.
-#[derive(Debug, Clone, Lombok, DisplayDebug)]
+#[derive(Debug, Clone, Data, DisplayDebug)]
 pub struct Response {
     #[set(skip)]
     pub(super) version: ResponseVersion,

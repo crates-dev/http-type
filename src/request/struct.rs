@@ -10,7 +10,7 @@ use crate::*;
 /// - `querys`: The query string of the request.
 /// - `headers`: A collection of HTTP headers as key-value pairs.
 /// - `body`: The binary body of the request.
-#[derive(Debug, Clone, Lombok, DisplayDebug)]
+#[derive(Debug, Clone, Data, DisplayDebug)]
 pub struct Request {
     #[set(skip)]
     pub(super) method: RequestMethod,
