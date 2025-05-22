@@ -71,7 +71,7 @@ impl ArcRwLockStream {
     /// # Returns
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    pub async fn send_body(&self, body: &ResponseBody, is_websocket: bool) -> ResponseResult {
+    async fn send_common(&self, body: &ResponseBody, is_websocket: bool) -> ResponseResult {
         let body_list: Vec<ResponseBody> = if is_websocket {
             WebSocketFrame::create_response_frame_list(body)
         } else {
@@ -85,6 +85,30 @@ impl ArcRwLockStream {
                 .map_err(|err| ResponseError::ResponseError(err.to_string()))?;
         }
         Ok(())
+    }
+
+    /// Sends the HTTP response body over a TCP stream.
+    ///
+    /// # Parameters
+    /// - `body`: Response body.
+    ///
+    /// # Returns
+    /// - `Ok`: If the response body is successfully sent.
+    /// - `Err`: If an error occurs during sending.
+    pub async fn send_body(&self, body: &ResponseBody) -> ResponseResult {
+        self.send_common(body, false).await
+    }
+
+    /// Sends the HTTP websocket response body over a TCP stream.
+    ///
+    /// # Parameters
+    /// - `body`: Response body.
+    ///
+    /// # Returns
+    /// - `Ok`: If the response body is successfully sent.
+    /// - `Err`: If an error occurs during sending.
+    pub async fn send_websocket_body(&self, body: &ResponseBody) -> ResponseResult {
+        self.send_common(body, true).await
     }
 
     /// Flush the TCP stream.
