@@ -62,7 +62,7 @@ impl ArcRwLockStream {
         Ok(())
     }
 
-    /// Sends the HTTP response body over a TCP stream.
+    /// Sends the HTTP or HTTP websocket response body over a TCP stream.
     ///
     /// # Parameters
     /// - `body`: Response body.
@@ -71,7 +71,11 @@ impl ArcRwLockStream {
     /// # Returns
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    async fn send_common(&self, body: &ResponseBody, is_websocket: bool) -> ResponseResult {
+    pub async fn send_body_with_websocket_flag(
+        &self,
+        body: &ResponseBody,
+        is_websocket: bool,
+    ) -> ResponseResult {
         let body_list: Vec<ResponseBody> = if is_websocket {
             WebSocketFrame::create_response_frame_list(body)
         } else {
@@ -96,7 +100,7 @@ impl ArcRwLockStream {
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
     pub async fn send_body(&self, body: &ResponseBody) -> ResponseResult {
-        self.send_common(body, false).await
+        self.send_body_with_websocket_flag(body, false).await
     }
 
     /// Sends the HTTP websocket response body over a TCP stream.
@@ -108,7 +112,7 @@ impl ArcRwLockStream {
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
     pub async fn send_websocket_body(&self, body: &ResponseBody) -> ResponseResult {
-        self.send_common(body, true).await
+        self.send_body_with_websocket_flag(body, true).await
     }
 
     /// Flush the TCP stream.

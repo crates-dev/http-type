@@ -225,6 +225,25 @@ impl Response {
         response_bytes
     }
 
+    /// Sends the HTTP or HTTP websocket response body over a TCP stream.
+    ///
+    /// # Parameters
+    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
+    /// - `is_websocket`: Is websocket
+    ///
+    /// # Returns
+    /// - `Ok`: If the response body is successfully sent.
+    /// - `Err`: If an error occurs during sending.
+    pub async fn send_body_with_websocket_flag(
+        &mut self,
+        stream_lock: &ArcRwLockStream,
+        is_websocket: bool,
+    ) -> ResponseResult {
+        stream_lock
+            .send_body_with_websocket_flag(self.get_body(), is_websocket)
+            .await
+    }
+
     /// Sends the HTTP response body over a TCP stream.
     ///
     /// # Parameters
@@ -237,7 +256,7 @@ impl Response {
         stream_lock.send_body(self.get_body()).await
     }
 
-    /// Sends the HTTP send_websocket response body over a TCP stream.
+    /// Sends the HTTP websocket response body over a TCP stream.
     ///
     /// # Parameters
     /// - `stream`: A mutable reference to the `TcpStream` to send the response.
