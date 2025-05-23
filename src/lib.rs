@@ -6,6 +6,7 @@ pub(crate) mod content_type;
 pub(crate) mod dash_map_xx_hash3_64;
 pub(crate) mod file_extension;
 pub(crate) mod hash_map_xx_hash3_64;
+pub(crate) mod hash_set_xx_hash3_64;
 pub(crate) mod http_status;
 pub(crate) mod http_url;
 pub(crate) mod http_version;
@@ -43,6 +44,7 @@ pub use content_type::*;
 pub use dash_map_xx_hash3_64::*;
 pub use file_extension::*;
 pub use hash_map_xx_hash3_64::*;
+pub use hash_set_xx_hash3_64::*;
 pub use http_status::*;
 pub use http_url::*;
 pub use http_version::*;
@@ -98,7 +100,7 @@ pub(crate) use serde_json::Error as SerdeJsonError;
 pub(crate) use std::{
     any::Any,
     borrow::Cow,
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     error::Error as StdError,
     fmt::{self, Debug, Display},
     hash::Hash,
