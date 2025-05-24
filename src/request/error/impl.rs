@@ -21,6 +21,7 @@ impl Display for RequestError {
             Self::RedirectUrlDeadLoop => write!(f, "Redirect URL Dead Loop"),
             Self::RedirectInvalidUrl => write!(f, "Redirect Invalid Url"),
             Self::NeedOpenRedirect => write!(f, "Need Open Redirect"),
+            Self::GetStreamError => write!(f, "Get Stream Error"),
             Self::Unknown => write!(f, "{}", "Unknown"),
         }
     }
