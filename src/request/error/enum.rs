@@ -18,6 +18,7 @@ pub enum RequestError {
     RedirectUrlDeadLoop,
     RedirectInvalidUrl,
     NeedOpenRedirect,
-    GetStreamError,
+    GetTcpStreamError,
+    GetTlsStreamError,
     Unknown,
 }
