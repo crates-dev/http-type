@@ -123,6 +123,30 @@ impl ContentType {
             Self::Unknown => Self::get_binary(data),
         }
     }
+
+    /// Formats a content type with a charset value.
+    ///
+    /// - `content_type`: The content type (e.g., `"text/html"`).
+    /// - `charset`: The character set (e.g., `"utf-8"`).
+    /// - Returns: A format string like `"text/html; charset=utf-8"`.
+    pub fn format_content_type_with_charset(content_type: &str, charset: &str) -> String {
+        format!(
+            "{}{}{}{}",
+            content_type, SEMICOLON_SPACE, CHARSET_EQUAL, charset
+        )
+    }
+
+    /// Formats a content type with a full charset declaration.
+    ///
+    /// - `content_type`: The content type (e.g., `"text/html"`).
+    /// - `charset_with_key`: The charset declaration (e.g., `"charset=utf-8"`).
+    /// - Returns: A format string like `"text/html; charset=utf-8"`.
+    pub fn format_content_type_with_charset_declaration(
+        content_type: &str,
+        charset_with_key: &str,
+    ) -> String {
+        format!("{}{}{}", content_type, SEMICOLON_SPACE, charset_with_key)
+    }
 }
 
 impl FromStr for ContentType {
