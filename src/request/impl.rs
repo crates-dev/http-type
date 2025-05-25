@@ -265,7 +265,7 @@ impl Request {
     where
         T: DeserializeOwned,
     {
-        json_parse_from_slice(self.get_body())
+        serde_json::from_slice(self.get_body())
     }
 
     /// Adds a header to the request.
@@ -401,7 +401,10 @@ impl Request {
             self.get_path(),
             self.get_querys(),
             self.get_headers(),
-            body_to_string(body),
+            match std::str::from_utf8(body) {
+                Ok(string_data) => Cow::Borrowed(string_data),
+                Err(_) => Cow::Owned(format!("binary data len: {}", body.len())),
+            },
         )
     }
 

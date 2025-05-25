@@ -32,7 +32,6 @@ pub(crate) mod response;
 pub(crate) mod result_serde_json_error;
 pub(crate) mod stream;
 pub(crate) mod upgrade_type;
-pub(crate) mod utils;
 pub(crate) mod websocket_frame;
 
 pub use any::*;
@@ -69,7 +68,6 @@ pub use response::*;
 pub use result_serde_json_error::*;
 pub use stream::*;
 pub use upgrade_type::*;
-pub use utils::*;
 pub use websocket_frame::*;
 
 pub use dashmap;
