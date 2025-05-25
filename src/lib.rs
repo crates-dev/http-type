@@ -31,7 +31,6 @@ pub(crate) mod request;
 pub(crate) mod response;
 pub(crate) mod result_serde_json_error;
 pub(crate) mod stream;
-pub(crate) mod thread;
 pub(crate) mod upgrade_type;
 pub(crate) mod utils;
 pub(crate) mod websocket_frame;
@@ -67,33 +66,21 @@ pub use protocol::*;
 pub use rc_rwlock::*;
 pub use request::*;
 pub use response::*;
+pub use result_serde_json_error::*;
 pub use stream::*;
-pub use thread::*;
 pub use upgrade_type::*;
 pub use utils::*;
 pub use websocket_frame::*;
 
-pub use ahash;
 pub use dashmap;
-pub use futures;
 pub use http_compress::*;
 pub use http_constant::*;
-pub use lombok_macros::*;
-pub use num_cpus;
-pub use once_cell;
-pub use result_serde_json_error::*;
-pub use serde;
-pub use serde_json;
-pub use serde_urlencoded;
-pub use serde_xml_rs;
-pub use simd_json;
 pub use std_macro_extensions::*;
 pub use tokio;
-pub use twox_hash;
-pub use urlencoding;
 
 pub(crate) use core::hash::BuildHasherDefault;
 pub(crate) use dashmap::*;
+pub(crate) use lombok_macros::*;
 pub(crate) use serde::Serialize;
 pub(crate) use serde::de::DeserializeOwned;
 pub(crate) use serde_json::Error as SerdeJsonError;
@@ -109,7 +96,6 @@ pub(crate) use std::{
     str::FromStr,
     str::SplitN,
     sync::Arc,
-    thread::available_parallelism,
     time::Duration,
 };
 pub(crate) use tokio::{
