@@ -441,13 +441,6 @@ impl Request {
         self.get_upgrade_type().is_unknown()
     }
 
-    /// Checks whether the WebSocket upgrade is disabled.
-    ///
-    /// - Returns: `true` if the upgrade type is not WebSocket; otherwise, `false`.
-    pub fn upgrade_type_is_disable_websocket(&self) -> bool {
-        !self.upgrade_type_is_websocket()
-    }
-
     /// Checks if the HTTP version is HTTP/1.1 or higher.
     ///
     /// - Returns: `true` if the HTTP version is 1.1 or higher; otherwise, `false`.
