@@ -592,15 +592,4 @@ impl Request {
         }
         self.version_is_http1_1_or_higher() || self.upgrade_type_is_websocket()
     }
-
-    /// Determines if keep-alive connection should be disabled for this request.
-    ///
-    /// This is the inverse of `is_enable_keep_alive()`. It returns true when
-    /// keep-alive should be disabled, and false when it should be enabled.
-    ///
-    /// # Returns
-    /// - `bool`: true if keep-alive should be disabled, false otherwise
-    pub fn is_disable_keep_alive(&self) -> bool {
-        !self.is_enable_keep_alive()
-    }
 }
