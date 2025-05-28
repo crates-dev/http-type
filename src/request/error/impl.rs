@@ -23,6 +23,7 @@ impl Display for RequestError {
             Self::NeedOpenRedirect => write!(f, "Open redirect required"),
             Self::GetTcpStreamError => write!(f, "Failed to get Tcp stream"),
             Self::GetTlsStreamError => write!(f, "Failed to get Tls stream"),
+            Self::RequestAborted => write!(f, "Request aborted"),
             Self::Unknown => write!(f, "Unknown error"),
         }
     }

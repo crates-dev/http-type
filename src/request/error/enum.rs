@@ -20,5 +20,6 @@ pub enum RequestError {
     NeedOpenRedirect,
     GetTcpStreamError,
     GetTlsStreamError,
+    RequestAborted,
     Unknown,
 }
