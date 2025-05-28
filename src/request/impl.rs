@@ -420,6 +420,160 @@ impl Request {
         upgrade_type
     }
 
+    /// Checks whether the WebSocket upgrade is enabled.
+    ///
+    /// - Returns: `true` if the upgrade type is WebSocket; otherwise, `false`.
+    pub fn upgrade_type_is_websocket(&self) -> bool {
+        self.get_upgrade_type().is_websocket()
+    }
+
+    /// Checks whether the upgrade type is HTTP.
+    ///
+    /// - Returns: `true` if the upgrade type is HTTP; otherwise, `false`.
+    pub fn upgrade_type_is_http(&self) -> bool {
+        self.get_upgrade_type().is_http()
+    }
+
+    /// Checks whether the upgrade type is unknown.
+    ///
+    /// - Returns: `true` if the upgrade type is unknown; otherwise, `false`.
+    pub fn upgrade_type_is_unknown(&self) -> bool {
+        self.get_upgrade_type().is_unknown()
+    }
+
+    /// Checks whether the WebSocket upgrade is disabled.
+    ///
+    /// - Returns: `true` if the upgrade type is not WebSocket; otherwise, `false`.
+    pub fn upgrade_type_is_disable_websocket(&self) -> bool {
+        !self.upgrade_type_is_websocket()
+    }
+
+    /// Checks if the HTTP version is HTTP/1.1 or higher.
+    ///
+    /// - Returns: `true` if the HTTP version is 1.1 or higher; otherwise, `false`.
+    pub fn version_is_http1_1_or_higher(&self) -> bool {
+        self.get_version().is_http1_1_or_higher()
+    }
+
+    /// Checks whether the HTTP version is HTTP/0.9.
+    ///
+    /// - Returns: `true` if the version is HTTP/0.9; otherwise, `false`.
+    pub fn version_is_http0_9(&self) -> bool {
+        self.get_version().is_http0_9()
+    }
+
+    /// Checks whether the HTTP version is HTTP/1.0.
+    ///
+    /// - Returns: `true` if the version is HTTP/1.0; otherwise, `false`.
+    pub fn version_is_http1_0(&self) -> bool {
+        self.get_version().is_http1_0()
+    }
+
+    /// Checks whether the HTTP version is HTTP/1.1.
+    ///
+    /// - Returns: `true` if the version is HTTP/1.1; otherwise, `false`.
+    pub fn version_is_http1_1(&self) -> bool {
+        self.get_version().is_http1_1()
+    }
+
+    /// Checks whether the HTTP version is HTTP/2.
+    ///
+    /// - Returns: `true` if the version is HTTP/2; otherwise, `false`.
+    pub fn version_is_http2(&self) -> bool {
+        self.get_version().is_http2()
+    }
+
+    /// Checks whether the HTTP version is HTTP/3.
+    ///
+    /// - Returns: `true` if the version is HTTP/3; otherwise, `false`.
+    pub fn version_is_http3(&self) -> bool {
+        self.get_version().is_http3()
+    }
+
+    /// Checks whether the HTTP version is unknown.
+    ///
+    /// - Returns: `true` if the version is unknown; otherwise, `false`.
+    pub fn version_is_unknown(&self) -> bool {
+        self.get_version().is_unknown()
+    }
+
+    /// Checks whether the version belongs to the HTTP family.
+    ///
+    /// - Returns: `true` if the version is a valid HTTP version; otherwise, `false`.
+    pub fn version_is_http(&self) -> bool {
+        self.get_version().is_http()
+    }
+
+    /// Checks whether the request method is `GET`.
+    ///
+    /// - Returns: `true` if the method is `GET`; otherwise, `false`.
+    pub fn method_is_get(&self) -> bool {
+        self.get_method().is_get()
+    }
+
+    /// Checks whether the request method is `POST`.
+    ///
+    /// - Returns: `true` if the method is `POST`; otherwise, `false`.
+    pub fn method_is_post(&self) -> bool {
+        self.get_method().is_post()
+    }
+
+    /// Checks whether the request method is `PUT`.
+    ///
+    /// - Returns: `true` if the method is `PUT`; otherwise, `false`.
+    pub fn method_is_put(&self) -> bool {
+        self.get_method().is_put()
+    }
+
+    /// Checks whether the request method is `DELETE`.
+    ///
+    /// - Returns: `true` if the method is `DELETE`; otherwise, `false`.
+    pub fn method_is_delete(&self) -> bool {
+        self.get_method().is_delete()
+    }
+
+    /// Checks whether the request method is `PATCH`.
+    ///
+    /// - Returns: `true` if the method is `PATCH`; otherwise, `false`.
+    pub fn method_is_patch(&self) -> bool {
+        self.get_method().is_patch()
+    }
+
+    /// Checks whether the request method is `HEAD`.
+    ///
+    /// - Returns: `true` if the method is `HEAD`; otherwise, `false`.
+    pub fn method_is_head(&self) -> bool {
+        self.get_method().is_head()
+    }
+
+    /// Checks whether the request method is `OPTIONS`.
+    ///
+    /// - Returns: `true` if the method is `OPTIONS`; otherwise, `false`.
+    pub fn method_is_options(&self) -> bool {
+        self.get_method().is_options()
+    }
+
+    /// Checks whether the request method is `CONNECT`.
+    ///
+    /// - Returns: `true` if the method is `CONNECT`; otherwise, `false`.
+    pub fn method_is_connect(&self) -> bool {
+        self.get_method().is_connect()
+    }
+
+    /// Checks whether the request method is `TRACE`.
+    ///
+    /// - Returns: `true` if the method is `TRACE`; otherwise, `false`.
+    pub fn method_is_trace(&self) -> bool {
+        self.get_method().is_trace()
+    }
+
+    /// Checks whether the request method is `UNKNOWN`.
+    ///
+    /// - Returns: `true` if the method is `UNKNOWN`; otherwise, `false`.
+    pub fn method_is_unknown(&self) -> bool {
+        self.get_method().is_unknown()
+    }
+
     /// Determines if keep-alive connection should be enabled for this request.
     ///
     /// This function checks the Connection header and HTTP version to determine if
@@ -440,10 +594,10 @@ impl Request {
             if connection_value_lowercase == CONNECTION_KEEP_ALIVE {
                 return true;
             } else if connection_value_lowercase == CONNECTION_CLOSE {
-                return false;
+                return self.upgrade_type_is_websocket();
             }
         }
-        self.get_version().is_http1_1_or_higher()
+        self.version_is_http1_1_or_higher() || self.upgrade_type_is_websocket()
     }
 
     /// Determines if keep-alive connection should be disabled for this request.
