@@ -254,6 +254,24 @@ impl Request {
         String::from_utf8_lossy(self.get_body()).into_owned()
     }
 
+    /// Deserializes the body content of the object into a specified type `T`.
+    ///
+    /// This method first retrieves the body content as a UTF-8 encoded string using `self.get_body()`.
+    /// It then attempts to deserialize the string into the specified type `T` using `serde_json::from_str`.
+    ///
+    /// # Type Parameters
+    /// - `T`: The target type to deserialize into. It must implement the `DeserializeOwned` trait.
+    ///
+    /// # Returns
+    /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
+    /// - `Err(serde_json::Error)`: An error if the deserialization fails (e.g., invalid JSON format or type mismatch).
+    pub fn get_body_json<T>(&self) -> ResultSerdeJsonError<T>
+    where
+        T: DeserializeOwned,
+    {
+        serde_json::from_slice(self.get_body())
+    }
+
     /// Converts the request to a formatted string representation.
     ///
     /// - Returns: A `String` containing formatted request details.
