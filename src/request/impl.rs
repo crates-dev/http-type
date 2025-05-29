@@ -18,8 +18,8 @@ impl Request {
     /// Creates a new `Request` object from a TCP stream.
     ///
     /// # Parameters
-    /// - `reader`: A mut reference to a `&mut BufReader<&mut TcpStream>`
-    /// - `buffer_size`: Request buffer size
+    /// - `reader`: A mut reference to a `&mut BufReader<&mut TcpStream>`.
+    /// - `buffer_size`: Request buffer size.
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
@@ -105,7 +105,7 @@ impl Request {
     ///
     /// # Parameters
     /// - `stream`: A reference to a `&ArcRwLockStream` representing the incoming connection.
-    /// - `buffer_size`: Request buffer size
+    /// - `buffer_size`: Request buffer size.
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
@@ -123,7 +123,8 @@ impl Request {
     ///
     /// # Parameters
     /// - `stream`: A reference to a `&ArcRwLockStream` representing the incoming connection.
-    /// - `buffer_size`: Request buffer size
+    /// - `buffer_size`: Request buffer size.
+    /// - `request`: A reference to a `Request` object. This object is used as a template.
     ///
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
@@ -131,10 +132,11 @@ impl Request {
     pub async fn websocket_request_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
+        request: &Self,
     ) -> RequestReaderHandleResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::websocket_from_reader(&mut reader, buffer_size).await
+        Self::websocket_from_reader(&mut reader, buffer_size, request).await
     }
 
     /// Reads a WebSocket request from a TCP stream and constructs a `Request` object.
@@ -146,7 +148,8 @@ impl Request {
     /// # Arguments
     /// - `reader` - A mutable reference to a `BufReader` wrapping a `TcpStream`.
     ///   This reader is used to read the incoming WebSocket request data.
-    /// - `buffer_size`: - Request buffer size
+    /// - `buffer_size`: - Request buffer size.
+    /// - `request` - A reference to a `Request` object. This object is used as a template.
     ///
     /// # Returns
     /// - `Ok(Request)` - A `Request` object constructed from the received data.
@@ -156,6 +159,7 @@ impl Request {
     pub async fn websocket_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
+        request: &Self,
     ) -> RequestReaderHandleResult {
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
@@ -175,8 +179,8 @@ impl Request {
                 dynamic_buffer.drain(0..consumed);
                 full_frame.extend_from_slice(frame.get_payload_data());
                 if *frame.get_fin() {
-                    let mut request: Request = Request::default();
-                    request.set_body(full_frame);
+                    let mut request: Request = request.clone();
+                    request.body = full_frame;
                     return Ok(request);
                 }
             }
@@ -248,144 +252,6 @@ impl Request {
     /// A `String` containing the body content.
     pub fn get_body_string(&self) -> String {
         String::from_utf8_lossy(self.get_body()).into_owned()
-    }
-
-    /// Deserializes the body content of the object into a specified type `T`.
-    ///
-    /// This method first retrieves the body content as a UTF-8 encoded string using `self.get_body()`.
-    /// It then attempts to deserialize the string into the specified type `T` using `serde_json::from_str`.
-    ///
-    /// # Type Parameters
-    /// - `T`: The target type to deserialize into. It must implement the `DeserializeOwned` trait.
-    ///
-    /// # Returns
-    /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
-    /// - `Err(serde_json::Error)`: An error if the deserialization fails (e.g., invalid JSON format or type mismatch).
-    pub fn get_body_json<T>(&self) -> ResultSerdeJsonError<T>
-    where
-        T: DeserializeOwned,
-    {
-        serde_json::from_slice(self.get_body())
-    }
-
-    /// Adds a header to the request.
-    ///
-    /// This function inserts a key-value pair into the request headers.
-    /// The key and value are converted into `String`, allowing for efficient handling of both owned and borrowed string data.
-    ///
-    /// # Parameters
-    /// - `key`: The header key, which will be converted into a `String`.
-    /// - `value`: The value of the header, which will be converted into a `String`.
-    ///
-    /// # Returns
-    /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
-    pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
-    where
-        K: Into<String>,
-        V: Into<String>,
-    {
-        self.headers.insert(key.into(), value.into());
-        self
-    }
-
-    /// Set the body of the response.
-    ///
-    /// This method allows you to set the body of the response by converting the provided
-    /// value into a `RequestBody` type. The `body` is updated with the converted value,
-    /// and the method returns a mutable reference to the current instance for method chaining.
-    ///
-    /// # Parameters
-    /// - `body`: The body of the response to be set. It can be any type that can be converted
-    ///   into a `RequestBody` using the `Into` trait.
-    ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    /// Set the body of the response.
-    ///
-    /// This method allows you to set the body of the response by converting the provided
-    /// value into a `RequestBody` type. The `body` is updated with the converted value,
-    /// and the method returns a mutable reference to the current instance for method chaining.
-    ///
-    /// # Parameters
-    /// - `body`: The body of the response to be set. It can be any type that can be converted
-    ///   into a `RequestBody` using the `Into` trait.
-    ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    pub fn set_body<T: Into<RequestBody>>(&mut self, body: T) -> &mut Self {
-        self.body = body.into();
-        self
-    }
-
-    /// Set the HTTP method of the request.
-    ///
-    /// This method allows you to set the HTTP method (e.g., GET, POST) of the request
-    /// by converting the provided value into a `RequestMethod` type. The `method` is updated
-    /// with the converted value, and the method returns a mutable reference to the current
-    /// instance for method chaining.
-    ///
-    /// # Parameters
-    /// - `method`: The HTTP method to be set for the request. It can be any type that can
-    ///   be converted into a `RequestMethod` using the `Into` trait.
-    ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    pub fn set_method<T: Into<RequestMethod>>(&mut self, method: T) -> &mut Self {
-        self.method = method.into();
-        self
-    }
-
-    /// Set the host of the request.
-    ///
-    /// This method allows you to set the host (e.g., www.example.com) for the request
-    /// by converting the provided value into a `RequestHost` type. The `host` is updated
-    /// with the converted value, and the method returns a mutable reference to the current
-    /// instance for method chaining.
-    ///
-    /// # Parameters
-    /// - `host`: The host to be set for the request. It can be any type that can be converted
-    ///   into a `RequestHost` using the `Into` trait.
-    ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    pub fn set_host<T: Into<RequestHost>>(&mut self, host: T) -> &mut Self {
-        self.host = host.into();
-        self
-    }
-
-    /// Set the path of the request.
-    ///
-    /// This method allows you to set the path (e.g., /api/v1/resource) for the request
-    /// by converting the provided value into a `RequestPath` type. The `path` is updated
-    /// with the converted value, and the method returns a mutable reference to the current
-    /// instance for method chaining.
-    ///
-    /// # Parameters
-    /// - `path`: The path to be set for the request. It can be any type that can be converted
-    ///   into a `RequestPath` using the `Into` trait.
-    ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    pub fn set_path<T: Into<RequestPath>>(&mut self, path: T) -> &mut Self {
-        self.path = path.into();
-        self
-    }
-
-    /// Sets a query parameter for the request.
-    ///
-    /// # Parameters
-    /// - `key`: The query parameter's key, which can be of any type that implements `Into<RequestQuerysKey>`.
-    /// - `value`: The query parameter's value, which can be of any type that implements `Into<RequestQuerysValue>`.
-    ///
-    /// # Returns
-    /// - Returns a mutable reference to the current instance (`Self`), allowing for method chaining.
-    pub fn set_query<K: Into<RequestQuerysKey>, V: Into<RequestQuerysValue>>(
-        &mut self,
-        key: K,
-        value: V,
-    ) -> &mut Self {
-        self.querys.insert(key.into(), value.into());
-        self
     }
 
     /// Converts the request to a formatted string representation.
