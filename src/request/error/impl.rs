@@ -5,25 +5,34 @@ impl StdError for RequestError {}
 impl Display for RequestError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Request => write!(f, "Request error"),
             Self::HttpRead => write!(f, "Http read error"),
-            Self::InvalidUrl => write!(f, "Invalid url"),
             Self::GetTcpStream => write!(f, "Failed to get tcp stream"),
             Self::GetTlsStream => write!(f, "Failed to get tls stream"),
             Self::WebSocketRead => write!(f, "Websocket read error"),
             Self::ReadConnection => write!(f, "Connection read error"),
             Self::RequestAborted => write!(f, "Request aborted"),
-            Self::SetReadTimeout => write!(f, "Failed to set read timeout"),
-            Self::SetWriteTimeout => write!(f, "Failed to set write timeout"),
             Self::TlsStreamConnect => write!(f, "Tls stream connection error"),
             Self::NeedOpenRedirect => write!(f, "Open redirect required"),
             Self::MaxRedirectTimes => write!(f, "Exceeded maximum redirect attempts"),
-            Self::TcpStreamConnect => write!(f, "Tcp stream connection error"),
             Self::MethodsNotSupport => write!(f, "Http method not supported"),
-            Self::TlsConnectorBuild => write!(f, "Tls connector build error"),
+
             Self::RedirectInvalidUrl => write!(f, "Invalid redirect url"),
             Self::RedirectUrlDeadLoop => write!(f, "Redirect url dead loop detected"),
+            Self::Request(err) => write!(f, "Request error{}{}", COLON_SPACE, err),
             Self::Unknown(err) => write!(f, "Unknown error{}{}", COLON_SPACE, err),
+            Self::InvalidUrl(err) => write!(f, "Invalid url{}{}", COLON_SPACE, err),
+            Self::SetReadTimeout(err) => {
+                write!(f, "Failed to set read timeout{}{}", COLON_SPACE, err)
+            }
+            Self::SetWriteTimeout(err) => {
+                write!(f, "Failed to set write timeout{}{}", COLON_SPACE, err)
+            }
+            Self::TcpStreamConnect(err) => {
+                write!(f, "Tcp stream connection error{}{}", COLON_SPACE, err)
+            }
+            Self::TlsConnectorBuild(err) => {
+                write!(f, "Tls connector build error{}{}", COLON_SPACE, err)
+            }
             Self::InvalidWebSocketRequest(err) => {
                 write!(f, "Invalid websocket request{}{}", COLON_SPACE, err)
             }
