@@ -5,17 +5,21 @@ impl StdError for ResponseError {}
 impl Display for ResponseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::ResponseError(data) => write!(f, "Response Error{}{}", COLON_SPACE, data),
-            Self::HasSendResponse(data) => write!(f, "Response Error{}{:?}", COLON_SPACE, data),
-            Self::CloseError(data) => write!(f, "Close Error{}{}", COLON_SPACE, data),
-            Self::WebSocketHandShakeError => write!(f, "Websocket handshake error"),
-            Self::NotSupportUseThisMethod => {
-                write!(f, "This method call is not supported")
-            }
             Self::NotFoundStream => {
                 write!(f, "Not found stream")
             }
-            Self::Unknown => write!(f, "Unknown"),
+            Self::Close(data) => write!(f, "Close{}{}", COLON_SPACE, data),
+            Self::Response(data) => write!(f, "Response{}{}", COLON_SPACE, data),
+            Self::HasSendResponse(data) => {
+                write!(f, "Has send response{}{:?}", COLON_SPACE, data)
+            }
+            Self::WebSocketHandShake(err) => {
+                write!(f, "Websocket handshake error{}{}", COLON_SPACE, err)
+            }
+            Self::MethodNotSupported(err) => {
+                write!(f, "Method not supported{}{}", COLON_SPACE, err)
+            }
+            Self::Unknown(err) => write!(f, "Unknown{}{}", COLON_SPACE, err),
         }
     }
 }

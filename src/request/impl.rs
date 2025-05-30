@@ -31,8 +31,9 @@ impl Request {
         let mut request_line: String = String::with_capacity(buffer_size);
         let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
-        if parts.len() < 3 {
-            return Err(RequestError::InvalidHttpRequest);
+        let parts_len: usize = parts.len();
+        if parts_len < 3 {
+            return Err(RequestError::InvalidHttpRequestPartsLength(parts_len));
         }
         let method: RequestMethod = parts[0]
             .to_string()
@@ -167,7 +168,7 @@ impl Request {
         loop {
             let len: usize = match reader.read(&mut temp_buffer).await {
                 Ok(len) => len,
-                Err(_) => return Err(RequestError::InvalidWebSocketRequest),
+                Err(err) => return Err(RequestError::InvalidWebSocketRequest(err.to_string())),
             };
             if len == 0 {
                 break;
@@ -185,7 +186,7 @@ impl Request {
                 }
             }
         }
-        Err(RequestError::InvalidWebSocketRequest)
+        Err(RequestError::WebSocketRead)
     }
 
     /// Parse querys

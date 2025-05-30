@@ -58,7 +58,7 @@ impl ArcRwLockStream {
             .await
             .write_all(&data)
             .await
-            .map_err(|err| ResponseError::ResponseError(err.to_string()))?;
+            .map_err(|err| ResponseError::Response(err.to_string()))?;
         Ok(())
     }
 
@@ -86,7 +86,7 @@ impl ArcRwLockStream {
             stream
                 .write_all(&tmp_body)
                 .await
-                .map_err(|err| ResponseError::ResponseError(err.to_string()))?;
+                .map_err(|err| ResponseError::Response(err.to_string()))?;
         }
         Ok(())
     }
@@ -123,7 +123,7 @@ impl ArcRwLockStream {
             .await
             .flush()
             .await
-            .map_err(|err| ResponseError::ResponseError(err.to_string()))?;
+            .map_err(|err| ResponseError::Response(err.to_string()))?;
         Ok(())
     }
 
@@ -141,6 +141,6 @@ impl ArcRwLockStream {
             .await
             .shutdown()
             .await
-            .map_err(|err| ResponseError::CloseError(err.to_string()))
+            .map_err(|err| ResponseError::Close(err.to_string()))
     }
 }
