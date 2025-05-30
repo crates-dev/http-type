@@ -73,7 +73,6 @@ pub use websocket_frame::*;
 pub use dashmap;
 pub use http_compress::*;
 pub use http_constant::*;
-pub use std_macro_extensions::*;
 pub use tokio;
 
 pub(crate) use core::hash::BuildHasherDefault;

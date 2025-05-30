@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "4.9.1"
+version = "4.10.0"
 edition = "2024"
 authors = ["root@ltpp.vip"] 
 license = "MIT"
@@ -27,7 +27,6 @@ url = "2.5.4"
 tokio = { version = "1.45.1", features = ["full"] }
 http-compress = "2.13.5"
 dashmap = "6.1.0"
-std-macro-extensions = "0.23.2"
 
 [profile.dev]
 incremental = false
