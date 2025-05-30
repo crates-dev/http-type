@@ -20,7 +20,7 @@ pub enum RequestError {
     TlsConnectorBuild,
     RedirectInvalidUrl,
     RedirectUrlDeadLoop,
+    Unknown(String),
     InvalidWebSocketRequest(String),
     InvalidHttpRequestPartsLength(usize),
-    Unknown(String),
 }

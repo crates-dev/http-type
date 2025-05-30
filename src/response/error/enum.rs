@@ -4,9 +4,8 @@ use crate::*;
 pub enum ResponseError {
     NotFoundStream,
     Close(String),
+    Unknown(String),
     Response(String),
-    HasSendResponse(Response),
     WebSocketHandShake(String),
     MethodNotSupported(String),
-    Unknown(String),
 }

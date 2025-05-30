@@ -23,13 +23,13 @@ impl Display for RequestError {
             Self::TlsConnectorBuild => write!(f, "Tls connector build error"),
             Self::RedirectInvalidUrl => write!(f, "Invalid redirect url"),
             Self::RedirectUrlDeadLoop => write!(f, "Redirect url dead loop detected"),
+            Self::Unknown(err) => write!(f, "Unknown error{}{}", COLON_SPACE, err),
             Self::InvalidWebSocketRequest(err) => {
                 write!(f, "Invalid websocket request{}{}", COLON_SPACE, err)
             }
             Self::InvalidHttpRequestPartsLength(len) => {
                 write!(f, "Invalid http request parts length{}{}", COLON_SPACE, len)
             }
-            Self::Unknown(err) => write!(f, "Unknown error{}{}", COLON_SPACE, err),
         }
     }
 }
