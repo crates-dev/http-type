@@ -1,12 +1,12 @@
 use crate::*;
 
 /// Represents a decoded WebSocket frame
-#[derive(Debug, Clone, Getter, Default, DisplayDebug)]
+#[derive(Debug, Clone, Getter, DisplayDebug)]
 pub struct WebSocketFrame {
     /// FIN flag indicating if this is the final frame
     pub(super) fin: bool,
     /// Opcode indicating the frame type (text, binary, etc.)
-    pub(super) opcode: u8,
+    pub(super) opcode: WebSocketOpcode,
     /// Mask flag indicating if the payload is masked
     pub(super) mask: bool,
     /// The payload data of the frame

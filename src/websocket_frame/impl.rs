@@ -1,5 +1,148 @@
 use crate::*;
 
+impl Default for WebSocketFrame {
+    fn default() -> Self {
+        Self {
+            fin: false,
+            opcode: WebSocketOpcode::Text,
+            mask: false,
+            payload_data: Vec::new(),
+        }
+    }
+}
+
+impl WebSocketOpcode {
+    /// Create a WebSocketOpcode from a raw u8 value
+    ///
+    /// # Parameters
+    /// - `opcode`: The raw opcode value
+    ///
+    /// # Returns
+    /// - A WebSocketOpcode enum variant corresponding to the raw value
+    pub fn from_u8(opcode: u8) -> Self {
+        match opcode {
+            0x0 => Self::Continuation,
+            0x1 => Self::Text,
+            0x2 => Self::Binary,
+            0x8 => Self::Close,
+            0x9 => Self::Ping,
+            0xA => Self::Pong,
+            _ => Self::Reserved(opcode),
+        }
+    }
+
+    /// Convert the WebSocketOpcode to its raw u8 value
+    ///
+    /// # Returns
+    /// - The raw u8 value of the opcode
+    pub fn to_u8(&self) -> u8 {
+        match self {
+            Self::Continuation => 0x0,
+            Self::Text => 0x1,
+            Self::Binary => 0x2,
+            Self::Close => 0x8,
+            Self::Ping => 0x9,
+            Self::Pong => 0xA,
+            Self::Reserved(code) => *code,
+        }
+    }
+
+    /// Check if the opcode is a control frame
+    ///
+    /// # Returns
+    /// - true if the opcode represents a control frame (Close, Ping, Pong)
+    /// - false otherwise
+    pub fn is_control(&self) -> bool {
+        matches!(self, Self::Close | Self::Ping | Self::Pong)
+    }
+
+    /// Check if the opcode is a data frame
+    ///
+    /// # Returns
+    /// - true if the opcode represents a data frame (Text, Binary, Continuation)
+    /// - false otherwise
+    pub fn is_data(&self) -> bool {
+        matches!(self, Self::Text | Self::Binary | Self::Continuation)
+    }
+
+    /// Checks if the frame is a continuation frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the frame is `Continuation`, otherwise `false`.
+    pub fn is_continuation(&self) -> bool {
+        matches!(self, Self::Continuation)
+    }
+
+    /// Checks if the frame is a text frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the frame is `Text`, otherwise `false`.
+    pub fn is_text(&self) -> bool {
+        matches!(self, Self::Text)
+    }
+
+    /// Checks if the frame is a binary frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the frame is `Binary`, otherwise `false`.
+    pub fn is_binary(&self) -> bool {
+        matches!(self, Self::Binary)
+    }
+
+    /// Checks if the frame is a close frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the frame is `Close`, otherwise `false`.
+    pub fn is_close(&self) -> bool {
+        matches!(self, Self::Close)
+    }
+
+    /// Checks if the frame is a ping frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the frame is `Ping`, otherwise `false`.
+    pub fn is_ping(&self) -> bool {
+        matches!(self, Self::Ping)
+    }
+
+    /// Checks if the frame is a pong frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the frame is `Pong`, otherwise `false`.
+    pub fn is_pong(&self) -> bool {
+        matches!(self, Self::Pong)
+    }
+
+    /// Checks if the frame is a reserved frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the frame is `Reserved(_)`, otherwise `false`.
+    pub fn is_reserved(&self) -> bool {
+        matches!(self, Self::Reserved(_))
+    }
+}
+
 impl WebSocketFrame {
     /// decode_websocket_frame_with_length
     ///
@@ -15,7 +158,7 @@ impl WebSocketFrame {
         }
         let mut index: usize = 0;
         let fin: bool = (data[index] & 0b1000_0000) != 0;
-        let opcode: u8 = data[index] & 0b0000_1111;
+        let opcode: WebSocketOpcode = WebSocketOpcode::from_u8(data[index] & 0b0000_1111);
         index += 1;
         let mask: bool = (data[index] & 0b1000_0000) != 0;
         let mut payload_len: usize = (data[index] & 0b0111_1111) as usize;
@@ -72,7 +215,11 @@ impl WebSocketFrame {
         let mut frames_list: Vec<ResponseBody> = Vec::new();
         let mut is_first_frame: bool = true;
         let is_valid_utf8: bool = std::str::from_utf8(body).is_ok();
-        let base_opcode: u8 = if is_valid_utf8 { 0x01 } else { 0x02 };
+        let base_opcode: WebSocketOpcode = if is_valid_utf8 {
+            WebSocketOpcode::Text
+        } else {
+            WebSocketOpcode::Binary
+        };
         while offset < total_len {
             let remaining: usize = total_len - offset;
             let mut frame_size: usize = remaining.min(MAX_FRAME_SIZE);
@@ -85,9 +232,13 @@ impl WebSocketFrame {
                 }
             }
             let mut frame: ResponseBody = Vec::with_capacity(frame_size + 10);
-            let opcode: u8 = if is_first_frame { base_opcode } else { 0x00 };
+            let opcode: WebSocketOpcode = if is_first_frame {
+                base_opcode
+            } else {
+                WebSocketOpcode::Continuation
+            };
             let fin_bit: u8 = if remaining > frame_size { 0x00 } else { 0x80 };
-            frame.push(fin_bit | opcode);
+            frame.push(fin_bit | opcode.to_u8());
             if frame_size < 126 {
                 frame.push(frame_size as u8);
             } else if frame_size <= MAX_FRAME_SIZE {
@@ -203,5 +354,82 @@ impl WebSocketFrame {
             }
         }
         String::from_utf8(encoded_data).unwrap()
+    }
+
+    /// Checks if the opcode is a continuation frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the opcode is `Continuation`, otherwise `false`.
+    pub fn opcode_is_continuation(&self) -> bool {
+        self.opcode.is_continuation()
+    }
+
+    /// Checks if the opcode is a text frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the opcode is `Text`, otherwise `false`.
+    pub fn opcode_is_text(&self) -> bool {
+        self.opcode.is_text()
+    }
+
+    /// Checks if the opcode is a binary frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the opcode is `Binary`, otherwise `false`.
+    pub fn opcode_is_binary(&self) -> bool {
+        self.opcode.is_binary()
+    }
+
+    /// Checks if the opcode is a close frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the opcode is `Close`, otherwise `false`.
+    pub fn opcode_is_close(&self) -> bool {
+        self.opcode.is_close()
+    }
+
+    /// Checks if the opcode is a ping frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the opcode is `Ping`, otherwise `false`.
+    pub fn opcode_is_ping(&self) -> bool {
+        self.opcode.is_ping()
+    }
+
+    /// Checks if the opcode is a pong frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the opcode is `Pong`, otherwise `false`.
+    pub fn opcode_is_pong(&self) -> bool {
+        self.opcode.is_pong()
+    }
+
+    /// Checks if the opcode is a reserved frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current frame.
+    ///
+    /// # Returns
+    /// - `true` if the opcode is `Reserved(_)`, otherwise `false`.
+    pub fn opcode_is_reserved(&self) -> bool {
+        self.opcode.is_reserved()
     }
 }
