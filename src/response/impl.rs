@@ -289,22 +289,6 @@ impl Response {
         stream_lock.flush().await
     }
 
-    /// Closes the stream after sending the response.
-    ///
-    /// This function is responsible for:
-    /// - Building the response using the `build()` method.
-    /// - Setting the response using the `set_response()` method.
-    /// - Shutting down the write half of the TCP stream to indicate no more data will be sent.
-    ///
-    /// # Parameters
-    /// - `stream`: A reference to the `TcpStream` that will be closed after sending the response.
-    ///
-    /// # Returns
-    /// - `ResponseResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
-    pub async fn close(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        stream_lock.close().await
-    }
-
     /// Converts the response to a formatted string representation.
     ///
     /// - Returns: A `String` containing formatted response details.

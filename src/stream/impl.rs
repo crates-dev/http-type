@@ -126,21 +126,4 @@ impl ArcRwLockStream {
             .map_err(|err| ResponseError::Response(err.to_string()))?;
         Ok(())
     }
-
-    /// Closes the stream after sending the response.
-    ///
-    /// This function is responsible for:
-    /// - Building the response using the `build()` method.
-    /// - Setting the response using the `set_response()` method.
-    /// - Shutting down the write half of the TCP stream to indicate no more data will be sent.
-    ///
-    /// # Returns
-    /// - `ResponseResult`: The result of the operation, indicating whether the closure was successful or if an error occurred.
-    pub async fn close(&self) -> ResponseResult {
-        self.get_write_lock()
-            .await
-            .shutdown()
-            .await
-            .map_err(|err| ResponseError::Close(err.to_string()))
-    }
 }
