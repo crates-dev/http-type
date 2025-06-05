@@ -171,7 +171,7 @@ impl Request {
                 Err(err) => return Err(RequestError::InvalidWebSocketRequest(err.to_string())),
             };
             if len == 0 {
-                break;
+                return Err(RequestError::IncompleteWebSocketFrame);
             }
             dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
             if let Some((frame, consumed)) =
@@ -186,7 +186,6 @@ impl Request {
                 }
             }
         }
-        Err(RequestError::WebSocketRead)
     }
 
     /// Parse querys

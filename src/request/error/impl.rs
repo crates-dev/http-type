@@ -8,16 +8,18 @@ impl Display for RequestError {
             Self::HttpRead => write!(f, "Http read error"),
             Self::GetTcpStream => write!(f, "Failed to get tcp stream"),
             Self::GetTlsStream => write!(f, "Failed to get tls stream"),
-            Self::WebSocketRead => write!(f, "Websocket read error"),
             Self::ReadConnection => write!(f, "Connection read error"),
             Self::RequestAborted => write!(f, "Request aborted"),
             Self::TlsStreamConnect => write!(f, "Tls stream connection error"),
             Self::NeedOpenRedirect => write!(f, "Open redirect required"),
             Self::MaxRedirectTimes => write!(f, "Exceeded maximum redirect attempts"),
             Self::MethodsNotSupport => write!(f, "Http method not supported"),
-
             Self::RedirectInvalidUrl => write!(f, "Invalid redirect url"),
             Self::RedirectUrlDeadLoop => write!(f, "Redirect url dead loop detected"),
+            Self::IncompleteWebSocketFrame => write!(
+                f,
+                "WebSocket connection closed before a complete frame was received"
+            ),
             Self::Request(err) => write!(f, "Request error{}{}", COLON_SPACE, err),
             Self::Unknown(err) => write!(f, "Unknown error{}{}", COLON_SPACE, err),
             Self::InvalidUrl(err) => write!(f, "Invalid url{}{}", COLON_SPACE, err),
