@@ -14,6 +14,7 @@ pub enum RequestError {
     RedirectInvalidUrl,
     ClientDisconnected,
     RedirectUrlDeadLoop,
+    ClientClosedConnection,
     IncompleteWebSocketFrame,
     Request(String),
     Unknown(String),
@@ -23,7 +24,6 @@ pub enum RequestError {
     TcpStreamConnect(String),
     TlsConnectorBuild(String),
     InvalidWebSocketFrame(String),
-    ClientClosedConnection(String),
     InvalidWebSocketRequest(String),
     InvalidHttpRequestPartsLength(usize),
 }

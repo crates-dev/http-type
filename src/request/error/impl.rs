@@ -17,6 +17,9 @@ impl Display for RequestError {
             Self::RedirectInvalidUrl => write!(f, "Invalid redirect url"),
             Self::ClientDisconnected => write!(f, "Client disconnected"),
             Self::RedirectUrlDeadLoop => write!(f, "Redirect url dead loop detected"),
+            Self::ClientClosedConnection => {
+                write!(f, "Client closed connection")
+            }
             Self::IncompleteWebSocketFrame => write!(
                 f,
                 "WebSocket connection closed before a complete frame was received"
@@ -39,9 +42,7 @@ impl Display for RequestError {
             Self::InvalidWebSocketFrame(err) => {
                 write!(f, "Invalid websocket frame{}{}", COLON_SPACE, err)
             }
-            Self::ClientClosedConnection(err) => {
-                write!(f, "Client closed connection{}{}", COLON_SPACE, err)
-            }
+
             Self::InvalidWebSocketRequest(err) => {
                 write!(f, "Invalid websocket request{}{}", COLON_SPACE, err)
             }

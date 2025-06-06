@@ -187,9 +187,7 @@ impl Request {
                 dynamic_buffer.drain(0..consumed);
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
-                        let reason: String =
-                            String::from_utf8_lossy(frame.get_payload_data()).to_string();
-                        return Err(RequestError::ClientClosedConnection(reason));
+                        return Err(RequestError::ClientClosedConnection);
                     }
                     WebSocketOpcode::Ping | WebSocketOpcode::Pong => {
                         continue;
