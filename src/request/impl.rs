@@ -133,7 +133,7 @@ impl Request {
     pub async fn websocket_request_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
-        request: &Self,
+        request: &mut Self,
     ) -> RequestReaderHandleResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
@@ -160,15 +160,19 @@ impl Request {
     pub async fn websocket_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
-        request: &Self,
+        request: &mut Self,
     ) -> RequestReaderHandleResult {
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
         let mut full_frame: Vec<u8> = Vec::with_capacity(buffer_size);
+        let mut error_handle = || {
+            request.body.clear();
+        };
         loop {
             let len: usize = match reader.read(&mut temp_buffer).await {
                 Ok(len) => len,
                 Err(err) => {
+                    error_handle();
                     if err.kind() == ErrorKind::ConnectionReset
                         || err.kind() == ErrorKind::ConnectionAborted
                     {
@@ -178,6 +182,7 @@ impl Request {
                 }
             };
             if len == 0 {
+                error_handle();
                 return Err(RequestError::IncompleteWebSocketFrame);
             }
             dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
@@ -187,6 +192,7 @@ impl Request {
                 dynamic_buffer.drain(0..consumed);
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
+                        error_handle();
                         return Err(RequestError::ClientClosedConnection);
                     }
                     WebSocketOpcode::Ping | WebSocketOpcode::Pong => {
@@ -201,6 +207,7 @@ impl Request {
                         }
                     }
                     _ => {
+                        error_handle();
                         return Err(RequestError::InvalidWebSocketFrame(
                             "Unsupported opcode".into(),
                         ));
