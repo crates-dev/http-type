@@ -8,7 +8,9 @@ impl Display for ResponseError {
             Self::NotFoundStream => {
                 write!(f, "Not found stream")
             }
-            Self::Close(data) => write!(f, "Close error{}{}", COLON_SPACE, data),
+            Self::ConnectionClosed => {
+                write!(f, "Connection has been closed")
+            }
             Self::Unknown(err) => write!(f, "Unknown error{}{}", COLON_SPACE, err),
             Self::Response(data) => write!(f, "Response error{}{}", COLON_SPACE, data),
             Self::WebSocketHandShake(err) => {

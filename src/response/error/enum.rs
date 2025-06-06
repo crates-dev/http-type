@@ -3,7 +3,7 @@ use crate::*;
 #[derive(Debug, Clone)]
 pub enum ResponseError {
     NotFoundStream,
-    Close(String),
+    ConnectionClosed,
     Unknown(String),
     Response(String),
     WebSocketHandShake(String),
