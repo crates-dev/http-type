@@ -115,7 +115,7 @@ impl Request {
         stream: &ArcRwLockStream,
         buffer_size: usize,
     ) -> RequestReaderHandleResult {
-        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
+        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
         Self::http_from_reader(&mut reader, buffer_size).await
     }
@@ -135,7 +135,7 @@ impl Request {
         buffer_size: usize,
         request: &Self,
     ) -> RequestReaderHandleResult {
-        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.get_write_lock().await;
+        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
         Self::websocket_from_reader(&mut reader, buffer_size, request).await
     }

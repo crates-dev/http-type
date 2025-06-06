@@ -30,7 +30,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     /// Returns a read guard that provides shared access to the TCP stream
-    pub async fn get_read_lock(&self) -> RwLockReadGuardTcpStream {
+    pub async fn read(&self) -> RwLockReadGuardTcpStream {
         self.0.read().await
     }
 
@@ -41,7 +41,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     /// Returns a write guard that provides exclusive access to the TCP stream
-    pub(crate) async fn get_write_lock(&self) -> RwLockWriteGuardTcpStream {
+    pub(crate) async fn write(&self) -> RwLockWriteGuardTcpStream {
         self.0.write().await
     }
 
@@ -54,7 +54,7 @@ impl ArcRwLockStream {
     /// - `Ok`: If the response is successfully sent.
     /// - `Err`: If an error occurs during sending.
     pub async fn send(&self, data: &ResponseData) -> ResponseResult {
-        self.get_write_lock()
+        self.write()
             .await
             .write_all(&data)
             .await
@@ -81,7 +81,7 @@ impl ArcRwLockStream {
         } else {
             vec![body.clone()]
         };
-        let mut stream: RwLockWriteGuardTcpStream = self.get_write_lock().await;
+        let mut stream: RwLockWriteGuardTcpStream = self.write().await;
         for tmp_body in body_list {
             stream
                 .write_all(&tmp_body)
@@ -119,7 +119,7 @@ impl ArcRwLockStream {
     ///
     /// - Returns: A `ResponseResult` indicating success or failure.
     pub async fn flush(&self) -> &Self {
-        let _ = self.get_write_lock().await.flush();
+        let _ = self.write().await.flush();
         self
     }
 }
