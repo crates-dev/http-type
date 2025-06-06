@@ -167,7 +167,7 @@ impl Response {
     /// Builds the full HTTP response as a byte vector.
     /// # Returns
     /// - `ResponseData`: response data
-    pub(super) fn build(&mut self) -> ResponseData {
+    pub fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(HttpStatus::phrase(*self.get_status_code()));
         }
@@ -223,70 +223,6 @@ impl Response {
         let mut response_bytes: Vec<u8> = response_string.into_bytes();
         response_bytes.extend_from_slice(&body);
         response_bytes
-    }
-
-    /// Sends the HTTP or HTTP websocket response body over a TCP stream.
-    ///
-    /// # Parameters
-    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
-    /// - `is_websocket`: Is websocket
-    ///
-    /// # Returns
-    /// - `Ok`: If the response body is successfully sent.
-    /// - `Err`: If an error occurs during sending.
-    pub async fn send_body_with_websocket_flag(
-        &mut self,
-        stream_lock: &ArcRwLockStream,
-        is_websocket: bool,
-    ) -> ResponseResult {
-        stream_lock
-            .send_body_with_websocket_flag(self.get_body(), is_websocket)
-            .await
-    }
-
-    /// Sends the HTTP response body over a TCP stream.
-    ///
-    /// # Parameters
-    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
-    ///
-    /// # Returns
-    /// - `Ok`: If the response body is successfully sent.
-    /// - `Err`: If an error occurs during sending.
-    pub async fn send_body(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        stream_lock.send_body(self.get_body()).await
-    }
-
-    /// Sends the HTTP websocket response body over a TCP stream.
-    ///
-    /// # Parameters
-    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
-    ///
-    /// # Returns
-    /// - `Ok`: If the response body is successfully sent.
-    /// - `Err`: If an error occurs during sending.
-    pub async fn send_websocket_body(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        stream_lock.send_websocket_body(self.get_body()).await
-    }
-
-    /// Sends the HTTP response over a TCP stream.
-    ///
-    /// # Parameters
-    /// - `stream`: A mutable reference to the `TcpStream` to send the response.
-    ///
-    /// # Returns
-    /// - `Ok`: If the response is successfully sent.
-    /// - `Err`: If an error occurs during sending.
-    pub async fn send(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        stream_lock.send(&self.build()).await
-    }
-
-    /// Flush the TCP stream.
-    ///
-    /// - `stream_lock`: A reference to an `ArcRwLockStream` that manages the TCP stream.
-    ///
-    /// - Returns: A `ResponseResult` indicating success or failure.
-    pub async fn flush(&mut self, stream_lock: &ArcRwLockStream) -> ResponseResult {
-        stream_lock.flush().await
     }
 
     /// Converts the response to a formatted string representation.

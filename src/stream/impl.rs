@@ -8,7 +8,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     /// Returns a new `ArcRwLockStream` instance containing the provided stream
-    pub fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
+    pub async fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
         Self(arc_rw_lock_stream)
     }
 
@@ -19,7 +19,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     /// Returns a new `ArcRwLockStream` instance containing the provided stream wrapped in an `Arc<RwLock<_>>`
-    pub fn from_stream(stream: TcpStream) -> Self {
+    pub async fn from_stream(stream: TcpStream) -> Self {
         Self(arc_rwlock(stream))
     }
 
@@ -41,7 +41,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     /// Returns a write guard that provides exclusive access to the TCP stream
-    pub async fn get_write_lock(&self) -> RwLockWriteGuardTcpStream {
+    pub(crate) async fn get_write_lock(&self) -> RwLockWriteGuardTcpStream {
         self.0.write().await
     }
 
@@ -118,12 +118,8 @@ impl ArcRwLockStream {
     /// Flush the TCP stream.
     ///
     /// - Returns: A `ResponseResult` indicating success or failure.
-    pub async fn flush(&self) -> ResponseResult {
-        self.get_write_lock()
-            .await
-            .flush()
-            .await
-            .map_err(|err| ResponseError::Response(err.to_string()))?;
-        Ok(())
+    pub async fn flush(&self) -> &Self {
+        let _ = self.get_write_lock().await.flush();
+        self
     }
 }
