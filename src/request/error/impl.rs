@@ -15,6 +15,7 @@ impl Display for RequestError {
             Self::MaxRedirectTimes => write!(f, "Exceeded maximum redirect attempts"),
             Self::MethodsNotSupport => write!(f, "Http method not supported"),
             Self::RedirectInvalidUrl => write!(f, "Invalid redirect url"),
+            Self::ClientDisconnected => write!(f, "Client disconnected"),
             Self::RedirectUrlDeadLoop => write!(f, "Redirect url dead loop detected"),
             Self::IncompleteWebSocketFrame => write!(
                 f,
@@ -34,6 +35,12 @@ impl Display for RequestError {
             }
             Self::TlsConnectorBuild(err) => {
                 write!(f, "Tls connector build error{}{}", COLON_SPACE, err)
+            }
+            Self::InvalidWebSocketFrame(err) => {
+                write!(f, "Invalid websocket frame{}{}", COLON_SPACE, err)
+            }
+            Self::ClientClosedConnection(err) => {
+                write!(f, "Client closed connection{}{}", COLON_SPACE, err)
             }
             Self::InvalidWebSocketRequest(err) => {
                 write!(f, "Invalid websocket request{}{}", COLON_SPACE, err)

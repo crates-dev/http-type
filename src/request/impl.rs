@@ -168,21 +168,45 @@ impl Request {
         loop {
             let len: usize = match reader.read(&mut temp_buffer).await {
                 Ok(len) => len,
-                Err(err) => return Err(RequestError::InvalidWebSocketRequest(err.to_string())),
+                Err(err) => {
+                    if err.kind() == ErrorKind::ConnectionReset
+                        || err.kind() == ErrorKind::ConnectionAborted
+                    {
+                        return Err(RequestError::ClientDisconnected);
+                    }
+                    return Err(RequestError::InvalidWebSocketRequest(err.to_string()));
+                }
             };
             if len == 0 {
                 return Err(RequestError::IncompleteWebSocketFrame);
             }
             dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
-            if let Some((frame, consumed)) =
+            while let Some((frame, consumed)) =
                 WebSocketFrame::decode_websocket_frame_with_length(&dynamic_buffer)
             {
                 dynamic_buffer.drain(0..consumed);
-                full_frame.extend_from_slice(frame.get_payload_data());
-                if *frame.get_fin() {
-                    let mut request: Request = request.clone();
-                    request.body = full_frame;
-                    return Ok(request);
+                match frame.get_opcode() {
+                    WebSocketOpcode::Close => {
+                        let reason: String =
+                            String::from_utf8_lossy(frame.get_payload_data()).to_string();
+                        return Err(RequestError::ClientClosedConnection(reason));
+                    }
+                    WebSocketOpcode::Ping | WebSocketOpcode::Pong => {
+                        continue;
+                    }
+                    WebSocketOpcode::Text | WebSocketOpcode::Binary => {
+                        full_frame.extend_from_slice(frame.get_payload_data());
+                        if *frame.get_fin() {
+                            let mut request: Request = request.clone();
+                            request.body = full_frame;
+                            return Ok(request);
+                        }
+                    }
+                    _ => {
+                        return Err(RequestError::InvalidWebSocketFrame(
+                            "Unsupported opcode".into(),
+                        ));
+                    }
                 }
             }
         }

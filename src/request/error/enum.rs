@@ -12,6 +12,7 @@ pub enum RequestError {
     MaxRedirectTimes,
     MethodsNotSupport,
     RedirectInvalidUrl,
+    ClientDisconnected,
     RedirectUrlDeadLoop,
     IncompleteWebSocketFrame,
     Request(String),
@@ -21,6 +22,8 @@ pub enum RequestError {
     SetWriteTimeout(String),
     TcpStreamConnect(String),
     TlsConnectorBuild(String),
+    InvalidWebSocketFrame(String),
+    ClientClosedConnection(String),
     InvalidWebSocketRequest(String),
     InvalidHttpRequestPartsLength(usize),
 }

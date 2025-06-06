@@ -88,6 +88,7 @@ pub(crate) use std::{
     error::Error as StdError,
     fmt::{self, Debug, Display},
     hash::Hash,
+    io::ErrorKind,
     net::{IpAddr, SocketAddr},
     rc::Rc,
     result::Result,
