@@ -8,7 +8,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     /// Returns a new `ArcRwLockStream` instance containing the provided stream
-    pub async fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
+    pub fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
         Self(arc_rw_lock_stream)
     }
 
@@ -19,7 +19,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     /// Returns a new `ArcRwLockStream` instance containing the provided stream wrapped in an `Arc<RwLock<_>>`
-    pub async fn from_stream(stream: TcpStream) -> Self {
+    pub fn from_stream(stream: TcpStream) -> Self {
         Self(arc_rwlock(stream))
     }
 
