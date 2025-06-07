@@ -1,36 +1,36 @@
 use crate::*;
 
-/// Request method
+/// HTTP request method.
 pub type RequestMethod = Method;
-/// Request host
+/// The host part of an HTTP request.
 pub type RequestHost = String;
-/// Request version
+/// The HTTP version (e.g., HTTP/1.1).
 pub type RequestVersion = HttpVersion;
-/// Request path
+/// The path portion of the request URL.
 pub type RequestPath = String;
-/// Request querys key
+/// Key type used in the request query parameters.
 pub type RequestQuerysKey = String;
-/// Request querys value
+/// Value type used in the request query parameters.
 pub type RequestQuerysValue = String;
-/// Request querys
+/// All query parameters parsed from the request URL.
 pub type RequestQuerys = HashMapXxHash3_64<RequestQuerysKey, RequestQuerysValue>;
-///  Request body
+/// The raw binary body of the request.
 pub type RequestBody = Vec<u8>;
-///  Request body string
+/// The request body as a UTF-8 string.
 pub type RequestBodyString = String;
-/// Request headers key
+/// Key type used in the request headers.
 pub type RequestHeadersKey = String;
-/// Request headers value
+/// Value type used in the request headers.
 pub type RequestHeadersValue = String;
-/// Request headers
+/// All headers sent with the HTTP request.
 pub type RequestHeaders = HashMapXxHash3_64<RequestHeadersKey, RequestHeadersValue>;
-/// Request reader handle result
+/// The result type returned from a request reader handler.
 pub type RequestReaderHandleResult = Result<Request, RequestError>;
-/// RwLockReadGuardRequest
+/// Read guard for a `Request` wrapped in a `RwLock`.
 pub type RwLockReadGuardRequest<'a> = RwLockReadGuard<'a, Request>;
-/// RwLockWriteGuardRequest
+/// Write guard for a `Request` wrapped in a `RwLock`.
 pub type RwLockWriteGuardRequest<'a> = RwLockWriteGuard<'a, Request>;
-/// OptionRequestQuerysValue
+/// Optional value for a query parameter.
 pub type OptionRequestQuerysValue = Option<RequestQuerysValue>;
-/// OptionRequestHeadersValue
+/// Optional value for a header.
 pub type OptionRequestHeadersValue = Option<RequestHeadersValue>;

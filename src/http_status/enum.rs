@@ -1,4 +1,4 @@
-/// Enumeration of HTTP status
+/// Represents common HTTP status codes.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HttpStatus {
     /// 100 Continue

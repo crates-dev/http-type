@@ -1,17 +1,16 @@
-/// Represents different types of HTTP content types, such as JSON, XML, plain text, HTML,
-/// form URL encoded, and an unknown type.
+/// Represents supported HTTP content types.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ContentType {
-    /// Represents the `application/json` content type.
+    /// `application/json`
     ApplicationJson,
-    /// Represents the `application/xml` content type.
+    /// `application/xml`
     ApplicationXml,
-    /// Represents the `text/plain` content type.
+    /// `text/plain`
     TextPlain,
-    /// Represents the `text/html` content type.
+    /// `text/html`
     TextHtml,
-    /// Represents the `application/x-www-form-urlencoded` content type.
+    /// `application/x-www-form-urlencoded`
     FormUrlEncoded,
-    /// Represents an unknown or unrecognized content type.
+    /// Unknown or unrecognized content type
     Unknown,
 }

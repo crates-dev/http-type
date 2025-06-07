@@ -1,21 +1,19 @@
 use crate::*;
 
-/// Represents an HTTP response.
-///
-/// # Fields
-/// - `version`: The HTTP version of the response.
-/// - `status_code`: The status code of the response.
-/// - `reason_phrase`: The reason phrase corresponding to the status code.
-/// - `headers`: A collection of HTTP headers as key-value pairs.
-/// - `body`: The binary body of the response.
+/// Represents a parsed HTTP response.
 #[derive(Debug, Clone, Data, DisplayDebug)]
 pub struct Response {
+    /// The HTTP version used in the response.
     #[set(skip)]
     pub(super) version: ResponseVersion,
+    /// The HTTP status code (e.g., 200, 404).
     pub(super) status_code: ResponseStatusCode,
+    /// The reason phrase associated with the status code (e.g., "OK", "Not Found").
     #[set(skip)]
     pub(super) reason_phrase: ResponseReasonPhrase,
+    /// The response headers as key-value pairs.
     pub(super) headers: ResponseHeaders,
+    /// The binary body content of the response.
     #[set(skip)]
     pub(super) body: ResponseBody,
 }

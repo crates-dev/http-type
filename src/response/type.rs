@@ -1,30 +1,30 @@
 use crate::*;
 
-///  Response body
+/// The binary body of the HTTP response.
 pub type ResponseBody = Vec<u8>;
-///  Response body string
+/// The body of the HTTP response represented as a UTF-8 string.
 pub type ResponseBodyString = String;
-///  Response headers key
+/// The key type used in HTTP response headers.
 pub type ResponseHeadersKey = String;
-///  Response headers value
+/// The value type used in HTTP response headers.
 pub type ResponseHeadersValue = String;
-///  Response headers
+/// A map of HTTP response headers.
 pub type ResponseHeaders = HashMapXxHash3_64<ResponseHeadersKey, ResponseHeadersValue>;
-/// Response version
+/// The HTTP version of the response (e.g., "HTTP/1.1").
 pub type ResponseVersion = String;
-/// Response status code
+/// The numeric status code of the HTTP response (e.g., 200, 404).
 pub type ResponseStatusCode = usize;
-/// Response reason phrase
+/// The reason phrase associated with the HTTP status code (e.g., "OK", "Not Found").
 pub type ResponseReasonPhrase = String;
-///  Response result
+/// The result type returned after writing an HTTP response.
 pub type ResponseResult = Result<(), ResponseError>;
-/// Response data
+/// The full serialized binary content of the HTTP response.
 pub type ResponseData = Vec<u8>;
-/// Response data string
+/// The full serialized content of the HTTP response as a UTF-8 string.
 pub type ResponseDataString = String;
-/// RwLockReadGuardResponse
+/// A read guard to a shared `Response` value protected by `RwLock`.
 pub type RwLockReadGuardResponse<'a> = RwLockReadGuard<'a, Response>;
-/// RwLockWriteGuardResponse
+/// A write guard to a shared `Response` value protected by `RwLock`.
 pub type RwLockWriteGuardResponse<'a> = RwLockWriteGuard<'a, Response>;
-/// OptionResponseHeadersValue
+/// An optional value of a response header.
 pub type OptionResponseHeadersValue = Option<ResponseHeadersValue>;

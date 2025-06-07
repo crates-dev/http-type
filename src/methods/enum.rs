@@ -1,6 +1,4 @@
 /// Defines the `Method` enum, representing HTTP request methods.
-///
-/// The `Method` enum includes commonly used HTTP methods such as `GET` and `POST`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Method {
     /// Represents the HTTP `GET` method.
