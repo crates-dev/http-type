@@ -144,7 +144,7 @@ impl WebSocketOpcode {
 }
 
 impl WebSocketFrame {
-    /// decode_websocket_frame_with_length
+    /// decode_ws_frame
     ///
     /// # Parameters
     /// - `data`: The raw data slice from the WebSocket stream.
@@ -152,7 +152,7 @@ impl WebSocketFrame {
     /// # Returns
     /// - An Option containing a tuple (WebSocketFrame, usize), where the WebSocketFrame is the decoded frame and usize is the number of bytes consumed.
     ///   Returns None if the frame is incomplete.
-    pub fn decode_websocket_frame_with_length(data: &[u8]) -> WebsocketFrameWithLengthOption {
+    pub fn decode_ws_frame(data: &[u8]) -> WebsocketFrameWithLengthOption {
         if data.len() < 2 {
             return None;
         }
@@ -363,7 +363,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     /// - `true` if the opcode is `Continuation`, otherwise `false`.
-    pub fn opcode_is_continuation(&self) -> bool {
+    pub fn is_continuation_opcode(&self) -> bool {
         self.opcode.is_continuation()
     }
 
@@ -374,7 +374,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     /// - `true` if the opcode is `Text`, otherwise `false`.
-    pub fn opcode_is_text(&self) -> bool {
+    pub fn is_text_opcode(&self) -> bool {
         self.opcode.is_text()
     }
 
@@ -385,7 +385,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     /// - `true` if the opcode is `Binary`, otherwise `false`.
-    pub fn opcode_is_binary(&self) -> bool {
+    pub fn is_binary_opcode(&self) -> bool {
         self.opcode.is_binary()
     }
 
@@ -396,7 +396,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     /// - `true` if the opcode is `Close`, otherwise `false`.
-    pub fn opcode_is_close(&self) -> bool {
+    pub fn is_close_opcode(&self) -> bool {
         self.opcode.is_close()
     }
 
@@ -407,7 +407,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     /// - `true` if the opcode is `Ping`, otherwise `false`.
-    pub fn opcode_is_ping(&self) -> bool {
+    pub fn is_ping_opcode(&self) -> bool {
         self.opcode.is_ping()
     }
 
@@ -418,7 +418,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     /// - `true` if the opcode is `Pong`, otherwise `false`.
-    pub fn opcode_is_pong(&self) -> bool {
+    pub fn is_pong_opcode(&self) -> bool {
         self.opcode.is_pong()
     }
 
@@ -429,7 +429,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     /// - `true` if the opcode is `Reserved(_)`, otherwise `false`.
-    pub fn opcode_is_reserved(&self) -> bool {
+    pub fn is_reserved_opcode(&self) -> bool {
         self.opcode.is_reserved()
     }
 }

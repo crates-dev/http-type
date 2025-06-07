@@ -130,14 +130,14 @@ impl Request {
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
-    pub async fn websocket_request_from_stream(
+    pub async fn ws_request_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
         request: &mut Self,
     ) -> RequestReaderHandleResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::websocket_from_reader(&mut reader, buffer_size, request).await
+        Self::ws_from_reader(&mut reader, buffer_size, request).await
     }
 
     /// Reads a WebSocket request from a TCP stream and constructs a `Request` object.
@@ -157,7 +157,7 @@ impl Request {
     ///   - If no data is read (`Ok(0)`), an empty `Request` object is returned.
     ///   - If data is successfully read, the request body is set with the received bytes.
     /// - `Err(RequestError::InvalidWebSocketRequest)` - If an error occurs while reading from the stream.
-    pub async fn websocket_from_reader(
+    pub async fn ws_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
         request: &mut Self,
@@ -186,9 +186,7 @@ impl Request {
                 return Err(RequestError::IncompleteWebSocketFrame);
             }
             dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
-            while let Some((frame, consumed)) =
-                WebSocketFrame::decode_websocket_frame_with_length(&dynamic_buffer)
-            {
+            while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&dynamic_buffer) {
                 dynamic_buffer.drain(0..consumed);
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
@@ -336,147 +334,158 @@ impl Request {
     /// Checks whether the WebSocket upgrade is enabled.
     ///
     /// - Returns: `true` if the upgrade type is WebSocket; otherwise, `false`.
-    pub fn upgrade_type_is_websocket(&self) -> bool {
-        self.get_upgrade_type().is_websocket()
+    pub fn is_ws(&self) -> bool {
+        self.get_upgrade_type().is_ws()
     }
 
-    /// Checks whether the upgrade type is HTTP.
+    /// Checks if the current upgrade type is HTTP/2 cleartext (h2c).
     ///
-    /// - Returns: `true` if the upgrade type is HTTP; otherwise, `false`.
-    pub fn upgrade_type_is_http(&self) -> bool {
-        self.get_upgrade_type().is_http()
+    /// - `&self` - The current instance (usually a request or context struct).
+    ///
+    /// - Returns `true` if the upgrade type is `h2c`, otherwise `false`.
+    pub fn is_h2c(&self) -> bool {
+        self.get_upgrade_type().is_h2c()
+    }
+
+    /// Checks if the current upgrade type is TLS (any version).
+    ///
+    /// - `&self` - The current instance (usually a request or context struct).
+    ///
+    /// - Returns `true` if the upgrade type is any `Tls` variant, otherwise `false`.
+    pub fn is_tls(&self) -> bool {
+        self.get_upgrade_type().is_tls()
     }
 
     /// Checks whether the upgrade type is unknown.
     ///
     /// - Returns: `true` if the upgrade type is unknown; otherwise, `false`.
-    pub fn upgrade_type_is_unknown(&self) -> bool {
+    pub fn is_unknown_upgrade(&self) -> bool {
         self.get_upgrade_type().is_unknown()
     }
 
     /// Checks if the HTTP version is HTTP/1.1 or higher.
     ///
     /// - Returns: `true` if the HTTP version is 1.1 or higher; otherwise, `false`.
-    pub fn version_is_http1_1_or_higher(&self) -> bool {
+    pub fn is_http1_1_or_higher(&self) -> bool {
         self.get_version().is_http1_1_or_higher()
     }
 
     /// Checks whether the HTTP version is HTTP/0.9.
     ///
     /// - Returns: `true` if the version is HTTP/0.9; otherwise, `false`.
-    pub fn version_is_http0_9(&self) -> bool {
+    pub fn is_http0_9(&self) -> bool {
         self.get_version().is_http0_9()
     }
 
     /// Checks whether the HTTP version is HTTP/1.0.
     ///
     /// - Returns: `true` if the version is HTTP/1.0; otherwise, `false`.
-    pub fn version_is_http1_0(&self) -> bool {
+    pub fn is_http1_0(&self) -> bool {
         self.get_version().is_http1_0()
     }
 
     /// Checks whether the HTTP version is HTTP/1.1.
     ///
     /// - Returns: `true` if the version is HTTP/1.1; otherwise, `false`.
-    pub fn version_is_http1_1(&self) -> bool {
+    pub fn is_http1_1(&self) -> bool {
         self.get_version().is_http1_1()
     }
 
     /// Checks whether the HTTP version is HTTP/2.
     ///
     /// - Returns: `true` if the version is HTTP/2; otherwise, `false`.
-    pub fn version_is_http2(&self) -> bool {
+    pub fn is_http2(&self) -> bool {
         self.get_version().is_http2()
     }
 
     /// Checks whether the HTTP version is HTTP/3.
     ///
     /// - Returns: `true` if the version is HTTP/3; otherwise, `false`.
-    pub fn version_is_http3(&self) -> bool {
+    pub fn is_http3(&self) -> bool {
         self.get_version().is_http3()
     }
 
     /// Checks whether the HTTP version is unknown.
     ///
     /// - Returns: `true` if the version is unknown; otherwise, `false`.
-    pub fn version_is_unknown(&self) -> bool {
+    pub fn is_unknown_version(&self) -> bool {
         self.get_version().is_unknown()
     }
 
     /// Checks whether the version belongs to the HTTP family.
     ///
     /// - Returns: `true` if the version is a valid HTTP version; otherwise, `false`.
-    pub fn version_is_http(&self) -> bool {
+    pub fn is_http(&self) -> bool {
         self.get_version().is_http()
     }
 
     /// Checks whether the request method is `GET`.
     ///
     /// - Returns: `true` if the method is `GET`; otherwise, `false`.
-    pub fn method_is_get(&self) -> bool {
+    pub fn is_get(&self) -> bool {
         self.get_method().is_get()
     }
 
     /// Checks whether the request method is `POST`.
     ///
     /// - Returns: `true` if the method is `POST`; otherwise, `false`.
-    pub fn method_is_post(&self) -> bool {
+    pub fn is_post(&self) -> bool {
         self.get_method().is_post()
     }
 
     /// Checks whether the request method is `PUT`.
     ///
     /// - Returns: `true` if the method is `PUT`; otherwise, `false`.
-    pub fn method_is_put(&self) -> bool {
+    pub fn is_put(&self) -> bool {
         self.get_method().is_put()
     }
 
     /// Checks whether the request method is `DELETE`.
     ///
     /// - Returns: `true` if the method is `DELETE`; otherwise, `false`.
-    pub fn method_is_delete(&self) -> bool {
+    pub fn is_delete(&self) -> bool {
         self.get_method().is_delete()
     }
 
     /// Checks whether the request method is `PATCH`.
     ///
     /// - Returns: `true` if the method is `PATCH`; otherwise, `false`.
-    pub fn method_is_patch(&self) -> bool {
+    pub fn is_patch(&self) -> bool {
         self.get_method().is_patch()
     }
 
     /// Checks whether the request method is `HEAD`.
     ///
     /// - Returns: `true` if the method is `HEAD`; otherwise, `false`.
-    pub fn method_is_head(&self) -> bool {
+    pub fn is_head(&self) -> bool {
         self.get_method().is_head()
     }
 
     /// Checks whether the request method is `OPTIONS`.
     ///
     /// - Returns: `true` if the method is `OPTIONS`; otherwise, `false`.
-    pub fn method_is_options(&self) -> bool {
+    pub fn is_options(&self) -> bool {
         self.get_method().is_options()
     }
 
     /// Checks whether the request method is `CONNECT`.
     ///
     /// - Returns: `true` if the method is `CONNECT`; otherwise, `false`.
-    pub fn method_is_connect(&self) -> bool {
+    pub fn is_connect(&self) -> bool {
         self.get_method().is_connect()
     }
 
     /// Checks whether the request method is `TRACE`.
     ///
     /// - Returns: `true` if the method is `TRACE`; otherwise, `false`.
-    pub fn method_is_trace(&self) -> bool {
+    pub fn is_trace(&self) -> bool {
         self.get_method().is_trace()
     }
 
     /// Checks whether the request method is `UNKNOWN`.
     ///
     /// - Returns: `true` if the method is `UNKNOWN`; otherwise, `false`.
-    pub fn method_is_unknown(&self) -> bool {
+    pub fn is_unknown_method(&self) -> bool {
         self.get_method().is_unknown()
     }
 
@@ -500,9 +509,9 @@ impl Request {
             if connection_value_lowercase == CONNECTION_KEEP_ALIVE {
                 return true;
             } else if connection_value_lowercase == CONNECTION_CLOSE {
-                return self.upgrade_type_is_websocket();
+                return self.is_ws();
             }
         }
-        self.version_is_http1_1_or_higher() || self.upgrade_type_is_websocket()
+        self.is_http1_1_or_higher() || self.is_ws()
     }
 }

@@ -71,7 +71,7 @@ impl ArcRwLockStream {
     /// # Returns
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    pub async fn send_body_with_websocket_flag(
+    pub async fn send_body_conditional(
         &self,
         body: &ResponseBody,
         is_websocket: bool,
@@ -100,10 +100,10 @@ impl ArcRwLockStream {
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
     pub async fn send_body(&self, body: &ResponseBody) -> ResponseResult {
-        self.send_body_with_websocket_flag(body, false).await
+        self.send_body_conditional(body, false).await
     }
 
-    /// Sends the HTTP websocket response body over a TCP stream.
+    /// Sends the HTTP ws response body over a TCP stream.
     ///
     /// # Parameters
     /// - `body`: Response body.
@@ -111,8 +111,8 @@ impl ArcRwLockStream {
     /// # Returns
     /// - `Ok`: If the response body is successfully sent.
     /// - `Err`: If an error occurs during sending.
-    pub async fn send_websocket_body(&self, body: &ResponseBody) -> ResponseResult {
-        self.send_body_with_websocket_flag(body, true).await
+    pub async fn send_ws_body(&self, body: &ResponseBody) -> ResponseResult {
+        self.send_body_conditional(body, true).await
     }
 
     /// Flush the TCP stream.
