@@ -1,8 +1,8 @@
-/// Defines the `Methods` enum, representing HTTP request methods.
+/// Defines the `Method` enum, representing HTTP request methods.
 ///
-/// The `Methods` enum includes commonly used HTTP methods such as `GET` and `POST`.
+/// The `Method` enum includes commonly used HTTP methods such as `GET` and `POST`.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Methods {
+pub enum Method {
     /// Represents the HTTP `GET` method.
     GET,
     /// Represents the HTTP `POST` method.

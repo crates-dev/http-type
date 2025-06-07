@@ -1,12 +1,12 @@
 use crate::*;
 
-impl Default for Methods {
+impl Default for Method {
     fn default() -> Self {
         Self::UNKNOWN(String::new())
     }
 }
 
-impl Display for Methods {
+impl Display for Method {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::GET => GET,
@@ -24,7 +24,7 @@ impl Display for Methods {
     }
 }
 
-impl FromStr for Methods {
+impl FromStr for Method {
     type Err = ();
 
     fn from_str(methods_str: &str) -> Result<Self, Self::Err> {
@@ -43,8 +43,8 @@ impl FromStr for Methods {
     }
 }
 
-impl Methods {
-    /// Creates a new instance of `Methods` with the default value of `Self::GET`.
+impl Method {
+    /// Creates a new instance of `Method` with the default value of `Self::GET`.
     ///
     /// This is a shorthand for using the `default` method.
     pub fn new() -> Self {

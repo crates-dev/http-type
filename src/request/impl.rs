@@ -3,7 +3,7 @@ use crate::*;
 impl Default for Request {
     fn default() -> Self {
         Self {
-            method: Methods::default(),
+            method: Method::default(),
             host: String::new(),
             version: HttpVersion::default(),
             path: String::new(),
