@@ -506,9 +506,9 @@ impl Request {
     pub fn is_enable_keep_alive(&self) -> bool {
         if let Some(connection_value) = self.get_header(CONNECTION) {
             let connection_value_lowercase: String = connection_value.to_ascii_lowercase();
-            if connection_value_lowercase == CONNECTION_KEEP_ALIVE {
+            if connection_value_lowercase == KEEP_ALIVE {
                 return true;
-            } else if connection_value_lowercase == CONNECTION_CLOSE {
+            } else if connection_value_lowercase == CLOSE {
                 return self.is_ws();
             }
         }

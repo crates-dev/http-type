@@ -198,7 +198,7 @@ impl Response {
             Self::push_header(&mut response_string, key, value);
         }
         if connection_opt.is_none() {
-            Self::push_header(&mut response_string, CONNECTION, CONNECTION_KEEP_ALIVE);
+            Self::push_header(&mut response_string, CONNECTION, KEEP_ALIVE);
         }
         if content_type_opt.is_none() {
             Self::push_header(
