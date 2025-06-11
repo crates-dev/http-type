@@ -14,7 +14,7 @@ impl ContentType {
     /// A string containing the serialized JSON representation of the provided data.
     /// If serialization fails, it returns an empty JSON object (`{}`).
     fn get_application_json<T: Serialize + Display>(data: &T) -> String {
-        serde_json::to_string(data).unwrap_or_else(|_| String::from("{}"))
+        json_to_string(data).unwrap_or_else(|_| String::from("{}"))
     }
 
     /// Handles the `application/xml` Content-Type by serializing the provided data

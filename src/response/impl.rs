@@ -52,19 +52,19 @@ impl Response {
     /// Deserializes the body content of the object into a specified type `T`.
     ///
     /// This method first retrieves the body content as a UTF-8 encoded string using `self.get_body()`.
-    /// It then attempts to deserialize the string into the specified type `T` using `serde_json::from_str`.
+    /// It then attempts to deserialize the string into the specified type `T` using `json_from_slice`.
     ///
     /// # Type Parameters
     /// - `T`: The target type to deserialize into. It must implement the `DeserializeOwned` trait.
     ///
     /// # Returns
     /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
-    /// - `Err(serde_json::Error)`: An error if the deserialization fails (e.g., invalid JSON format or type mismatch).
-    pub fn get_body_json<T>(&self) -> ResultSerdeJsonError<T>
+    /// - `Err(ResultJsonError)`: An error if the deserialization fails (e.g., invalid JSON format or type mismatch).
+    pub fn get_body_json<T>(&self) -> ResultJsonError<T>
     where
         T: DeserializeOwned,
     {
-        serde_json::from_slice(self.get_body())
+        json_from_slice(self.get_body())
     }
 
     /// Adds a header to the response.
