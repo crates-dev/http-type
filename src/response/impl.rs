@@ -13,7 +13,7 @@ impl Response {
     /// - An initialized `Response` with default values.
     pub fn new() -> Self {
         Response {
-            version: HTTP_VERSION_1_1.to_owned(),
+            version: HttpVersion::HTTP1_1,
             status_code: 200,
             reason_phrase: EMPTY_STR.to_owned(),
             headers: hash_map_xx_hash3_64(),
