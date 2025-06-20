@@ -29,15 +29,15 @@ impl FromStr for Method {
 
     fn from_str(methods_str: &str) -> Result<Self, Self::Err> {
         match methods_str {
-            methods if methods == GET => Ok(Self::GET),
-            methods if methods == POST => Ok(Self::POST),
-            methods if methods == PUT => Ok(Self::PUT),
-            methods if methods == DELETE => Ok(Self::DELETE),
-            methods if methods == PATCH => Ok(Self::PATCH),
-            methods if methods == HEAD => Ok(Self::HEAD),
-            methods if methods == OPTIONS => Ok(Self::OPTIONS),
-            methods if methods == CONNECT => Ok(Self::CONNECT),
-            methods if methods == TRACE => Ok(Self::TRACE),
+            GET => Ok(Self::GET),
+            POST => Ok(Self::POST),
+            PUT => Ok(Self::PUT),
+            DELETE => Ok(Self::DELETE),
+            PATCH => Ok(Self::PATCH),
+            HEAD => Ok(Self::HEAD),
+            OPTIONS => Ok(Self::OPTIONS),
+            CONNECT => Ok(Self::CONNECT),
+            TRACE => Ok(Self::TRACE),
             _ => Ok(Self::UNKNOWN(methods_str.to_string())),
         }
     }

@@ -35,28 +35,20 @@ impl Request {
         if parts_len < 3 {
             return Err(RequestError::InvalidHttpRequestPartsLength(parts_len));
         }
-        let method: RequestMethod = parts[0]
-            .to_string()
-            .parse::<RequestMethod>()
-            .unwrap_or_default();
+        let method: RequestMethod = parts[0].parse::<RequestMethod>().unwrap_or_default();
         let full_path: RequestPath = parts[1].to_string();
-        let version: RequestVersion = parts[2]
-            .to_string()
-            .parse::<RequestVersion>()
-            .unwrap_or_default();
+        let version: RequestVersion = parts[2].parse::<RequestVersion>().unwrap_or_default();
         let hash_index: OptionUsize = full_path.find(HASH_SYMBOL);
         let query_index: OptionUsize = full_path.find(QUERY_SYMBOL);
-        let query_string: String = query_index.map_or(EMPTY_STR.to_owned(), |i| {
-            let temp: String = full_path[i + 1..].to_string();
+        let query_string: String = query_index.map_or(String::new(), |i| {
+            let temp: &str = &full_path[i + 1..];
             if hash_index.is_none() || hash_index.unwrap() <= i {
-                return temp.into();
+                return temp.to_string();
             }
-            let data: String = temp
-                .split(HASH_SYMBOL)
+            temp.split(HASH_SYMBOL)
                 .next()
                 .unwrap_or_default()
-                .to_string();
-            data.into()
+                .to_string()
         });
         let querys: RequestQuerys = Self::parse_querys(&query_string);
         let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
@@ -65,7 +57,7 @@ impl Request {
             full_path
         };
         let mut headers: RequestHeaders = hash_map_xx_hash3_64();
-        let mut host: RequestHost = EMPTY_STR.to_owned();
+        let mut host: RequestHost = String::new();
         let mut content_length: usize = 0;
         loop {
             let mut header_line: String = String::with_capacity(buffer_size);
@@ -74,18 +66,16 @@ impl Request {
             if header_line.is_empty() {
                 break;
             }
-            let parts: Vec<&str> = header_line.splitn(2, COLON_SPACE_SYMBOL).collect();
-            if parts.len() != 2 {
-                continue;
+            if let Some((key_part, value_part)) = header_line.split_once(COLON_SPACE_SYMBOL) {
+                let key: String = key_part.trim().to_ascii_lowercase();
+                let value: String = value_part.trim().to_string();
+                if key == HOST {
+                    host = value.clone();
+                } else if key == CONTENT_LENGTH {
+                    content_length = value.parse().unwrap_or(0);
+                }
+                headers.insert(key, value);
             }
-            let key: String = parts[0].trim().to_ascii_lowercase();
-            let value: String = parts[1].trim().to_string();
-            if key == HOST {
-                host = value.clone();
-            } else if key == CONTENT_LENGTH {
-                content_length = value.parse().unwrap_or(0);
-            }
-            headers.insert(key, value);
         }
         let mut body: RequestBody = vec![0; content_length];
         if content_length > 0 {
@@ -164,7 +154,7 @@ impl Request {
     ) -> RequestReaderHandleResult {
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
-        let mut full_frame: Vec<u8> = Vec::with_capacity(buffer_size);
+        let mut full_frame: Vec<u8> = Vec::new();
         let mut error_handle = || {
             request.body.clear();
         };
@@ -225,13 +215,13 @@ impl Request {
     fn parse_querys(query: &str) -> RequestQuerys {
         let mut query_map: RequestQuerys = hash_map_xx_hash3_64();
         for pair in query.split(AND) {
-            let mut parts: SplitN<'_, &str> = pair.splitn(2, EQUAL);
-            let key: String = parts.next().unwrap_or_default().to_string();
-            if key.is_empty() {
-                continue;
+            if let Some((key, value)) = pair.split_once(EQUAL) {
+                if !key.is_empty() {
+                    query_map.insert(key.to_string(), value.to_string());
+                }
+            } else if !pair.is_empty() {
+                query_map.insert(pair.to_string(), String::new());
             }
-            let value: String = parts.next().unwrap_or_default().to_string();
-            query_map.insert(key, value);
         }
         query_map
     }
@@ -248,9 +238,7 @@ impl Request {
     where
         K: Into<RequestQuerysKey>,
     {
-        self.querys
-            .get(&key.into())
-            .and_then(|data| Some(data.clone()))
+        self.querys.get(&key.into()).cloned()
     }
 
     /// Retrieves the value of a request header by its key.
@@ -265,9 +253,7 @@ impl Request {
     where
         K: Into<RequestHeadersKey>,
     {
-        self.headers
-            .get(&key.into())
-            .and_then(|data| Some(data.clone()))
+        self.headers.get(&key.into()).cloned()
     }
 
     /// Retrieves the body content of the object as a UTF-8 encoded string.
@@ -304,6 +290,10 @@ impl Request {
     /// - Returns: A `String` containing formatted request details.
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
+        let body_display: Cow<'_, str> = match std::str::from_utf8(body) {
+            Ok(string_data) => Cow::Borrowed(string_data),
+            Err(_) => Cow::Owned(format!("binary data len: {}", body.len())),
+        };
         format!(
             "[Request] => [Method]: {}; [Host]: {}; [Version]: {}; [Path]: {}; [Querys]: {:?}; [Headers]: {:?}; [Body]: {};",
             self.get_method(),
@@ -312,10 +302,7 @@ impl Request {
             self.get_path(),
             self.get_querys(),
             self.get_headers(),
-            match std::str::from_utf8(body) {
-                Ok(string_data) => Cow::Borrowed(string_data),
-                Err(_) => Cow::Owned(format!("binary data len: {}", body.len())),
-            },
+            body_display,
         )
     }
 
@@ -505,10 +492,9 @@ impl Request {
     /// - `bool`: true if keep-alive should be enabled, false otherwise
     pub fn is_enable_keep_alive(&self) -> bool {
         if let Some(connection_value) = self.get_header(CONNECTION) {
-            let connection_value_lowercase: String = connection_value.to_ascii_lowercase();
-            if connection_value_lowercase == KEEP_ALIVE {
+            if connection_value.eq_ignore_ascii_case(KEEP_ALIVE) {
                 return true;
-            } else if connection_value_lowercase == CLOSE {
+            } else if connection_value.eq_ignore_ascii_case(CLOSE) {
                 return self.is_ws();
             }
         }

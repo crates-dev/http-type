@@ -144,7 +144,10 @@ impl Response {
     /// - `key`: The header key as a string slice (`&str`).
     /// - `value`: The header value as a string slice (`&str`).
     pub(super) fn push_header(response_string: &mut String, key: &str, value: &str) {
-        response_string.push_str(&format!("{}{}{}{}", key, COLON_SPACE, value, HTTP_BR));
+        response_string.push_str(key);
+        response_string.push_str(COLON_SPACE);
+        response_string.push_str(value);
+        response_string.push_str(HTTP_BR);
     }
 
     /// Pushes the first line of an HTTP response (version, status code, and reason phrase) into the response string.
@@ -153,15 +156,12 @@ impl Response {
     /// # Parameters
     /// - `response_string`: A mutable reference to the string where the first line will be added.
     pub(super) fn push_http_response_first_line(&self, response_string: &mut String) {
-        response_string.push_str(&format!(
-            "{}{}{}{}{}{}",
-            self.get_version(),
-            SPACE,
-            self.get_status_code(),
-            SPACE,
-            self.get_reason_phrase(),
-            HTTP_BR
-        ));
+        response_string.push_str(&self.get_version().to_string());
+        response_string.push_str(SPACE);
+        response_string.push_str(&self.get_status_code().to_string());
+        response_string.push_str(SPACE);
+        response_string.push_str(self.get_reason_phrase());
+        response_string.push_str(HTTP_BR);
     }
 
     /// Builds the full HTTP response as a byte vector.
@@ -191,7 +191,7 @@ impl Response {
                 connection_opt = Some(value.to_owned());
             } else if key == CONTENT_TYPE {
                 content_type_opt = Some(value.to_owned());
-                if value.to_ascii_lowercase() == TEXT_EVENT_STREAM {
+                if value.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
                     unset_content_length = true;
                 }
             }
@@ -201,11 +201,13 @@ impl Response {
             Self::push_header(&mut response_string, CONNECTION, KEEP_ALIVE);
         }
         if content_type_opt.is_none() {
-            Self::push_header(
-                &mut response_string,
-                CONTENT_TYPE,
-                &format!("{}{}{}", TEXT_HTML, SEMICOLON_SPACE, CHARSET_UTF_8),
+            let mut content_type: String = String::with_capacity(
+                TEXT_HTML.len() + SEMICOLON_SPACE.len() + CHARSET_UTF_8.len(),
             );
+            content_type.push_str(TEXT_HTML);
+            content_type.push_str(SEMICOLON_SPACE);
+            content_type.push_str(CHARSET_UTF_8);
+            Self::push_header(&mut response_string, CONTENT_TYPE, &content_type);
         }
         let mut body: Cow<Vec<u8>> = Cow::Borrowed(self.get_body());
         if !unset_content_length {
@@ -230,16 +232,17 @@ impl Response {
     /// - Returns: A `String` containing formatted response details.
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
+        let body_display: Cow<'_, str> = match std::str::from_utf8(body) {
+            Ok(string_data) => Cow::Borrowed(string_data),
+            Err(_) => Cow::Owned(format!("binary data len: {}", body.len())),
+        };
         format!(
             "[Response] => [Version]: {}; [Status Code]: {}; [Reason]: {}; [Headers]: {:?}; [Body]: {};",
             self.get_version(),
             self.get_status_code(),
             self.get_reason_phrase(),
             self.get_headers(),
-            match std::str::from_utf8(body) {
-                Ok(string_data) => Cow::Borrowed(string_data),
-                Err(_) => Cow::Owned(format!("binary data len: {}", body.len())),
-            },
+            body_display,
         )
     }
 }

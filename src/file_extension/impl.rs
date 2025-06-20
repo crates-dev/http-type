@@ -12,8 +12,10 @@ impl FileExtension {
     }
 
     pub fn get_extension_name(full_path: &str) -> String {
-        let ext_name: String = full_path.split(POINT).last().unwrap_or_default().to_owned();
-        ext_name
+        full_path
+            .rfind(POINT)
+            .map(|pos| full_path[pos + 1..].to_string())
+            .unwrap_or_default()
     }
 
     pub fn get_content_type(&self) -> &'static str {
