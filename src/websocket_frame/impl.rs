@@ -238,7 +238,8 @@ impl WebSocketFrame {
                 WebSocketOpcode::Continuation
             };
             let fin_bit: u8 = if remaining > frame_size { 0x00 } else { 0x80 };
-            frame.push(fin_bit | opcode.to_u8());
+            let opcode_byte: u8 = opcode.to_u8() & 0x0F;
+            frame.push(fin_bit | opcode_byte);
             if frame_size < 126 {
                 frame.push(frame_size as u8);
             } else if frame_size <= MAX_FRAME_SIZE {
