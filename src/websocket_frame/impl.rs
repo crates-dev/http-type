@@ -12,13 +12,13 @@ impl Default for WebSocketFrame {
 }
 
 impl WebSocketOpcode {
-    /// Create a WebSocketOpcode from a raw u8 value
+    /// Creates a WebSocketOpcode from a raw u8 value.
     ///
     /// # Parameters
-    /// - `opcode`: The raw opcode value
+    /// - `opcode`: The raw opcode value.
     ///
     /// # Returns
-    /// - A WebSocketOpcode enum variant corresponding to the raw value
+    /// - A WebSocketOpcode enum variant corresponding to the raw value.
     pub fn from_u8(opcode: u8) -> Self {
         match opcode {
             0x0 => Self::Continuation,
@@ -31,10 +31,13 @@ impl WebSocketOpcode {
         }
     }
 
-    /// Convert the WebSocketOpcode to its raw u8 value
+    /// Converts the WebSocketOpcode to its raw u8 value.
+    ///
+    /// # Parameters
+    /// - `self`: The current opcode.
     ///
     /// # Returns
-    /// - The raw u8 value of the opcode
+    /// - The raw u8 value of the opcode.
     pub fn to_u8(&self) -> u8 {
         match self {
             Self::Continuation => 0x0,
@@ -47,20 +50,24 @@ impl WebSocketOpcode {
         }
     }
 
-    /// Check if the opcode is a control frame
+    /// Checks if the opcode is a control frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current opcode.
     ///
     /// # Returns
-    /// - true if the opcode represents a control frame (Close, Ping, Pong)
-    /// - false otherwise
+    /// - `true` if the opcode represents a control frame (Close, Ping, Pong), otherwise `false`.
     pub fn is_control(&self) -> bool {
         matches!(self, Self::Close | Self::Ping | Self::Pong)
     }
 
-    /// Check if the opcode is a data frame
+    /// Checks if the opcode is a data frame.
+    ///
+    /// # Parameters
+    /// - `self`: The current opcode.
     ///
     /// # Returns
-    /// - true if the opcode represents a data frame (Text, Binary, Continuation)
-    /// - false otherwise
+    /// - `true` if the opcode represents a data frame (Text, Binary, Continuation), otherwise `false`.
     pub fn is_data(&self) -> bool {
         matches!(self, Self::Text | Self::Binary | Self::Continuation)
     }
@@ -144,14 +151,13 @@ impl WebSocketOpcode {
 }
 
 impl WebSocketFrame {
-    /// decode_ws_frame
+    /// Decodes a WebSocket frame from the provided data slice.
     ///
     /// # Parameters
     /// - `data`: The raw data slice from the WebSocket stream.
     ///
     /// # Returns
-    /// - An Option containing a tuple (WebSocketFrame, usize), where the WebSocketFrame is the decoded frame and usize is the number of bytes consumed.
-    ///   Returns None if the frame is incomplete.
+    /// - An Option containing a tuple (WebSocketFrame, usize), where the WebSocketFrame is the decoded frame and usize is the number of bytes consumed. Returns None if the frame is incomplete.
     pub fn decode_ws_frame(data: &[u8]) -> WebsocketFrameWithLengthOption {
         if data.len() < 2 {
             return None;
@@ -205,10 +211,13 @@ impl WebSocketFrame {
         Some((frame, index))
     }
 
-    /// create_response_frame_list
+    /// Creates a list of response frames from the provided body.
     ///
+    /// # Parameters
     /// - `body`: A reference to a response body (payload) as a byte slice.
-    /// - Returns: A vector of response bodies (frames) representing the framed data.
+    ///
+    /// # Returns
+    /// - A vector of response bodies (frames) representing the framed data.
     pub fn create_response_frame_list(body: &ResponseBody) -> Vec<ResponseBody> {
         let total_len: usize = body.len();
         let mut offset: usize = 0;
@@ -259,10 +268,13 @@ impl WebSocketFrame {
         frames_list
     }
 
-    /// sha1
+    /// Calculates the SHA-1 hash of the input data.
     ///
+    /// # Parameters
     /// - `data`: A byte slice containing the input data to be hashed.
-    /// - Returns: A 20-byte array representing the SHA-1 hash of the input data.
+    ///
+    /// # Returns
+    /// - A 20-byte array representing the SHA-1 hash of the input data.
     pub fn sha1(data: &[u8]) -> [u8; 20] {
         let mut hash_state: [u32; 5] = HASH_STATE;
         let mut padded_data: Vec<u8> = Vec::from(data);
@@ -322,10 +334,13 @@ impl WebSocketFrame {
         result
     }
 
-    /// generate_accept_key
+    /// Generates a WebSocket accept key from the client-provided key.
     ///
+    /// # Parameters
     /// - `key`: A string slice containing the client-provided key.
-    /// - Returns: A string representing the generated WebSocket accept key.
+    ///
+    /// # Returns
+    /// - A string representing the generated WebSocket accept key.
     pub fn generate_accept_key(key: &str) -> String {
         let mut data: [u8; 60] = [0u8; 60];
         data[..24].copy_from_slice(&key.as_bytes()[..24.min(key.len())]);
@@ -334,10 +349,13 @@ impl WebSocketFrame {
         Self::base64_encode(&hash)
     }
 
-    /// base64_encode
+    /// Encodes the input data as a base64 string.
     ///
+    /// # Parameters
     /// - `data`: A byte slice containing the data to encode in base64.
-    /// - Returns: A string with the base64 encoded representation of the input data.
+    ///
+    /// # Returns
+    /// - A string with the base64 encoded representation of the input data.
     pub fn base64_encode(data: &[u8]) -> String {
         let mut encoded_data: Vec<u8> = Vec::with_capacity((data.len() + 2) / 3 * 4);
         for chunk in data.chunks(3) {
