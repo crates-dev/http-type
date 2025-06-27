@@ -212,7 +212,8 @@ impl WebSocketFrame {
     pub fn create_response_frame_list(body: &ResponseBody) -> Vec<ResponseBody> {
         let total_len: usize = body.len();
         let mut offset: usize = 0;
-        let mut frames_list: Vec<ResponseBody> = Vec::new();
+        let mut frames_list: Vec<ResponseBody> =
+            Vec::with_capacity((total_len / MAX_FRAME_SIZE) + 1);
         let mut is_first_frame: bool = true;
         let is_valid_utf8: bool = std::str::from_utf8(body).is_ok();
         let base_opcode: WebSocketOpcode = if is_valid_utf8 {
@@ -237,9 +238,9 @@ impl WebSocketFrame {
             } else {
                 WebSocketOpcode::Continuation
             };
-            let fin_bit: u8 = if remaining > frame_size { 0x00 } else { 0x80 };
+            let fin: u8 = if remaining > frame_size { 0x00 } else { 0x80 };
             let opcode_byte: u8 = opcode.to_u8() & 0x0F;
-            frame.push(fin_bit | opcode_byte);
+            frame.push(fin | opcode_byte);
             if frame_size < 126 {
                 frame.push(frame_size as u8);
             } else if frame_size <= MAX_FRAME_SIZE {
@@ -247,11 +248,12 @@ impl WebSocketFrame {
                 frame.extend_from_slice(&(frame_size as u16).to_be_bytes());
             } else {
                 frame.push(127);
-                frame.extend_from_slice(&(frame_size as u64).to_be_bytes());
+                frame.extend_from_slice(&(frame_size as u16).to_be_bytes());
             }
-            frame.extend_from_slice(&body[offset..offset + frame_size]);
+            let end: usize = offset + frame_size;
+            frame.extend_from_slice(&body[offset..end]);
             frames_list.push(frame);
-            offset += frame_size;
+            offset = end;
             is_first_frame = false;
         }
         frames_list
