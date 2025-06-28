@@ -290,19 +290,21 @@ impl Request {
     /// - Returns: A `String` containing formatted request details.
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
-        let body_display: Cow<'_, str> = match std::str::from_utf8(body) {
-            Ok(string_data) => Cow::Borrowed(string_data),
-            Err(_) => Cow::Owned(format!("binary data len: {}", body.len())),
+        let body_type: &'static str = if std::str::from_utf8(body).is_ok() {
+            PLAIN
+        } else {
+            BINARY
         };
         format!(
-            "[Request] => [Method]: {}; [Host]: {}; [Version]: {}; [Path]: {}; [Querys]: {:?}; [Headers]: {:?}; [Body]: {};",
+            "[Request] => [method]: {}; [host]: {}; [version]: {}; [path]: {}; [querys]: {:?}; [headers]: {:?}; [body]: {} bytes {};",
             self.get_method(),
             self.get_host(),
             self.get_version(),
             self.get_path(),
             self.get_querys(),
             self.get_headers(),
-            body_display,
+            body.len(),
+            body_type
         )
     }
 

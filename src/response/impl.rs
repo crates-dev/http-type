@@ -232,17 +232,19 @@ impl Response {
     /// - Returns: A `String` containing formatted response details.
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
-        let body_display: Cow<'_, str> = match std::str::from_utf8(body) {
-            Ok(string_data) => Cow::Borrowed(string_data),
-            Err(_) => Cow::Owned(format!("binary data len: {}", body.len())),
+        let body_type: &'static str = if std::str::from_utf8(body).is_ok() {
+            PLAIN
+        } else {
+            BINARY
         };
         format!(
-            "[Response] => [Version]: {}; [Status Code]: {}; [Reason]: {}; [Headers]: {:?}; [Body]: {};",
+            "[Response] => [version]: {}; [status code]: {}; [reason]: {}; [headers]: {:?}; [body]: {} bytes {};",
             self.get_version(),
             self.get_status_code(),
             self.get_reason_phrase(),
             self.get_headers(),
-            body_display,
+            body.len(),
+            body_type
         )
     }
 }
