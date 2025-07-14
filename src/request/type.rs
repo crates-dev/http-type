@@ -34,3 +34,11 @@ pub type RwLockWriteGuardRequest<'a> = RwLockWriteGuard<'a, Request>;
 pub type OptionRequestQuerysValue = Option<RequestQuerysValue>;
 /// Optional value for a header.
 pub type OptionRequestHeadersValue = Option<RequestHeadersValue>;
+/// The raw cookie string from the HTTP request header.
+pub type CookieString = String;
+/// Key type used in the request cookies.
+pub type CookiesKey = String;
+/// Value type used in the request cookies.
+pub type CookiesValue = String;
+/// All cookies parsed from the request Cookie header.
+pub type Cookies = HashMapXxHash3_64<CookiesKey, CookiesValue>;
