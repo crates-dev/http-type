@@ -22,8 +22,13 @@ pub type RequestBody = Vec<u8>;
 pub type RequestBodyString = String;
 /// Key type used in the request headers.
 pub type RequestHeadersKey = String;
-/// Value type used in the request headers.
-pub type RequestHeadersValue = String;
+/// A single value string for an HTTP request header.
+/// This represents one individual value that can be associated with a header key.
+pub type RequestHeadersValueItem = String;
+/// Optional value for a header string.
+pub type OptionRequestHeadersValueItem = Option<RequestHeadersValueItem>;
+/// A collection of values for a single HTTP request header.
+pub type RequestHeadersValue = VecDeque<RequestHeadersValueItem>;
 /// Optional value for a header.
 pub type OptionRequestHeadersValue = Option<RequestHeadersValue>;
 /// All headers sent with the HTTP request.
@@ -34,13 +39,3 @@ pub type RequestReaderHandleResult = Result<Request, RequestError>;
 pub type RwLockReadGuardRequest<'a> = RwLockReadGuard<'a, Request>;
 /// Write guard for a `Request` wrapped in a `RwLock`.
 pub type RwLockWriteGuardRequest<'a> = RwLockWriteGuard<'a, Request>;
-/// The raw cookie string from the HTTP request header.
-pub type CookieString = String;
-/// Key type used in the request cookies.
-pub type CookiesKey = String;
-/// Value type used in the request cookies.
-pub type CookiesValue = String;
-/// Optional value for a cookie.
-pub type OptionCookiesValue = Option<CookiesValue>;
-/// All cookies parsed from the request Cookie header.
-pub type Cookies = HashMapXxHash3_64<CookiesKey, CookiesValue>;

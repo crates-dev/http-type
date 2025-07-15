@@ -11,6 +11,7 @@ pub struct Response {
     #[set(skip)]
     pub(super) reason_phrase: ResponseReasonPhrase,
     /// The response headers as key-value pairs.
+    #[set(skip)]
     pub(super) headers: ResponseHeaders,
     /// The binary body content of the response.
     #[set(skip)]

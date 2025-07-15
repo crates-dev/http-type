@@ -68,13 +68,19 @@ impl Request {
             }
             if let Some((key_part, value_part)) = header_line.split_once(COLON_SPACE_SYMBOL) {
                 let key: String = key_part.trim().to_ascii_lowercase();
+                if key.is_empty() {
+                    continue;
+                }
                 let value: String = value_part.trim().to_string();
                 if key == HOST {
                     host = value.clone();
                 } else if key == CONTENT_LENGTH {
                     content_length = value.parse().unwrap_or(0);
                 }
-                headers.insert(key, value);
+                headers
+                    .entry(key)
+                    .or_insert_with(VecDeque::new)
+                    .push_back(value);
             }
         }
         let mut body: RequestBody = vec![0; content_length];
@@ -241,6 +247,21 @@ impl Request {
         self.querys.get(&key.into()).cloned()
     }
 
+    /// Retrieves the value of a request query parameter by its key.
+    ///
+    /// # Parameters
+    /// - `key`: The query parameter's key, which can be of any type that implements `Into<RequestHeadersKey>`.
+    ///
+    /// # Returns
+    /// - `OptionRequestQuerysValue`: Returns `Some(value)` if the key exists in the query parameters,
+    ///   or `None` if the key does not exist.
+    pub fn get_request_query<T>(&self, key: T) -> OptionRequestQuerysValue
+    where
+        T: Into<RequestHeadersKey>,
+    {
+        self.querys.get(&key.into()).map(|data| data.clone())
+    }
+
     /// Retrieves the value of a request header by its key.
     ///
     /// # Parameters
@@ -254,6 +275,109 @@ impl Request {
         K: Into<RequestHeadersKey>,
     {
         self.headers.get(&key.into()).cloned()
+    }
+
+    /// Retrieves the first value of a request header by its key.
+    ///
+    /// # Parameters
+    /// - `key`: The header's key, which can be of any type that implements `Into<RequestHeadersKey>`.
+    ///
+    /// # Returns
+    /// - `OptionRequestHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
+    ///   or `None` if the key does not exist or has no values.
+    pub fn get_header_front<K>(&self, key: K) -> OptionRequestHeadersValueItem
+    where
+        K: Into<RequestHeadersKey>,
+    {
+        self.headers
+            .get(&key.into())
+            .and_then(|values| values.front().cloned())
+    }
+
+    /// Retrieves the last value of a request header by its key.
+    ///
+    /// # Parameters
+    /// - `key`: The header's key, which can be of any type that implements `Into<RequestHeadersKey>`.
+    ///
+    /// # Returns
+    /// - `OptionRequestHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
+    ///   or `None` if the key does not exist or has no values.
+    pub fn get_header_back<K>(&self, key: K) -> OptionRequestHeadersValueItem
+    where
+        K: Into<RequestHeadersKey>,
+    {
+        self.headers
+            .get(&key.into())
+            .and_then(|values| values.back().cloned())
+    }
+
+    /// Retrieves the number of values for a specific header.
+    ///
+    /// # Parameters
+    /// - `key`: The header's key, which can be of any type that implements `Into<RequestHeadersKey>`.
+    ///
+    /// # Returns
+    /// - `usize`: The number of values for the specified header. Returns 0 if the header does not exist.
+    pub fn get_header_len<K>(&self, key: K) -> usize
+    where
+        K: Into<RequestHeadersKey>,
+    {
+        self.headers
+            .get(&key.into())
+            .map(|values| values.len())
+            .unwrap_or(0)
+    }
+
+    /// Retrieves the total number of header values across all headers.
+    ///
+    /// # Returns
+    /// - `usize`: The total count of all header values.
+    pub fn get_headers_values_len(&self) -> usize {
+        self.headers.values().map(|values| values.len()).sum()
+    }
+
+    /// Retrieves the number of unique headers.
+    ///
+    /// # Returns
+    /// - `usize`: The number of unique header keys.
+    pub fn get_headers_len(&self) -> usize {
+        self.headers.len()
+    }
+
+    /// Checks if a specific header exists.
+    ///
+    /// # Parameters
+    /// - `key`: The header key to check, which will be converted into a `RequestHeadersKey`.
+    ///
+    /// # Returns
+    /// - `bool`: Returns `true` if the header exists, `false` otherwise.
+    pub fn has_header<K>(&self, key: K) -> bool
+    where
+        K: Into<RequestHeadersKey>,
+    {
+        self.headers.contains_key(&key.into())
+    }
+
+    /// Checks if a header contains a specific value.
+    ///
+    /// # Parameters
+    /// - `key`: The header key to check, which will be converted into a `RequestHeadersKey`.
+    /// - `value`: The value to search for in the header.
+    ///
+    /// # Returns
+    /// - `bool`: Returns `true` if the header exists and contains the specified value, `false` otherwise.
+    pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
+    where
+        K: Into<RequestHeadersKey>,
+        V: Into<RequestHeadersValueItem>,
+    {
+        let key: RequestHeadersKey = key.into();
+        let value: RequestHeadersValueItem = value.into();
+        if let Some(values) = self.headers.get(&key) {
+            values.contains(&value)
+        } else {
+            false
+        }
     }
 
     /// Retrieves the body content of the object as a UTF-8 encoded string.
@@ -314,7 +438,7 @@ impl Request {
     ///            If the header is missing or invalid, returns the default `UpgradeType`.
     pub fn get_upgrade_type(&self) -> UpgradeType {
         let upgrade_type: UpgradeType = self
-            .get_header(UPGRADE)
+            .get_header_back(UPGRADE)
             .and_then(|data| data.parse::<UpgradeType>().ok())
             .unwrap_or_default();
         upgrade_type
@@ -493,7 +617,7 @@ impl Request {
     /// # Returns
     /// - `bool`: true if keep-alive should be enabled, false otherwise
     pub fn is_enable_keep_alive(&self) -> bool {
-        if let Some(connection_value) = self.get_header(CONNECTION) {
+        if let Some(connection_value) = self.get_header_back(CONNECTION) {
             if connection_value.eq_ignore_ascii_case(KEEP_ALIVE) {
                 return true;
             } else if connection_value.eq_ignore_ascii_case(CLOSE) {

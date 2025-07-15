@@ -38,6 +38,113 @@ impl Response {
             .and_then(|data| Some(data.clone()))
     }
 
+    /// Retrieves the first value of a response header by its key.
+    ///
+    /// # Parameters
+    /// - `key`: The header's key, which can be of any type that implements `Into<ResponseHeadersKey>`.
+    ///
+    /// # Returns
+    /// - `OptionResponseHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
+    ///   or `None` if the key does not exist or has no values.
+    pub fn get_header_front<K>(&self, key: K) -> OptionResponseHeadersValueItem
+    where
+        K: Into<ResponseHeadersKey>,
+    {
+        self.headers
+            .get(&key.into())
+            .and_then(|values| values.front().cloned())
+    }
+
+    /// Retrieves the last value of a response header by its key.
+    ///
+    /// # Parameters
+    /// - `key`: The header's key, which can be of any type that implements `Into<ResponseHeadersKey>`.
+    ///
+    /// # Returns
+    /// - `OptionResponseHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
+    ///   or `None` if the key does not exist or has no values.
+    pub fn get_header_back<K>(&self, key: K) -> OptionResponseHeadersValueItem
+    where
+        K: Into<ResponseHeadersKey>,
+    {
+        self.headers
+            .get(&key.into())
+            .and_then(|values| values.back().cloned())
+    }
+
+    /// Checks if a header exists in the response.
+    ///
+    /// # Parameters
+    /// - `key`: The header key to check, which will be converted into a `ResponseHeadersKey`.
+    ///
+    /// # Returns
+    /// - `true`: If the header exists.
+    /// - `false`: If the header does not exist.
+    pub fn has_header<K>(&self, key: K) -> bool
+    where
+        K: Into<ResponseHeadersKey>,
+    {
+        let key: ResponseHeadersKey = key.into().to_lowercase();
+        self.headers.contains_key(&key)
+    }
+
+    /// Checks if a header contains a specific value.
+    ///
+    /// # Parameters
+    /// - `key`: The header key to check, which will be converted into a `ResponseHeadersKey`.
+    /// - `value`: The value to search for in the header.
+    ///
+    /// # Returns
+    /// - `true`: If the header exists and contains the specified value.
+    /// - `false`: If the header does not exist or does not contain the value.
+    pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
+    where
+        K: Into<ResponseHeadersKey>,
+        V: Into<ResponseHeadersValueItem>,
+    {
+        let key: ResponseHeadersKey = key.into();
+        let value: ResponseHeadersValueItem = value.into();
+        if let Some(values) = self.headers.get(&key) {
+            values.contains(&value)
+        } else {
+            false
+        }
+    }
+
+    /// Gets the number of headers in the response.
+    ///
+    /// # Returns
+    /// - The number of unique header keys in the response.
+    pub fn get_headers_len(&self) -> usize {
+        self.headers.len()
+    }
+
+    /// Gets the number of values for a specific header key.
+    ///
+    /// # Parameters
+    /// - `key`: The header key to count values for, which will be converted into a `ResponseHeadersKey`.
+    ///
+    /// # Returns
+    /// - The number of values for the specified header key. Returns 0 if the header does not exist.
+    pub fn get_header_len<K>(&self, key: K) -> usize
+    where
+        K: Into<ResponseHeadersKey>,
+    {
+        let key: ResponseHeadersKey = key.into().to_lowercase();
+        self.headers.get(&key).map_or(0, |values| values.len())
+    }
+
+    /// Gets the total number of header values in the response.
+    ///
+    /// This counts all values across all headers, so a header with multiple values
+    /// will contribute more than one to the total count.
+    ///
+    /// # Returns
+    /// - The total number of header values in the response.
+    pub fn get_headers_values_len(&self) -> usize {
+        self.headers.values().map(|values| values.len()).sum()
+    }
+
     /// Retrieves the body content of the object as a UTF-8 encoded string.
     ///
     /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` into a string.
@@ -69,21 +176,97 @@ impl Response {
 
     /// Adds a header to the response.
     ///
-    /// This function inserts a key-value pair into the response headers.
-    /// The key and value are converted into `ResponseHeadersKey`, allowing for efficient handling of both owned and borrowed string data.
+    /// This function appends a value to the response headers.
+    /// If the header already exists, the new value will be added to the existing values.
     ///
     /// # Parameters
     /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
-    /// - `value`: The value of the header, which will be converted into a `ResponseHeadersValue`.
-    ///
-    /// # Returns
-    /// - Returns a mutable reference to the current instance (`&mut Self`), allowing for method chaining.
+    /// - `value`: The value of the header, which will be converted into a String.
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
-        V: Into<ResponseHeadersValue>,
+        V: Into<String>,
     {
-        self.headers.insert(key.into(), value.into());
+        let key: ResponseHeadersKey = key.into().to_lowercase();
+        if key.trim().is_empty() || key == CONTENT_LENGTH {
+            return self;
+        }
+        let value: String = value.into();
+        self.headers
+            .entry(key)
+            .or_insert_with(VecDeque::new)
+            .push_front(value);
+        self
+    }
+
+    /// Replaces all values for a header in the response.
+    ///
+    /// This function replaces all existing values for a header with a single new value.
+    ///
+    /// # Parameters
+    /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
+    /// - `value`: The value of the header, which will be converted into a String.
+    pub fn replace_header<K, V>(&mut self, key: K, value: V) -> &mut Self
+    where
+        K: Into<ResponseHeadersKey>,
+        V: Into<String>,
+    {
+        let key: ResponseHeadersKey = key.into().to_lowercase();
+        if key.trim().is_empty() {
+            return self;
+        }
+        let value: String = value.into();
+        let mut deque: VecDeque<String> = VecDeque::new();
+        deque.push_front(value);
+        self.headers.insert(key, deque);
+        self
+    }
+
+    /// Removes a header from the response.
+    ///
+    /// This function removes all values for the specified header key.
+    ///
+    /// # Parameters
+    /// - `key`: The header key to remove, which will be converted into a `ResponseHeadersKey`.
+    pub fn remove_header<K>(&mut self, key: K) -> &mut Self
+    where
+        K: Into<ResponseHeadersKey>,
+    {
+        let key: ResponseHeadersKey = key.into().to_lowercase();
+        let _ = self.headers.remove(&key).is_some();
+        self
+    }
+
+    /// Removes a specific value from a header in the response.
+    ///
+    /// This function removes only the specified value from the header.
+    /// If the header has multiple values, only the matching value is removed.
+    /// If this was the last value for the header, the entire header is removed.
+    ///
+    /// # Parameters
+    /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
+    /// - `value`: The specific value to remove from the header.
+    pub fn remove_header_value<K, V>(&mut self, key: K, value: V) -> &mut Self
+    where
+        K: Into<ResponseHeadersKey>,
+        V: Into<String>,
+    {
+        let key: ResponseHeadersKey = key.into().to_lowercase();
+        let value: String = value.into();
+        if let Some(values) = self.headers.get_mut(&key) {
+            values.retain(|v| v != &value);
+            if values.is_empty() {
+                self.headers.remove(&key);
+            }
+        }
+        self
+    }
+
+    /// Clears all headers from the response.
+    ///
+    /// This function removes all headers, leaving the headers map empty.
+    pub fn clear_headers(&mut self) -> &mut Self {
+        self.headers.clear();
         self
     }
 
@@ -111,7 +294,10 @@ impl Response {
     ///
     /// # Return Value
     /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    pub fn set_body<T: Into<ResponseBody>>(&mut self, body: T) -> &mut Self {
+    pub fn set_body<T>(&mut self, body: T) -> &mut Self
+    where
+        T: Into<ResponseBody>,
+    {
         self.body = body.into();
         self
     }
@@ -129,10 +315,10 @@ impl Response {
     ///
     /// # Return Value
     /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    pub fn set_reason_phrase<T: Into<ResponseReasonPhrase>>(
-        &mut self,
-        reason_phrase: T,
-    ) -> &mut Self {
+    pub fn set_reason_phrase<T>(&mut self, reason_phrase: T) -> &mut Self
+    where
+        T: Into<ResponseReasonPhrase>,
+    {
         self.reason_phrase = reason_phrase.into();
         self
     }
@@ -182,20 +368,20 @@ impl Response {
             .map(|(key, value)| (key.to_lowercase(), value))
             .collect();
         let mut unset_content_length: bool = false;
-        for (key, value) in headers.iter() {
-            if key == CONTENT_LENGTH {
-                continue;
-            } else if key == CONTENT_ENCODING {
-                compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
-            } else if key == CONNECTION {
-                connection_opt = Some(value.to_owned());
-            } else if key == CONTENT_TYPE {
-                content_type_opt = Some(value.to_owned());
-                if value.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
-                    unset_content_length = true;
+        for (key, values) in headers.iter() {
+            for value in values.iter().rev() {
+                if key == CONTENT_ENCODING {
+                    compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
+                } else if key == CONNECTION {
+                    connection_opt = Some(value.to_owned());
+                } else if key == CONTENT_TYPE {
+                    content_type_opt = Some(value.to_owned());
+                    if value.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
+                        unset_content_length = true;
+                    }
                 }
+                Self::push_header(&mut response_string, key, value);
             }
-            Self::push_header(&mut response_string, key, value);
         }
         if connection_opt.is_none() {
             Self::push_header(&mut response_string, CONNECTION, KEEP_ALIVE);

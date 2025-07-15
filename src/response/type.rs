@@ -6,8 +6,13 @@ pub type ResponseBody = Vec<u8>;
 pub type ResponseBodyString = String;
 /// The key type used in HTTP response headers.
 pub type ResponseHeadersKey = String;
-/// The value type used in HTTP response headers.
-pub type ResponseHeadersValue = String;
+/// A single value string for an HTTP response header.
+/// This represents one individual value that can be associated with a header key.
+pub type ResponseHeadersValueItem = String;
+/// An optional value string for an HTTP response header.
+pub type OptionResponseHeadersValueItem = Option<ResponseHeadersValueItem>;
+/// A collection of values for a single HTTP response header.
+pub type ResponseHeadersValue = VecDeque<ResponseHeadersValueItem>;
 /// A map of HTTP response headers.
 pub type ResponseHeaders = HashMapXxHash3_64<ResponseHeadersKey, ResponseHeadersValue>;
 /// The HTTP version of the response (e.g., "HTTP/1.1").
@@ -26,5 +31,5 @@ pub type ResponseDataString = String;
 pub type RwLockReadGuardResponse<'a> = RwLockReadGuard<'a, Response>;
 /// A write guard to a shared `Response` value protected by `RwLock`.
 pub type RwLockWriteGuardResponse<'a> = RwLockWriteGuard<'a, Response>;
-/// An optional value of a response header.
+/// An optional collection of values for a response header.
 pub type OptionResponseHeadersValue = Option<ResponseHeadersValue>;

@@ -13,7 +13,10 @@ impl ContentType {
     /// # Returns
     /// A string containing the serialized JSON representation of the provided data.
     /// If serialization fails, it returns an empty JSON object (`{}`).
-    fn get_application_json<T: Serialize + Display>(data: &T) -> String {
+    fn get_application_json<T>(data: &T) -> String
+    where
+        T: Serialize + Display,
+    {
         json_to_string(data).unwrap_or_else(|_| "{}".to_string())
     }
 
@@ -29,7 +32,10 @@ impl ContentType {
     /// # Returns
     /// A string containing the serialized XML representation of the provided data.
     /// If serialization fails, it returns an empty XML root element (`<root></root>`).
-    fn get_application_xml<T: Serialize + Display>(data: &T) -> String {
+    fn get_application_xml<T>(data: &T) -> String
+    where
+        T: Serialize + Display,
+    {
         serde_xml_rs::to_string(data).unwrap_or_else(|_| "<root></root>".to_string())
     }
 
@@ -44,7 +50,10 @@ impl ContentType {
     ///
     /// # Returns
     /// A plain text string representing the provided data, formatted with the `Debug` trait.
-    fn get_text_plain<T: Serialize + Debug + Clone + Default + Display>(data: &T) -> String {
+    fn get_text_plain<T>(data: &T) -> String
+    where
+        T: Serialize + Debug + Clone + Default + Display,
+    {
         data.to_string()
     }
 
@@ -59,7 +68,10 @@ impl ContentType {
     ///
     /// # Returns
     /// A string containing the HTML representation of the provided data, inside a table row.
-    fn get_text_html<T: Serialize + Debug + Clone + Default>(data: &T) -> String {
+    fn get_text_html<T>(data: &T) -> String
+    where
+        T: Serialize + Debug + Clone + Default,
+    {
         let mut html: String = String::with_capacity(64);
         html.push_str("<table><tr><td>");
         html.push_str(&format!("{:?}", data));
@@ -79,7 +91,10 @@ impl ContentType {
     /// # Returns
     /// A string containing the URL-encoded representation of the provided data.
     /// If serialization fails, it returns an empty string.
-    fn get_form_url_encoded<T: Serialize + Display>(data: &T) -> String {
+    fn get_form_url_encoded<T>(data: &T) -> String
+    where
+        T: Serialize + Display,
+    {
         serde_urlencoded::to_string(data).unwrap_or_else(|_| String::new())
     }
 
@@ -94,7 +109,10 @@ impl ContentType {
     ///
     /// # Returns
     /// A string containing the hexadecimal encoding of the provided data.
-    fn get_binary<T: Serialize + Debug + Clone + Default + Display>(data: &T) -> String {
+    fn get_binary<T>(data: &T) -> String
+    where
+        T: Serialize + Debug + Clone + Default + Display,
+    {
         hex::encode(data.to_string())
     }
 
@@ -111,10 +129,10 @@ impl ContentType {
     ///
     /// # Returns
     /// A string containing the formatted body based on the content type, such as JSON, XML, plain text, HTML, etc.
-    pub fn get_body_string<T: Serialize + Debug + Clone + Default + Display>(
-        &self,
-        data: &T,
-    ) -> String {
+    pub fn get_body_string<T>(&self, data: &T) -> String
+    where
+        T: Serialize + Debug + Clone + Default + Display,
+    {
         match self {
             Self::ApplicationJson => Self::get_application_json(data),
             Self::ApplicationXml => Self::get_application_xml(data),

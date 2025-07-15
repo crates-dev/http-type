@@ -3,6 +3,7 @@ pub(crate) mod arc_mutex;
 pub(crate) mod arc_rwlock;
 pub(crate) mod box_rwlock;
 pub(crate) mod content_type;
+pub(crate) mod cookie;
 pub(crate) mod dash_map_xx_hash3_64;
 pub(crate) mod file_extension;
 pub(crate) mod hash_map_xx_hash3_64;
@@ -39,6 +40,7 @@ pub use arc_mutex::*;
 pub use arc_rwlock::*;
 pub use box_rwlock::*;
 pub use content_type::*;
+pub use cookie::*;
 pub use dash_map_xx_hash3_64::*;
 pub use file_extension::*;
 pub use hash_map_xx_hash3_64::*;
@@ -83,7 +85,7 @@ pub(crate) use serde::de::DeserializeOwned;
 pub(crate) use std::{
     any::Any,
     borrow::Cow,
-    collections::{HashMap, HashSet},
+    collections::{HashMap, HashSet, VecDeque},
     error::Error as StdError,
     fmt::{self, Debug, Display},
     hash::Hash,
