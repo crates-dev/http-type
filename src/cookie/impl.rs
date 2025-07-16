@@ -27,6 +27,73 @@ impl CookieBuilder {
         }
     }
 
+    /// Parses a Set-Cookie header string and returns a CookieBuilder instance.
+    ///
+    /// # Parameters
+    /// - `cookie_string`: The Set-Cookie header string to parse.
+    ///
+    /// # Returns
+    /// - A CookieBuilder instance with parsed attributes.
+    pub fn parse(cookie_string: &str) -> Self {
+        let mut cookie_builder: Self = Self::default();
+        let parts: Vec<&str> = cookie_string.split(SEMICOLON).collect();
+        if parts.is_empty() {
+            return cookie_builder;
+        }
+        if let Some(name_value_pair) = parts.first() {
+            let name_value_pair: &str = name_value_pair.trim();
+            if let Some((name, value)) = name_value_pair.split_once(EQUAL) {
+                cookie_builder.name = name.trim().to_string();
+                cookie_builder.value = value.trim().to_string();
+            } else if !name_value_pair.is_empty() {
+                cookie_builder.name = name_value_pair.to_string();
+                cookie_builder.value = String::new();
+            }
+        }
+        for part in parts.iter().skip(1) {
+            let part: &str = part.trim();
+            if part.is_empty() {
+                continue;
+            }
+            if let Some((key, value)) = part.split_once(EQUAL) {
+                let key_lowercase: String = key.trim().to_lowercase();
+                let value: String = value.trim().to_string();
+                match key_lowercase.as_str() {
+                    COOKIE_EXPIRES => {
+                        cookie_builder.expires = Some(value);
+                    }
+                    COOKIE_MAX_AGE => {
+                        if let Ok(max_age_value) = value.parse::<i64>() {
+                            cookie_builder.max_age = Some(max_age_value);
+                        }
+                    }
+                    COOKIE_DOMAIN => {
+                        cookie_builder.domain = Some(value);
+                    }
+                    COOKIE_PATH => {
+                        cookie_builder.path = Some(value);
+                    }
+                    COOKIE_SAME_SITE => {
+                        cookie_builder.same_site = Some(value);
+                    }
+                    _ => {}
+                }
+            } else {
+                let attribute_lowercase: String = part.to_lowercase();
+                match attribute_lowercase.as_str() {
+                    COOKIE_SECURE => {
+                        cookie_builder.secure = true;
+                    }
+                    COOKIE_HTTP_ONLY => {
+                        cookie_builder.http_only = true;
+                    }
+                    _ => {}
+                }
+            }
+        }
+        cookie_builder
+    }
+
     /// Sets the expiration date for the cookie.
     ///
     /// # Parameters
