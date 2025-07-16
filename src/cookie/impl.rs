@@ -131,29 +131,29 @@ impl CookieBuilder {
         }
         let mut cookie_string: String = format!("{}={}", self.name, self.value);
         if let Some(ref expires_value) = self.expires {
-            cookie_string.push_str("; Expires=");
+            cookie_string.push_str("; expires=");
             cookie_string.push_str(expires_value);
         }
         if let Some(max_age_value) = self.max_age {
-            cookie_string.push_str("; Max-Age=");
+            cookie_string.push_str("; max-age=");
             cookie_string.push_str(&max_age_value.to_string());
         }
         if let Some(ref domain_value) = self.domain {
-            cookie_string.push_str("; Domain=");
+            cookie_string.push_str("; domain=");
             cookie_string.push_str(domain_value);
         }
         if let Some(ref path_value) = self.path {
-            cookie_string.push_str("; Path=");
+            cookie_string.push_str("; path=");
             cookie_string.push_str(path_value);
         }
         if self.secure {
-            cookie_string.push_str("; Secure");
+            cookie_string.push_str("; secure");
         }
         if self.http_only {
-            cookie_string.push_str("; HttpOnly");
+            cookie_string.push_str("; httponly");
         }
         if let Some(ref same_site_value) = self.same_site {
-            cookie_string.push_str("; SameSite=");
+            cookie_string.push_str("; samesite=");
             cookie_string.push_str(same_site_value);
         }
         cookie_string
