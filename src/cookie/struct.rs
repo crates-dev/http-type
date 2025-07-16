@@ -22,3 +22,7 @@ pub struct CookieBuilder {
     /// Optional SameSite policy ("Strict", "Lax", or "None").
     pub(super) same_site: OptionCookieSameSite,
 }
+
+/// A simple cookie structure for parsing HTTP Cookie headers.
+#[derive(Debug, Clone, Default)]
+pub struct Cookie;
