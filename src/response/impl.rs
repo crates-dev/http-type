@@ -195,7 +195,7 @@ impl Response {
         self.headers
             .entry(key)
             .or_insert_with(VecDeque::new)
-            .push_front(value);
+            .push_back(value);
         self
     }
 
@@ -217,7 +217,7 @@ impl Response {
         }
         let value: String = value.into();
         let mut deque: VecDeque<String> = VecDeque::new();
-        deque.push_front(value);
+        deque.push_back(value);
         self.headers.insert(key, deque);
         self
     }
@@ -329,7 +329,7 @@ impl Response {
     /// - `response_string`: A mutable reference to the string where the header will be added.
     /// - `key`: The header key as a string slice (`&str`).
     /// - `value`: The header value as a string slice (`&str`).
-    pub(super) fn push_header(response_string: &mut String, key: &str, value: &str) {
+    fn push_header(response_string: &mut String, key: &str, value: &str) {
         response_string.push_str(key);
         response_string.push_str(COLON_SPACE);
         response_string.push_str(value);
@@ -341,7 +341,7 @@ impl Response {
     ///
     /// # Parameters
     /// - `response_string`: A mutable reference to the string where the first line will be added.
-    pub(super) fn push_http_response_first_line(&self, response_string: &mut String) {
+    fn push_http_first_line(&self, response_string: &mut String) {
         response_string.push_str(&self.get_version().to_string());
         response_string.push_str(SPACE);
         response_string.push_str(&self.get_status_code().to_string());
@@ -358,7 +358,7 @@ impl Response {
             self.set_reason_phrase(HttpStatus::phrase(*self.get_status_code()));
         }
         let mut response_string: String = String::new();
-        self.push_http_response_first_line(&mut response_string);
+        self.push_http_first_line(&mut response_string);
         let mut compress_type_opt: OptionCompress = None;
         let mut connection_opt: OptionString = None;
         let mut content_type_opt: OptionString = None;
@@ -369,7 +369,7 @@ impl Response {
             .collect();
         let mut unset_content_length: bool = false;
         for (key, values) in headers.iter() {
-            for value in values.iter().rev() {
+            for value in values.iter() {
                 if key == CONTENT_ENCODING {
                     compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
                 } else if key == CONNECTION {

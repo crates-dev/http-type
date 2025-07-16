@@ -107,7 +107,7 @@ impl Request {
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
-    pub async fn http_request_from_stream(
+    pub async fn http_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
     ) -> RequestReaderHandleResult {
@@ -126,7 +126,7 @@ impl Request {
     /// # Returns
     /// - `Ok`: A `Request` object populated with the HTTP request data.
     /// - `Err`: An `RequestError` if the request is invalid or cannot be read.
-    pub async fn ws_request_from_stream(
+    pub async fn ws_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
         request: &mut Self,
@@ -245,21 +245,6 @@ impl Request {
         K: Into<RequestQuerysKey>,
     {
         self.querys.get(&key.into()).cloned()
-    }
-
-    /// Retrieves the value of a request query parameter by its key.
-    ///
-    /// # Parameters
-    /// - `key`: The query parameter's key, which can be of any type that implements `Into<RequestHeadersKey>`.
-    ///
-    /// # Returns
-    /// - `OptionRequestQuerysValue`: Returns `Some(value)` if the key exists in the query parameters,
-    ///   or `None` if the key does not exist.
-    pub fn get_request_query<T>(&self, key: T) -> OptionRequestQuerysValue
-    where
-        T: Into<RequestHeadersKey>,
-    {
-        self.querys.get(&key.into()).map(|data| data.clone())
     }
 
     /// Retrieves the value of a request header by its key.
