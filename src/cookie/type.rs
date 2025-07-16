@@ -1,3 +1,5 @@
+use crate::*;
+
 /// The raw cookie string from the HTTP request header.
 pub type CookieString = String;
 /// Key type used in the request cookies.
@@ -16,3 +18,5 @@ pub type OptionCookieDomain = Option<String>;
 pub type OptionCookiePath = Option<String>;
 /// Optional SameSite policy for a cookie.
 pub type OptionCookieSameSite = Option<String>;
+// A collection of cookies.
+pub type Cookies = HashMapXxHash3_64<CookieKey, CookieValue>;

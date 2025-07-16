@@ -451,6 +451,67 @@ impl Request {
         self.get_upgrade_type().is_ws()
     }
 
+    /// Parses a single cookie header string and adds the results to the provided cookies map.
+    ///
+    /// # Parameters
+    /// - `cookie_header`: The cookie header string to parse.
+    /// - `cookies`: The mutable reference to the cookies map to populate.
+    fn parse_cookie_header(cookie_header: &str, cookies: &mut Cookies) {
+        for cookie_pair in cookie_header.split(SEMICOLON) {
+            let cookie_pair: &str = cookie_pair.trim();
+            if cookie_pair.is_empty() {
+                continue;
+            }
+            if let Some((key, value)) = cookie_pair.split_once(EQUAL) {
+                let key: String = key.trim().to_string();
+                let value: String = value.trim().to_string();
+                if !key.is_empty() {
+                    cookies.insert(key, value);
+                }
+            } else {
+                let key: String = cookie_pair.to_string();
+                if !key.is_empty() {
+                    cookies.insert(key, String::new());
+                }
+            }
+        }
+    }
+
+    /// Parses cookies from the request headers.
+    ///
+    /// This method extracts and parses all cookies from the "cookie" header.
+    /// Multiple cookie values are supported and will be merged into a single collection.
+    ///
+    /// # Returns
+    /// - `Cookies`: A hash map containing all parsed cookies as key-value pairs.
+    ///   Returns an empty collection if no cookies are present or if parsing fails.
+    pub fn get_cookies(&self) -> Cookies {
+        let mut cookies: Cookies = hash_map_xx_hash3_64();
+        if let Some(cookie_headers) = self.get_header("cookie") {
+            for cookie_header in cookie_headers {
+                Self::parse_cookie_header(&cookie_header, &mut cookies);
+            }
+        }
+        cookies
+    }
+
+    /// Retrieves a specific cookie value by its key.
+    ///
+    /// This method parses all cookies from the request headers and returns the value
+    /// for the specified cookie key.
+    ///
+    /// # Parameters
+    /// - `key`: The cookie key to search for, which can be of any type that implements `Into<CookieKey>`.
+    ///
+    /// # Returns
+    /// - `OptionCookiesValue`: Returns `Some(value)` if the cookie exists, or `None` if not found.
+    pub fn get_cookie<K>(&self, key: K) -> OptionCookiesValue
+    where
+        K: Into<CookieKey>,
+    {
+        self.get_cookies().get(&key.into()).cloned()
+    }
+
     /// Checks if the current upgrade type is HTTP/2 cleartext (h2c).
     ///
     /// - `&self` - The current instance (usually a request or context struct).
