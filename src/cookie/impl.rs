@@ -59,21 +59,21 @@ impl CookieBuilder {
                 let key_lowercase: String = key.trim().to_lowercase();
                 let value: String = value.trim().to_string();
                 match key_lowercase.as_str() {
-                    COOKIE_EXPIRES => {
+                    COOKIE_EXPIRES_LOWERCASE => {
                         cookie_builder.expires = Some(value);
                     }
-                    COOKIE_MAX_AGE => {
+                    COOKIE_MAX_AGE_LOWERCASE => {
                         if let Ok(max_age_value) = value.parse::<i64>() {
                             cookie_builder.max_age = Some(max_age_value);
                         }
                     }
-                    COOKIE_DOMAIN => {
+                    COOKIE_DOMAIN_LOWERCASE => {
                         cookie_builder.domain = Some(value);
                     }
-                    COOKIE_PATH => {
+                    COOKIE_PATH_LOWERCASE => {
                         cookie_builder.path = Some(value);
                     }
-                    COOKIE_SAME_SITE => {
+                    COOKIE_SAME_SITE_LOWERCASE => {
                         cookie_builder.same_site = Some(value);
                     }
                     _ => {}
@@ -81,10 +81,10 @@ impl CookieBuilder {
             } else {
                 let attribute_lowercase: String = part.to_lowercase();
                 match attribute_lowercase.as_str() {
-                    COOKIE_SECURE => {
+                    COOKIE_SECURE_LOWERCASE => {
                         cookie_builder.secure = true;
                     }
-                    COOKIE_HTTP_ONLY => {
+                    COOKIE_HTTP_ONLY_LOWERCASE => {
                         cookie_builder.http_only = true;
                     }
                     _ => {}
