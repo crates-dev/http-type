@@ -15,6 +15,14 @@ impl Default for Request {
 }
 
 impl Request {
+    /// Creates a new instance of `Request`.
+    ///
+    /// # Returns
+    /// - An initialized `Request` with default values.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Creates a new `Request` object from a TCP stream.
     ///
     /// # Parameters

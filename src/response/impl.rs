@@ -2,7 +2,13 @@ use crate::*;
 
 impl Default for Response {
     fn default() -> Self {
-        Self::new()
+        Self {
+            version: HttpVersion::default(),
+            status_code: ResponseStatusCode::default(),
+            reason_phrase: ResponseReasonPhrase::default(),
+            headers: hash_map_xx_hash3_64(),
+            body: Vec::new(),
+        }
     }
 }
 
@@ -12,13 +18,7 @@ impl Response {
     /// # Returns
     /// - An initialized `Response` with default values.
     pub fn new() -> Self {
-        Response {
-            version: HttpVersion::HTTP1_1,
-            status_code: 200,
-            reason_phrase: EMPTY_STR.to_owned(),
-            headers: hash_map_xx_hash3_64(),
-            body: Vec::new(),
-        }
+        Self::default()
     }
 
     /// Retrieves the value of a response header by its key.

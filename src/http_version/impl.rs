@@ -2,7 +2,7 @@ use crate::*;
 
 impl Default for HttpVersion {
     fn default() -> Self {
-        Self::HTTP1_1
+        Self::Unknown(String::new())
     }
 }
 
