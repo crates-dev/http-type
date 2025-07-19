@@ -1,7 +1,7 @@
 use crate::*;
 
 /// A builder for constructing HTTP cookies with various attributes.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct CookieBuilder {
     /// The name of the cookie.
     pub(super) name: CookieKey,
@@ -24,5 +24,5 @@ pub struct CookieBuilder {
 }
 
 /// A simple cookie structure for parsing HTTP Cookie headers.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Cookie;

@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Represents a parsed HTTP request.
-#[derive(Debug, Clone, Getter, DisplayDebug)]
+#[derive(Debug, Clone, PartialEq, Eq, Getter, DisplayDebug)]
 pub struct Request {
     /// The HTTP method of the request.
     pub(super) method: RequestMethod,
