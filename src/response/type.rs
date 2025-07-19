@@ -16,7 +16,7 @@ pub type ResponseHeadersValue = VecDeque<ResponseHeadersValueItem>;
 /// A map of HTTP response headers.
 pub type ResponseHeaders = HashMapXxHash3_64<ResponseHeadersKey, ResponseHeadersValue>;
 /// The HTTP version of the response (e.g., "HTTP/1.1").
-pub type ResponseHttpVersion = HttpVersion;
+pub type ResponseVersion = HttpVersion;
 /// The numeric status code of the HTTP response (e.g., 200, 404).
 pub type ResponseStatusCode = usize;
 /// The reason phrase associated with the HTTP status code (e.g., "OK", "Not Found").
