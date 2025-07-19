@@ -8,5 +8,5 @@ use crate::*;
 ///
 /// # Fields
 /// - `0`: The inner `Arc<RwLock<TcpStream>>` stream.
-#[derive(Clone, Debug)]
-pub struct ArcRwLockStream(pub(super) ArcRwLock<TcpStream>);
+#[derive(Clone, Debug, Getter)]
+pub struct ArcRwLockStream(#[get(pub(super))] pub(super) ArcRwLock<TcpStream>);

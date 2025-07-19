@@ -31,7 +31,7 @@ impl ArcRwLockStream {
     /// # Returns
     /// Returns a read guard that provides shared access to the TCP stream
     pub async fn read(&self) -> RwLockReadGuardTcpStream {
-        self.0.read().await
+        self.get_0().read().await
     }
 
     /// Returns a mutable reference to the inner `TcpStream`.
@@ -42,7 +42,7 @@ impl ArcRwLockStream {
     /// # Returns
     /// Returns a write guard that provides exclusive access to the TCP stream
     pub(crate) async fn write(&self) -> RwLockWriteGuardTcpStream {
-        self.0.write().await
+        self.get_0().write().await
     }
 
     /// Sends the HTTP response over a TCP stream.
