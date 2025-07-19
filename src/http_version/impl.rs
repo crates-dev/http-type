@@ -8,7 +8,7 @@ impl Default for HttpVersion {
 
 impl fmt::Display for HttpVersion {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let version_str = match self {
+        let version_str: &str = match self {
             Self::HTTP0_9 => HTTP_VERSION_0_9,
             Self::HTTP1_0 => HTTP_VERSION_1_0,
             Self::HTTP1_1 => HTTP_VERSION_1_1,
@@ -23,13 +23,14 @@ impl fmt::Display for HttpVersion {
 impl FromStr for HttpVersion {
     type Err = String;
 
+    #[allow(warnings)]
     fn from_str(version_str: &str) -> Result<Self, Self::Err> {
         match version_str {
-            version_0_9 if version_0_9 == HTTP_VERSION_0_9 => Ok(Self::HTTP0_9),
-            version_1_0 if version_1_0 == HTTP_VERSION_1_0 => Ok(Self::HTTP1_0),
-            version_1_1 if version_1_1 == HTTP_VERSION_1_1 => Ok(Self::HTTP1_1),
-            version_2 if version_2 == HTTP_VERSION_2 => Ok(Self::HTTP2),
-            version_3 if version_3 == HTTP_VERSION_3 => Ok(Self::HTTP3),
+            HTTP_VERSION_0_9 => Ok(Self::HTTP0_9),
+            HTTP_VERSION_1_0 => Ok(Self::HTTP1_0),
+            HTTP_VERSION_1_1 => Ok(Self::HTTP1_1),
+            HTTP_VERSION_2 => Ok(Self::HTTP2),
+            HTTP_VERSION_3 => Ok(Self::HTTP3),
             _ => Ok(Self::Unknown(version_str.to_string())),
         }
     }

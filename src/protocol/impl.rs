@@ -2,7 +2,7 @@ use crate::*;
 
 impl Default for Protocol {
     fn default() -> Self {
-        Self::HTTP
+        Self::Unknown(String::new())
     }
 }
 
@@ -57,9 +57,9 @@ impl FromStr for Protocol {
     type Err = &'static str;
 
     fn from_str(data: &str) -> Result<Self, Self::Err> {
-        match data {
-            _data if _data == HTTP_LOWERCASE => Ok(Self::HTTP),
-            _data if _data == HTTPS_LOWERCASE => Ok(Self::HTTPS),
+        match data.to_ascii_lowercase().as_str() {
+            HTTP_LOWERCASE => Ok(Self::HTTP),
+            HTTPS_LOWERCASE => Ok(Self::HTTPS),
             _ => Ok(Self::Unknown(data.to_string())),
         }
     }

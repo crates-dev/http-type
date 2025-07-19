@@ -22,7 +22,7 @@ impl FromStr for UpgradeType {
 
     fn from_str(from_str: &str) -> Result<Self, Self::Err> {
         match from_str.to_ascii_lowercase().as_str() {
-            val if val == WEBSOCKET => Ok(Self::WebSocket),
+            WEBSOCKET => Ok(Self::WebSocket),
             H2C_LOWERCASE => Ok(Self::H2c),
             val if val.starts_with(TLS_LOWERCASE) => Ok(Self::Tls(val.to_string())),
             other => Ok(Self::Unknown(other.to_string())),

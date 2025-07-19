@@ -182,12 +182,12 @@ impl FromStr for ContentType {
     type Err = ();
 
     fn from_str(data: &str) -> Result<Self, Self::Err> {
-        match data.to_ascii_lowercase() {
-            _data if _data == APPLICATION_JSON => Ok(Self::ApplicationJson),
-            _data if _data == APPLICATION_XML => Ok(Self::ApplicationXml),
-            _data if _data == TEXT_PLAIN => Ok(Self::TextPlain),
-            _data if _data == TEXT_HTML => Ok(Self::TextHtml),
-            _data if _data == FORM_URLENCODED => Ok(Self::FormUrlEncoded),
+        match data.to_ascii_lowercase().as_str() {
+            APPLICATION_JSON => Ok(Self::ApplicationJson),
+            APPLICATION_XML => Ok(Self::ApplicationXml),
+            TEXT_PLAIN => Ok(Self::TextPlain),
+            TEXT_HTML => Ok(Self::TextHtml),
+            FORM_URLENCODED => Ok(Self::FormUrlEncoded),
             _ => Ok(Self::Unknown),
         }
     }

@@ -4,7 +4,7 @@ use crate::*;
 #[derive(Debug, Clone, Data, DisplayDebug)]
 pub struct Response {
     /// The HTTP version used in the response.
-    pub(super) version: ResponseVersion,
+    pub(super) version: ResponseHttpVersion,
     /// The HTTP status code (e.g., 200, 404).
     pub(super) status_code: ResponseStatusCode,
     /// The reason phrase associated with the status code (e.g., "OK", "Not Found").
