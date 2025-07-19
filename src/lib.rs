@@ -4,7 +4,6 @@ pub(crate) mod arc_rwlock;
 pub(crate) mod box_rwlock;
 pub(crate) mod content_type;
 pub(crate) mod cookie;
-pub(crate) mod dash_map_xx_hash3_64;
 pub(crate) mod file_extension;
 pub(crate) mod hash_map_xx_hash3_64;
 pub(crate) mod hash_set_xx_hash3_64;
@@ -41,7 +40,6 @@ pub use arc_rwlock::*;
 pub use box_rwlock::*;
 pub use content_type::*;
 pub use cookie::*;
-pub use dash_map_xx_hash3_64::*;
 pub use file_extension::*;
 pub use hash_map_xx_hash3_64::*;
 pub use hash_set_xx_hash3_64::*;
@@ -72,16 +70,13 @@ pub use stream::*;
 pub use upgrade_type::*;
 pub use websocket_frame::*;
 
-pub use dashmap;
 pub use http_compress::*;
 pub use http_constant::*;
 pub use tokio;
 
 pub(crate) use core::hash::BuildHasherDefault;
-pub(crate) use dashmap::*;
 pub(crate) use lombok_macros::*;
-pub(crate) use serde::Serialize;
-pub(crate) use serde::de::DeserializeOwned;
+pub(crate) use serde::{Serialize, de::DeserializeOwned};
 pub(crate) use std::{
     any::Any,
     borrow::Cow,
