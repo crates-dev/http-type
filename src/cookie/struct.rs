@@ -7,7 +7,7 @@ pub struct CookieBuilder {
     pub(super) name: CookieKey,
     /// The value of the cookie.
     pub(super) value: CookieValue,
-    /// Optional expiration date string (e.g., "Wed, 21 Oct 2015 07:28:00 GMT").
+    /// Optional expiration date string.
     pub(super) expires: OptionCookieExpires,
     /// Optional maximum age in seconds.
     pub(super) max_age: OptionCookieMaxAge,
@@ -19,7 +19,7 @@ pub struct CookieBuilder {
     pub(super) secure: bool,
     /// Whether the cookie should be inaccessible to JavaScript.
     pub(super) http_only: bool,
-    /// Optional SameSite policy ("Strict", "Lax", or "None").
+    /// Optional SameSite policy.
     pub(super) same_site: OptionCookieSameSite,
 }
 

@@ -15,11 +15,11 @@ pub type OptionResponseHeadersValueItem = Option<ResponseHeadersValueItem>;
 pub type ResponseHeadersValue = VecDeque<ResponseHeadersValueItem>;
 /// A map of HTTP response headers.
 pub type ResponseHeaders = HashMapXxHash3_64<ResponseHeadersKey, ResponseHeadersValue>;
-/// The HTTP version of the response (e.g., "HTTP/1.1").
+/// The HTTP version of the response.
 pub type ResponseVersion = HttpVersion;
-/// The numeric status code of the HTTP response (e.g., 200, 404).
+/// The numeric status code of the HTTP response.
 pub type ResponseStatusCode = usize;
-/// The reason phrase associated with the HTTP status code (e.g., "OK", "Not Found").
+/// The reason phrase associated with the HTTP status code.
 pub type ResponseReasonPhrase = String;
 /// The result type returned after writing an HTTP response.
 pub type ResponseResult = Result<(), ResponseError>;

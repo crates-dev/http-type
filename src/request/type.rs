@@ -4,7 +4,7 @@ use crate::*;
 pub type RequestMethod = Method;
 /// The host part of an HTTP request.
 pub type RequestHost = String;
-/// The HTTP version (e.g., HTTP/1.1).
+/// The HTTP version.
 pub type RequestVersion = HttpVersion;
 /// The path portion of the request URL.
 pub type RequestPath = String;

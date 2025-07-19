@@ -5,9 +5,9 @@ use crate::*;
 pub struct Response {
     /// The HTTP version used in the response.
     pub(super) version: ResponseVersion,
-    /// The HTTP status code (e.g., 200, 404).
+    /// The HTTP status code.
     pub(super) status_code: ResponseStatusCode,
-    /// The reason phrase associated with the status code (e.g., "OK", "Not Found").
+    /// The reason phrase associated with the status code.
     #[set(skip)]
     pub(super) reason_phrase: ResponseReasonPhrase,
     /// The response headers as key-value pairs.

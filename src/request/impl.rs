@@ -394,7 +394,7 @@ impl Request {
     ///
     /// # Returns
     /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
-    /// - `Err(ResultJsonError)`: An error if the deserialization fails (e.g., invalid JSON format or type mismatch).
+    /// - `Err(ResultJsonError)`: An error if the deserialization fails.
     pub fn get_body_json<T>(&self) -> ResultJsonError<T>
     where
         T: DeserializeOwned,

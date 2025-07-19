@@ -97,7 +97,7 @@ impl CookieBuilder {
     /// Sets the expiration date for the cookie.
     ///
     /// # Parameters
-    /// - `expires`: The expiration date string (e.g., "Wed, 21 Oct 2015 07:28:00 GMT").
+    /// - `expires`: The expiration date string.
     ///
     /// # Returns
     /// - The CookieBuilder instance for method chaining.
@@ -231,7 +231,7 @@ impl Cookie {
     /// Parses a Cookie header string and returns a Cookies collection.
     ///
     /// # Parameters
-    /// - `cookie_string`: The Cookie header string to parse (e.g., "name1=value1; name2=value2").
+    /// - `cookie_string`: The Cookie header string to parse.
     ///
     /// # Returns
     /// - A Cookies collection containing all parsed cookie key-value pairs.
