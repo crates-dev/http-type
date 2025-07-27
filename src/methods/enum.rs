@@ -1,4 +1,8 @@
 /// Defines the `Method` enum, representing HTTP request methods.
+///
+/// This enum provides a comprehensive list of standard HTTP methods,
+/// such as GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, CONNECT, and TRACE.
+/// It also includes an `UNKNOWN` variant for unrecognized methods.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Method {
     /// Represents the HTTP `GET` method.

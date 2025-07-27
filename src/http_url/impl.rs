@@ -1,7 +1,13 @@
 use crate::*;
 use url::Url as UrlParser;
 
+/// Implements the `Default` trait for `HttpUrlComponents`.
 impl Default for HttpUrlComponents {
+    /// Returns a default `HttpUrlComponents` instance with all fields set to their default or empty values.
+    ///
+    /// # Returns
+    ///
+    /// A default `HttpUrlComponents` instance.
     fn default() -> Self {
         HttpUrlComponents {
             protocol: Protocol::Unknown(String::new()),

@@ -182,7 +182,17 @@ impl HttpStatus {
     }
 }
 
+/// Implements the `Display` trait for `HttpStatus`, allowing it to be formatted as a string.
 impl Display for HttpStatus {
+    /// Formats the `HttpStatus` variant into a human-readable string.
+    ///
+    /// # Arguments
+    ///
+    /// - `f` - The formatter to write the string into.
+    ///
+    /// # Returns
+    ///
+    /// A `fmt::Result` indicating success or failure of the formatting operation.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::Continue => CONTINUE,
@@ -253,9 +263,24 @@ impl Display for HttpStatus {
     }
 }
 
+/// Implements the `FromStr` trait for `HttpStatus`, allowing conversion from a string slice.
 impl FromStr for HttpStatus {
+    /// The error type returned when conversion fails.
     type Err = ();
 
+    /// Converts a string slice into an `HttpStatus` variant.
+    ///
+    /// This method attempts to parse the input string as a numeric HTTP status code.
+    /// If successful, it returns the corresponding `HttpStatus` variant.
+    /// If parsing fails or the code is unrecognized, it defaults to `HttpStatus::Unknown`.
+    ///
+    /// # Arguments
+    ///
+    /// - `code_str` - The string slice to convert.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the `HttpStatus` variant if successful, or `Self::Err` on failure.
     fn from_str(code_str: &str) -> Result<Self, Self::Err> {
         if let Ok(code) = code_str.parse::<ResponseStatusCode>() {
             match code {
@@ -329,7 +354,13 @@ impl FromStr for HttpStatus {
     }
 }
 
+/// Implements the `Default` trait for `HttpStatus`.
 impl Default for HttpStatus {
+    /// Returns the default `HttpStatus` variant, which is `HttpStatus::Ok`.
+    ///
+    /// # Returns
+    ///
+    /// The default `HttpStatus` variant.
     fn default() -> Self {
         Self::Ok
     }

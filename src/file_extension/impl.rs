@@ -7,10 +7,28 @@ impl Default for FileExtension {
 }
 
 impl FileExtension {
+    /// Parses a string into a `FileExtension`.
+    ///
+    /// # Arguments
+    ///
+    /// * `file_extension` - The string to parse.
+    ///
+    /// # Returns
+    ///
+    /// The parsed `FileExtension`.
     pub fn parse(file_extension: &str) -> Self {
         file_extension.parse::<Self>().unwrap_or_default()
     }
 
+    /// Gets the extension name from a full path.
+    ///
+    /// # Arguments
+    ///
+    /// * `full_path` - The full path to the file.
+    ///
+    /// # Returns
+    ///
+    /// The extension name.
     pub fn get_extension_name(full_path: &str) -> String {
         full_path
             .rfind(POINT)
@@ -18,6 +36,11 @@ impl FileExtension {
             .unwrap_or_default()
     }
 
+    /// Gets the content type for the file extension.
+    ///
+    /// # Returns
+    ///
+    /// The content type as a string slice.
     pub fn get_content_type(&self) -> &'static str {
         match self {
             Self::FileExtension123 => APPLICATION_VND_LOTUS_1_2_3,
@@ -1054,6 +1077,15 @@ impl FileExtension {
 impl FromStr for FileExtension {
     type Err = ();
 
+    /// Parses a string slice into a `FileExtension`.
+    ///
+    /// # Arguments
+    ///
+    /// - `data` - The string slice to parse.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` indicating either the parsed `FileExtension` or an empty error.
     fn from_str(data: &str) -> Result<Self, Self::Err> {
         match data.to_ascii_lowercase().as_str() {
             FILE_EXTENSION_123 => Ok(Self::FileExtension123),
@@ -2072,6 +2104,15 @@ impl FromStr for FileExtension {
 }
 
 impl Display for FileExtension {
+    /// Formats the `FileExtension` into a string.
+    ///
+    /// # Arguments
+    ///
+    /// - `f` - The formatter to write into.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` indicating success or failure of the formatting operation.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let version_str: &str = match self {
             Self::FileExtension123 => FILE_EXTENSION_123,

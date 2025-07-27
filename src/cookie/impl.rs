@@ -1,14 +1,16 @@
 use crate::*;
 
 impl CookieBuilder {
-    /// Creates a new CookieBuilder with the specified name and value.
+    /// Creates a new `CookieBuilder`.
     ///
-    /// # Parameters
-    /// - `name`: The name of the cookie.
-    /// - `value`: The value of the cookie.
+    /// # Arguments
+    ///
+    /// * `name` - The name of the cookie.
+    /// * `value` - The value of the cookie.
     ///
     /// # Returns
-    /// - A new CookieBuilder instance.
+    ///
+    /// A new `CookieBuilder` instance with the specified name and value.
     pub fn new<N, V>(name: N, value: V) -> Self
     where
         N: Into<CookieKey>,
@@ -27,13 +29,18 @@ impl CookieBuilder {
         }
     }
 
-    /// Parses a Set-Cookie header string and returns a CookieBuilder instance.
+    /// Parses a `Set-Cookie` header string into a `CookieBuilder`.
     ///
-    /// # Parameters
-    /// - `cookie_string`: The Set-Cookie header string to parse.
+    /// This method takes a `Set-Cookie` header string and extracts the various
+    /// attributes of a cookie, populating a `CookieBuilder` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `cookie_string` - The `Set-Cookie` header string to parse.
     ///
     /// # Returns
-    /// - A CookieBuilder instance with parsed attributes.
+    ///
+    /// A `CookieBuilder` instance populated with the parsed cookie attributes.
     pub fn parse(cookie_string: &str) -> Self {
         let mut cookie_builder: Self = Self::default();
         let parts: Vec<&str> = cookie_string.split(SEMICOLON).collect();
@@ -96,11 +103,13 @@ impl CookieBuilder {
 
     /// Sets the expiration date for the cookie.
     ///
-    /// # Parameters
-    /// - `expires`: The expiration date string.
+    /// # Arguments
+    ///
+    /// * `expires` - The expiration date string (e.g., "Wed, 21 Oct 2015 07:28:00 GMT").
     ///
     /// # Returns
-    /// - The CookieBuilder instance for method chaining.
+    ///
+    /// The `CookieBuilder` instance for method chaining.
     pub fn expires<T>(&mut self, expires: T) -> &mut Self
     where
         T: Into<String>,
@@ -111,11 +120,13 @@ impl CookieBuilder {
 
     /// Sets the maximum age for the cookie in seconds.
     ///
-    /// # Parameters
-    /// - `max_age`: The maximum age in seconds.
+    /// # Arguments
+    ///
+    /// * `max_age` - The maximum age in seconds.
     ///
     /// # Returns
-    /// - The CookieBuilder instance for method chaining.
+    ///
+    /// The `CookieBuilder` instance for method chaining.
     pub fn max_age(&mut self, max_age: i64) -> &mut Self {
         self.max_age = Some(max_age);
         self
@@ -123,11 +134,13 @@ impl CookieBuilder {
 
     /// Sets the domain for the cookie.
     ///
-    /// # Parameters
-    /// - `domain`: The domain for the cookie.
+    /// # Arguments
+    ///
+    /// * `domain` - The domain for the cookie (e.g., "example.com").
     ///
     /// # Returns
-    /// - The CookieBuilder instance for method chaining.
+    ///
+    /// The `CookieBuilder` instance for method chaining.
     pub fn domain<T>(&mut self, domain: T) -> &mut Self
     where
         T: Into<String>,
@@ -138,11 +151,13 @@ impl CookieBuilder {
 
     /// Sets the path for the cookie.
     ///
-    /// # Parameters
-    /// - `path`: The path for the cookie.
+    /// # Arguments
+    ///
+    /// * `path` - The path for the cookie (e.g., "/admin").
     ///
     /// # Returns
-    /// - The CookieBuilder instance for method chaining.
+    ///
+    /// The `CookieBuilder` instance for method chaining.
     pub fn path<T>(&mut self, path: T) -> &mut Self
     where
         T: Into<String>,
@@ -151,35 +166,39 @@ impl CookieBuilder {
         self
     }
 
-    /// Sets the secure flag for the cookie.
+    /// Sets the `Secure` flag for the cookie.
     ///
-    /// When set to true, the cookie will only be sent over HTTPS connections.
+    /// This flag indicates that the cookie should only be transmitted over secure (HTTPS) connections.
     ///
     /// # Returns
-    /// - The CookieBuilder instance for method chaining.
+    ///
+    /// The `CookieBuilder` instance for method chaining.
     pub fn secure(&mut self) -> &mut Self {
         self.secure = true;
         self
     }
 
-    /// Sets the HttpOnly flag for the cookie.
+    /// Sets the `HttpOnly` flag for the cookie.
     ///
-    /// When set to true, the cookie will be inaccessible to JavaScript.
+    /// This flag prevents client-side JavaScript from accessing the cookie.
     ///
     /// # Returns
-    /// - The CookieBuilder instance for method chaining.
+    ///
+    /// The `CookieBuilder` instance for method chaining.
     pub fn http_only(&mut self) -> &mut Self {
         self.http_only = true;
         self
     }
 
-    /// Sets the SameSite policy for the cookie.
+    /// Sets the `SameSite` policy for the cookie.
     ///
-    /// # Parameters
-    /// - `same_site`: The SameSite policy ("Strict", "Lax", or "None").
+    /// # Arguments
+    ///
+    /// * `same_site` - The `SameSite` policy (e.g., "Strict", "Lax", "None").
     ///
     /// # Returns
-    /// - The CookieBuilder instance for method chaining.
+    ///
+    /// The `CookieBuilder` instance for method chaining.
     pub fn same_site<T>(&mut self, same_site: T) -> &mut Self
     where
         T: Into<String>,
@@ -188,10 +207,11 @@ impl CookieBuilder {
         self
     }
 
-    /// Builds the cookie string representation.
+    /// Builds the cookie string according to the `Set-Cookie` header format.
     ///
     /// # Returns
-    /// - A formatted cookie string ready to be used in Set-Cookie headers.
+    ///
+    /// A formatted cookie string ready to be sent in a `Set-Cookie` header.
     pub fn build(&self) -> String {
         if self.name.is_empty() {
             return String::new();
@@ -228,13 +248,18 @@ impl CookieBuilder {
 }
 
 impl Cookie {
-    /// Parses a Cookie header string and returns a Cookies collection.
+    /// Parses a `Cookie` header string into a collection of key-value pairs.
     ///
-    /// # Parameters
-    /// - `cookie_string`: The Cookie header string to parse.
+    /// This method takes a `Cookie` header string (typically from a `Cookie` request header)
+    /// and parses it into a map of cookie names to their values.
+    ///
+    /// # Arguments
+    ///
+    /// * `cookie_string` - The `Cookie` header string to parse.
     ///
     /// # Returns
-    /// - A Cookies collection containing all parsed cookie key-value pairs.
+    ///
+    /// A `Cookies` collection (a hash map) containing all parsed cookie key-value pairs.
     pub fn parse(cookie_string: &str) -> Cookies {
         let mut cookies: Cookies = hash_map_xx_hash3_64();
         if cookie_string.trim().is_empty() {

@@ -1,22 +1,22 @@
 use crate::*;
 
-/// The raw cookie string from the HTTP request header.
+/// The raw cookie string from an HTTP request header.
 pub type CookieString = String;
-/// Key type used in the request cookies.
+/// The key of a cookie.
 pub type CookieKey = String;
-/// Value type used in the request cookies.
+/// The value of a cookie.
 pub type CookieValue = String;
-/// Optional value for a cookie.
+/// An optional cookie value.
 pub type OptionCookiesValue = Option<CookieValue>;
-/// Optional expiration date string for a cookie.
+/// An optional cookie expiration date.
 pub type OptionCookieExpires = Option<String>;
-/// Optional maximum age in seconds for a cookie.
+/// An optional cookie maximum age in seconds.
 pub type OptionCookieMaxAge = Option<i64>;
-/// Optional domain for a cookie.
+/// An optional cookie domain.
 pub type OptionCookieDomain = Option<String>;
-/// Optional path for a cookie.
+/// An optional cookie path.
 pub type OptionCookiePath = Option<String>;
-/// Optional SameSite policy for a cookie.
+/// An optional cookie `SameSite` policy.
 pub type OptionCookieSameSite = Option<String>;
-// A collection of cookies.
+/// A collection of cookies.
 pub type Cookies = HashMapXxHash3_64<CookieKey, CookieValue>;

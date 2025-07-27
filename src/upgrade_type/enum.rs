@@ -1,12 +1,12 @@
 /// Represents different upgrade types.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UpgradeType {
-    /// WebSocket protocol upgrade
+    /// Represents an upgrade to the WebSocket protocol.
     WebSocket,
-    /// HTTP/2 cleartext upgrade (h2c)
+    /// Represents an upgrade to HTTP/2 cleartext (h2c).
     H2c,
-    /// TLS upgrade (rare, experimental)
+    /// Represents a TLS upgrade, which is rare and experimental. It includes the specific TLS protocol string.
     Tls(String),
-    /// Other custom or unknown upgrade protocols
+    /// Represents other custom or unknown upgrade protocols, including the protocol string.
     Unknown(String),
 }

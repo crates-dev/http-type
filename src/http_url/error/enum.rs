@@ -1,13 +1,11 @@
 use crate::*;
 
-/// Represents different types of errors that can occur in the application.
+/// Represents different types of errors that can occur when handling HTTP URLs.
 ///
-/// The `HttpUrlError` enum defines various error types related to HTTP requests, network connections, and TLS operations.
-/// Each variant corresponds to a specific error that can occur during the execution of the application.
-///
-/// # Variants
-/// - `InvalidUrl`: Indicates that the provided URL is invalid.
+/// This enum defines various error types specifically related to parsing or
+/// otherwise processing HTTP URLs.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HttpUrlError {
+    /// Indicates that the provided URL is invalid.
     InvalidUrl,
 }

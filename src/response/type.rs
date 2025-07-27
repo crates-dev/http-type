@@ -1,35 +1,34 @@
 use crate::*;
 
-/// The binary body of the HTTP response.
+/// An alias for `Vec<u8>`, representing the binary body of the HTTP response.
 pub type ResponseBody = Vec<u8>;
-/// The body of the HTTP response represented as a UTF-8 string.
+/// An alias for `String`, representing the body of the HTTP response as a UTF-8 string.
 pub type ResponseBodyString = String;
-/// The key type used in HTTP response headers.
+/// An alias for `String`, representing the key type used in HTTP response headers.
 pub type ResponseHeadersKey = String;
-/// A single value string for an HTTP response header.
-/// This represents one individual value that can be associated with a header key.
+/// An alias for `String`, representing a single value string for an HTTP response header.
 pub type ResponseHeadersValueItem = String;
-/// An optional value string for an HTTP response header.
+/// An alias for `Option<ResponseHeadersValueItem>`, representing an optional value string for an HTTP response header.
 pub type OptionResponseHeadersValueItem = Option<ResponseHeadersValueItem>;
-/// A collection of values for a single HTTP response header.
+/// An alias for `VecDeque<ResponseHeadersValueItem>`, representing a collection of values for a single HTTP response header.
 pub type ResponseHeadersValue = VecDeque<ResponseHeadersValueItem>;
-/// A map of HTTP response headers.
+/// An alias for `HashMapXxHash3_64<ResponseHeadersKey, ResponseHeadersValue>`, representing a map of HTTP response headers.
 pub type ResponseHeaders = HashMapXxHash3_64<ResponseHeadersKey, ResponseHeadersValue>;
-/// The HTTP version of the response.
+/// An alias for `HttpVersion`, representing the HTTP version of the response.
 pub type ResponseVersion = HttpVersion;
-/// The numeric status code of the HTTP response.
+/// An alias for `usize`, representing the numeric status code of the HTTP response.
 pub type ResponseStatusCode = usize;
-/// The reason phrase associated with the HTTP status code.
+/// An alias for `String`, representing the reason phrase associated with the HTTP status code.
 pub type ResponseReasonPhrase = String;
-/// The result type returned after writing an HTTP response.
+/// An alias for `Result<(), ResponseError>`, representing the result type returned after writing an HTTP response.
 pub type ResponseResult = Result<(), ResponseError>;
-/// The full serialized binary content of the HTTP response.
+/// An alias for `Vec<u8>`, representing the full serialized binary content of the HTTP response.
 pub type ResponseData = Vec<u8>;
-/// The full serialized content of the HTTP response as a UTF-8 string.
+/// An alias for `String`, representing the full serialized content of the HTTP response as a UTF-8 string.
 pub type ResponseDataString = String;
-/// A read guard to a shared `Response` value protected by `RwLock`.
+/// An alias for `RwLockReadGuard<'a, Response>`, representing a read guard to a shared `Response` value protected by `RwLock`.
 pub type RwLockReadGuardResponse<'a> = RwLockReadGuard<'a, Response>;
-/// A write guard to a shared `Response` value protected by `RwLock`.
+/// An alias for `RwLockWriteGuard<'a, Response>`, representing a write guard to a shared `Response` value protected by `RwLock`.
 pub type RwLockWriteGuardResponse<'a> = RwLockWriteGuard<'a, Response>;
-/// An optional collection of values for a response header.
+/// An alias for `Option<ResponseHeadersValue>`, representing an optional collection of values for a response header.
 pub type OptionResponseHeadersValue = Option<ResponseHeadersValue>;

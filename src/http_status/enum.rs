@@ -1,4 +1,8 @@
 /// Represents common HTTP status codes.
+///
+/// This enum provides a comprehensive list of standard HTTP status codes,
+/// categorized into informational, success, redirection, client error,
+/// and server error responses.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HttpStatus {
     /// 100 Continue

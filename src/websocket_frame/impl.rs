@@ -1,6 +1,15 @@
 use crate::*;
 
+/// Implements the `Default` trait for `WebSocketFrame`.
+///
+/// Provides a default `WebSocketFrame` with `fin: false`, `opcode: WebSocketOpcode::Text`,
+/// `mask: false`, and an empty `payload_data`.
 impl Default for WebSocketFrame {
+    /// Returns the default `WebSocketFrame`.
+    ///
+    /// # Returns
+    ///
+    /// A default `WebSocketFrame` instance.
     fn default() -> Self {
         Self {
             fin: false,
@@ -12,13 +21,15 @@ impl Default for WebSocketFrame {
 }
 
 impl WebSocketOpcode {
-    /// Creates a WebSocketOpcode from a raw u8 value.
+    /// Creates a `WebSocketOpcode` from a raw u8 value.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `opcode`: The raw opcode value.
     ///
     /// # Returns
-    /// - A WebSocketOpcode enum variant corresponding to the raw value.
+    ///
+    /// A `WebSocketOpcode` enum variant corresponding to the raw value.
     pub fn from_u8(opcode: u8) -> Self {
         match opcode {
             0x0 => Self::Continuation,
@@ -31,13 +42,11 @@ impl WebSocketOpcode {
         }
     }
 
-    /// Converts the WebSocketOpcode to its raw u8 value.
-    ///
-    /// # Parameters
-    /// - `self`: The current opcode.
+    /// Converts the `WebSocketOpcode` to its raw u8 value.
     ///
     /// # Returns
-    /// - The raw u8 value of the opcode.
+    ///
+    /// The raw u8 value of the opcode.
     pub fn to_u8(&self) -> u8 {
         match self {
             Self::Continuation => 0x0,
@@ -52,99 +61,81 @@ impl WebSocketOpcode {
 
     /// Checks if the opcode is a control frame.
     ///
-    /// # Parameters
-    /// - `self`: The current opcode.
-    ///
     /// # Returns
-    /// - `true` if the opcode represents a control frame (Close, Ping, Pong), otherwise `false`.
+    ///
+    /// `true` if the opcode represents a control frame (Close, Ping, Pong), otherwise `false`.
     pub fn is_control(&self) -> bool {
         matches!(self, Self::Close | Self::Ping | Self::Pong)
     }
 
     /// Checks if the opcode is a data frame.
     ///
-    /// # Parameters
-    /// - `self`: The current opcode.
-    ///
     /// # Returns
-    /// - `true` if the opcode represents a data frame (Text, Binary, Continuation), otherwise `false`.
+    ///
+    /// `true` if the opcode represents a data frame (Text, Binary, Continuation), otherwise `false`.
     pub fn is_data(&self) -> bool {
         matches!(self, Self::Text | Self::Binary | Self::Continuation)
     }
 
-    /// Checks if the frame is a continuation frame.
-    ///
-    /// # Parameters
-    /// - `self`: The current frame.
+    /// Checks if the opcode is a continuation frame.
     ///
     /// # Returns
-    /// - `true` if the frame is `Continuation`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Continuation`, otherwise `false`.
     pub fn is_continuation(&self) -> bool {
         matches!(self, Self::Continuation)
     }
 
-    /// Checks if the frame is a text frame.
-    ///
-    /// # Parameters
-    /// - `self`: The current frame.
+    /// Checks if the opcode is a text frame.
     ///
     /// # Returns
-    /// - `true` if the frame is `Text`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Text`, otherwise `false`.
     pub fn is_text(&self) -> bool {
         matches!(self, Self::Text)
     }
 
-    /// Checks if the frame is a binary frame.
-    ///
-    /// # Parameters
-    /// - `self`: The current frame.
+    /// Checks if the opcode is a binary frame.
     ///
     /// # Returns
-    /// - `true` if the frame is `Binary`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Binary`, otherwise `false`.
     pub fn is_binary(&self) -> bool {
         matches!(self, Self::Binary)
     }
 
-    /// Checks if the frame is a close frame.
-    ///
-    /// # Parameters
-    /// - `self`: The current frame.
+    /// Checks if the opcode is a close frame.
     ///
     /// # Returns
-    /// - `true` if the frame is `Close`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Close`, otherwise `false`.
     pub fn is_close(&self) -> bool {
         matches!(self, Self::Close)
     }
 
-    /// Checks if the frame is a ping frame.
-    ///
-    /// # Parameters
-    /// - `self`: The current frame.
+    /// Checks if the opcode is a ping frame.
     ///
     /// # Returns
-    /// - `true` if the frame is `Ping`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Ping`, otherwise `false`.
     pub fn is_ping(&self) -> bool {
         matches!(self, Self::Ping)
     }
 
-    /// Checks if the frame is a pong frame.
-    ///
-    /// # Parameters
-    /// - `self`: The current frame.
+    /// Checks if the opcode is a pong frame.
     ///
     /// # Returns
-    /// - `true` if the frame is `Pong`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Pong`, otherwise `false`.
     pub fn is_pong(&self) -> bool {
         matches!(self, Self::Pong)
     }
 
-    /// Checks if the frame is a reserved frame.
-    ///
-    /// # Parameters
-    /// - `self`: The current frame.
+    /// Checks if the opcode is a reserved frame.
     ///
     /// # Returns
-    /// - `true` if the frame is `Reserved(_)`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Reserved(_)`, otherwise `false`.
     pub fn is_reserved(&self) -> bool {
         matches!(self, Self::Reserved(_))
     }
@@ -153,11 +144,19 @@ impl WebSocketOpcode {
 impl WebSocketFrame {
     /// Decodes a WebSocket frame from the provided data slice.
     ///
-    /// # Parameters
+    /// This function parses the raw bytes from a WebSocket stream according to the WebSocket protocol
+    /// specification to reconstruct a `WebSocketFrame`. It handles FIN bit, opcode, mask bit,
+    /// payload length (including extended lengths), mask key, and the payload data itself.
+    ///
+    /// # Arguments
+    ///
     /// - `data`: The raw data slice from the WebSocket stream.
     ///
     /// # Returns
-    /// - An Option containing a tuple (WebSocketFrame, usize), where the WebSocketFrame is the decoded frame and usize is the number of bytes consumed. Returns None if the frame is incomplete.
+    ///
+    /// - `Some((WebSocketFrame, usize))`: If the frame is successfully decoded, returns the decoded frame
+    ///   and the number of bytes consumed from the input slice.
+    /// - `None`: If the frame is incomplete or malformed.
     pub fn decode_ws_frame(data: &[u8]) -> WebsocketFrameWithLengthOption {
         if data.len() < 2 {
             return None;
@@ -213,11 +212,17 @@ impl WebSocketFrame {
 
     /// Creates a list of response frames from the provided body.
     ///
-    /// # Parameters
+    /// This method segments the response body into WebSocket frames, respecting the maximum frame size
+    /// and handling UTF-8 character boundaries for text frames. It determines the appropriate opcode
+    /// (Text or Binary) based on the body's content.
+    ///
+    /// # Arguments
+    ///
     /// - `body`: A reference to a response body (payload) as a byte slice.
     ///
     /// # Returns
-    /// - A vector of response bodies (frames) representing the framed data.
+    ///
+    /// - A vector of `ResponseBody` (byte vectors), where each element represents a framed WebSocket message.
     pub fn create_response_frame_list(body: &ResponseBody) -> Vec<ResponseBody> {
         let total_len: usize = body.len();
         let mut offset: usize = 0;
@@ -270,10 +275,15 @@ impl WebSocketFrame {
 
     /// Calculates the SHA-1 hash of the input data.
     ///
-    /// # Parameters
+    /// This function implements the SHA-1 cryptographic hash algorithm according to RFC 3174.
+    /// It processes the input data in 512-bit (64-byte) blocks and produces a 160-bit (20-byte) hash.
+    ///
+    /// # Arguments
+    ///
     /// - `data`: A byte slice containing the input data to be hashed.
     ///
     /// # Returns
+    ///
     /// - A 20-byte array representing the SHA-1 hash of the input data.
     pub fn sha1(data: &[u8]) -> [u8; 20] {
         let mut hash_state: [u32; 5] = HASH_STATE;
@@ -336,11 +346,17 @@ impl WebSocketFrame {
 
     /// Generates a WebSocket accept key from the client-provided key.
     ///
-    /// # Parameters
-    /// - `key`: A string slice containing the client-provided key.
+    /// This function is used during the WebSocket handshake to validate the client's request.
+    /// It concatenates the client's key with a specific GUID, calculates the SHA-1 hash of the result,
+    /// and then encodes the hash in base64.
+    ///
+    /// # Arguments
+    ///
+    /// - `key`: A string slice containing the client-provided key (typically from the `Sec-WebSocket-Key` header).
     ///
     /// # Returns
-    /// - A string representing the generated WebSocket accept key.
+    ///
+    /// - A string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
     pub fn generate_accept_key(key: &str) -> String {
         let mut data: [u8; 60] = [0u8; 60];
         data[..24].copy_from_slice(&key.as_bytes()[..24.min(key.len())]);
@@ -351,10 +367,16 @@ impl WebSocketFrame {
 
     /// Encodes the input data as a base64 string.
     ///
-    /// # Parameters
+    /// This function implements the Base64 encoding scheme, converting binary data into an ASCII string format.
+    /// It processes the input data in chunks of 3 bytes and encodes them into 4 base64 characters.
+    /// Padding with '=' characters is applied if necessary.
+    ///
+    /// # Arguments
+    ///
     /// - `data`: A byte slice containing the data to encode in base64.
     ///
     /// # Returns
+    ///
     /// - A string with the base64 encoded representation of the input data.
     pub fn base64_encode(data: &[u8]) -> String {
         let mut encoded_data: Vec<u8> = Vec::with_capacity((data.len() + 2) / 3 * 4);
@@ -379,77 +401,63 @@ impl WebSocketFrame {
 
     /// Checks if the opcode is a continuation frame.
     ///
-    /// # Parameters
-    /// - `self`: The current frame.
-    ///
     /// # Returns
-    /// - `true` if the opcode is `Continuation`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Continuation`, otherwise `false`.
     pub fn is_continuation_opcode(&self) -> bool {
         self.opcode.is_continuation()
     }
 
     /// Checks if the opcode is a text frame.
     ///
-    /// # Parameters
-    /// - `self`: The current frame.
-    ///
     /// # Returns
-    /// - `true` if the opcode is `Text`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Text`, otherwise `false`.
     pub fn is_text_opcode(&self) -> bool {
         self.opcode.is_text()
     }
 
     /// Checks if the opcode is a binary frame.
     ///
-    /// # Parameters
-    /// - `self`: The current frame.
-    ///
     /// # Returns
-    /// - `true` if the opcode is `Binary`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Binary`, otherwise `false`.
     pub fn is_binary_opcode(&self) -> bool {
         self.opcode.is_binary()
     }
 
     /// Checks if the opcode is a close frame.
     ///
-    /// # Parameters
-    /// - `self`: The current frame.
-    ///
     /// # Returns
-    /// - `true` if the opcode is `Close`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Close`, otherwise `false`.
     pub fn is_close_opcode(&self) -> bool {
         self.opcode.is_close()
     }
 
     /// Checks if the opcode is a ping frame.
     ///
-    /// # Parameters
-    /// - `self`: The current frame.
-    ///
     /// # Returns
-    /// - `true` if the opcode is `Ping`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Ping`, otherwise `false`.
     pub fn is_ping_opcode(&self) -> bool {
         self.opcode.is_ping()
     }
 
     /// Checks if the opcode is a pong frame.
     ///
-    /// # Parameters
-    /// - `self`: The current frame.
-    ///
     /// # Returns
-    /// - `true` if the opcode is `Pong`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Pong`, otherwise `false`.
     pub fn is_pong_opcode(&self) -> bool {
         self.opcode.is_pong()
     }
 
     /// Checks if the opcode is a reserved frame.
     ///
-    /// # Parameters
-    /// - `self`: The current frame.
-    ///
     /// # Returns
-    /// - `true` if the opcode is `Reserved(_)`, otherwise `false`.
+    ///
+    /// `true` if the opcode is `Reserved(_)`, otherwise `false`.
     pub fn is_reserved_opcode(&self) -> bool {
         self.opcode.is_reserved()
     }

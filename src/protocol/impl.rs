@@ -10,29 +10,49 @@ impl Default for Protocol {
 impl Protocol {
     /// Creates a new instance of `Protocol` with the default value of `Self::HTTP`.
     ///
-    /// This is a shorthand for using the `default` method.
+    /// # Returns
+    ///
+    /// A new `Protocol` instance, defaulting to `Protocol::HTTP`.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Checks if the current protocol is `HTTP`.
     ///
-    /// Returns `true` if the protocol is `HTTP`, otherwise returns `false`.    
+    /// # Arguments
+    ///
+    /// - `self` - A reference to the `Protocol` instance.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the protocol is `HTTP`, otherwise returns `false`.
     pub fn is_http(&self) -> bool {
         self.to_owned() == Self::HTTP.to_owned()
     }
 
     /// Checks if the current protocol is `HTTPS`.
     ///
-    /// Returns `true` if the protocol is `HTTPS`, otherwise returns `false`.
+    /// # Arguments
+    ///
+    /// - `self` - A reference to the `Protocol` instance.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the protocol is `HTTPS`, otherwise returns `false`.
     pub fn is_https(&self) -> bool {
         self.to_owned() == Self::HTTPS.to_owned()
     }
 
     /// Returns the default port associated with the protocol.
     ///
-    /// - Returns `80` for `Self::HTTP`.
-    /// - Returns `443` for `Self::HTTPS`.
+    /// # Arguments
+    ///
+    /// - `self` - A reference to the `Protocol` instance.
+    ///
+    /// # Returns
+    ///
+    /// The default port number for the protocol. Returns `80` for `HTTP` and unknown protocols,
+    /// and `443` for `HTTPS`.
     pub fn get_port(&self) -> u16 {
         match self {
             Self::HTTP => 80,

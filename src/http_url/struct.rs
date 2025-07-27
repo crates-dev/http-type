@@ -1,6 +1,9 @@
 use crate::*;
 
 /// Represents the components of a parsed HTTP URL.
+///
+/// This struct holds various parts of a URL, including the protocol, host, port,
+/// path, query, and fragment, allowing for structured access to URL information.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HttpUrlComponents {
     /// The URL scheme, such as "http" or "https".

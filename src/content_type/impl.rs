@@ -1,18 +1,15 @@
 use crate::*;
 
 impl ContentType {
-    /// Handles the `application/json` Content-Type by serializing the provided data
-    /// into a JSON string.
+    /// Serializes the provided data into a JSON string.
     ///
-    /// # Type Parameters
-    /// - `T`: The type of the data to be serialized, which must implement `Serialize`.
+    /// # Arguments
     ///
-    /// # Parameters
-    /// - `data`: The data to be serialized into JSON.
+    /// * `data` - The data to be serialized into JSON.
     ///
     /// # Returns
+    ///
     /// A string containing the serialized JSON representation of the provided data.
-    /// If serialization fails, it returns an empty JSON object (`{}`).
     fn get_application_json<T>(data: &T) -> String
     where
         T: Serialize + Display,
@@ -20,18 +17,15 @@ impl ContentType {
         json_to_string(data).unwrap_or_else(|_| "{}".to_string())
     }
 
-    /// Handles the `application/xml` Content-Type by serializing the provided data
-    /// into an XML string.
+    /// Serializes the provided data into an XML string.
     ///
-    /// # Type Parameters
-    /// - `T`: The type of the data to be serialized, which must implement `Serialize`.
+    /// # Arguments
     ///
-    /// # Parameters
-    /// - `data`: The data to be serialized into XML.
+    /// * `data` - The data to be serialized into XML.
     ///
     /// # Returns
+    ///
     /// A string containing the serialized XML representation of the provided data.
-    /// If serialization fails, it returns an empty XML root element (`<root></root>`).
     fn get_application_xml<T>(data: &T) -> String
     where
         T: Serialize + Display,
@@ -39,17 +33,15 @@ impl ContentType {
         serde_xml_rs::to_string(data).unwrap_or_else(|_| "<root></root>".to_string())
     }
 
-    /// Handles the `text/plain` Content-Type by formatting the provided data
-    /// into a plain text string.
+    /// Formats the provided data into a plain text string.
     ///
-    /// # Type Parameters
-    /// - `T`: The type of the data to be formatted, which must implement `Serialize`, `Debug`, `Clone`, and `Default`.
+    /// # Arguments
     ///
-    /// # Parameters
-    /// - `data`: The data to be formatted into plain text.
+    /// * `data` - The data to be formatted into plain text.
     ///
     /// # Returns
-    /// A plain text string representing the provided data, formatted with the `Debug` trait.
+    ///
+    /// A plain text string representing the provided data.
     fn get_text_plain<T>(data: &T) -> String
     where
         T: Serialize + Debug + Clone + Default + Display,
@@ -57,17 +49,15 @@ impl ContentType {
         data.to_string()
     }
 
-    /// Handles the `text/html` Content-Type by formatting the provided data
-    /// into an HTML string, typically inside a simple table.
+    /// Formats the provided data into an HTML string.
     ///
-    /// # Type Parameters
-    /// - `T`: The type of the data to be formatted, which must implement `Serialize`, `Debug`, `Clone`, and `Default`.
+    /// # Arguments
     ///
-    /// # Parameters
-    /// - `data`: The data to be formatted into HTML.
+    /// * `data` - The data to be formatted into HTML.
     ///
     /// # Returns
-    /// A string containing the HTML representation of the provided data, inside a table row.
+    ///
+    /// A string containing the HTML representation of the provided data.
     fn get_text_html<T>(data: &T) -> String
     where
         T: Serialize + Debug + Clone + Default,
@@ -79,18 +69,15 @@ impl ContentType {
         html
     }
 
-    /// Handles the `application/x-www-form-urlencoded` Content-Type by serializing
-    /// the provided data into a URL-encoded string.
+    /// Serializes the provided data into a URL-encoded string.
     ///
-    /// # Type Parameters
-    /// - `T`: The type of the data to be serialized, which must implement `Serialize`.
+    /// # Arguments
     ///
-    /// # Parameters
-    /// - `data`: The data to be serialized into URL-encoded format.
+    /// * `data` - The data to be serialized into URL-encoded format.
     ///
     /// # Returns
+    ///
     /// A string containing the URL-encoded representation of the provided data.
-    /// If serialization fails, it returns an empty string.
     fn get_form_url_encoded<T>(data: &T) -> String
     where
         T: Serialize + Display,
@@ -98,16 +85,14 @@ impl ContentType {
         serde_urlencoded::to_string(data).unwrap_or_else(|_| String::new())
     }
 
-    /// Handles binary data when the `Content-Type` is unknown by formatting the
-    /// provided data as a hexadecimal string.
+    /// Formats the provided data as a hexadecimal string.
     ///
-    /// # Type Parameters
-    /// - `T`: The type of the data to be formatted, which must implement `Serialize`, `Debug`, `Clone`, and `Default`.
+    /// # Arguments
     ///
-    /// # Parameters
-    /// - `data`: The data to be formatted into binary representation.
+    /// * `data` - The data to be formatted into binary representation.
     ///
     /// # Returns
+    ///
     /// A string containing the hexadecimal encoding of the provided data.
     fn get_binary<T>(data: &T) -> String
     where
@@ -116,19 +101,15 @@ impl ContentType {
         hex::encode(data.to_string())
     }
 
-    /// Public interface for getting a formatted body string based on the `ContentType`.
+    /// Gets a formatted body string based on the `ContentType`.
     ///
-    /// This method routes the data to the appropriate handler method based on the
-    /// `ContentType`, formatting the body accordingly.
+    /// # Arguments
     ///
-    /// # Type Parameters
-    /// - `T`: The type of the data to be formatted, which must implement `Serialize`, `Debug`, `Clone`, and `Default`.
-    ///
-    /// # Parameters
-    /// - `data`: The data to be formatted into the body string.
+    /// * `data` - The data to be formatted into the body string.
     ///
     /// # Returns
-    /// A string containing the formatted body based on the content type, such as JSON, XML, plain text, HTML, etc.
+    ///
+    /// A string containing the formatted body based on the content type.
     pub fn get_body_string<T>(&self, data: &T) -> String
     where
         T: Serialize + Debug + Clone + Default + Display,
@@ -145,12 +126,14 @@ impl ContentType {
 
     /// Formats a content type with a charset value.
     ///
-    /// # Parameters
-    /// - `content_type`: The content type.
-    /// - `charset`: The character set.
+    /// # Arguments
+    ///
+    /// * `content_type` - The content type.
+    /// * `charset` - The character set.
     ///
     /// # Returns
-    /// A format string.
+    ///
+    /// A formatted string.
     pub fn format_content_type_with_charset(content_type: &str, charset: &str) -> String {
         let mut result: String = String::with_capacity(
             content_type.len() + SEMICOLON_SPACE.len() + CHARSET_EQUAL.len() + charset.len(),
@@ -164,12 +147,14 @@ impl ContentType {
 
     /// Formats a content type with a full charset declaration.
     ///
-    /// # Parameters
-    /// - `content_type`: The content type.
-    /// - `charset_with_key`: The charset declaration.
+    /// # Arguments
+    ///
+    /// * `content_type` - The content type.
+    /// * `charset_with_key` - The charset declaration.
     ///
     /// # Returns
-    /// A format string like `"text/html; charset=utf-8"`.
+    ///
+    /// A formatted string.
     pub fn format_content_type_with_charset_declaration(
         content_type: &str,
         charset_with_key: &str,
@@ -187,6 +172,15 @@ impl ContentType {
 impl FromStr for ContentType {
     type Err = ();
 
+    /// Parses a string slice into a `ContentType`.
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - The string slice to parse.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` indicating either the parsed `ContentType` or an empty error.
     fn from_str(data: &str) -> Result<Self, Self::Err> {
         match data.to_ascii_lowercase().as_str() {
             APPLICATION_JSON => Ok(Self::ApplicationJson),
@@ -200,6 +194,11 @@ impl FromStr for ContentType {
 }
 
 impl Default for ContentType {
+    /// Returns the default `ContentType`.
+    ///
+    /// # Returns
+    ///
+    /// The `Unknown` variant of `ContentType`.
     fn default() -> Self {
         Self::Unknown
     }

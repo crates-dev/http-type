@@ -1,8 +1,21 @@
 use crate::*;
 
+/// Implements the `StdError` trait for `ResponseError`.
+/// This allows `ResponseError` to be treated as a standard Rust error type.
 impl StdError for ResponseError {}
 
+/// Implements the `Display` trait for `ResponseError`.
+/// This allows `ResponseError` variants to be formatted into human-readable strings.
 impl Display for ResponseError {
+    /// Formats the `ResponseError` variant into a human-readable string.
+    ///
+    /// # Arguments
+    ///
+    /// - `f`: A mutable reference to a `fmt::Formatter` used for writing the formatted string.
+    ///
+    /// # Returns
+    ///
+    /// A `fmt::Result` indicating whether the formatting was successful.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NotFoundStream => {

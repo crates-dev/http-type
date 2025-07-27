@@ -16,17 +16,20 @@ impl Response {
     /// Creates a new instance of `Response`.
     ///
     /// # Returns
-    /// - An initialized `Response` with default values.
+    ///
+    /// An initialized `Response` with default values.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Retrieves the value of a response header by its key.
     ///
-    /// # Parameters
-    /// - `key`: The header's key, which can be of any type that implements `Into<ResponseHeadersKey>`.
+    /// # Arguments
+    ///
+    /// - `key`: The header's key. It can be any type that can be converted into `ResponseHeadersKey`.
     ///
     /// # Returns
+    ///
     /// - `OptionResponseHeadersValue`: Returns `Some(value)` if the key exists in the response headers,
     ///   or `None` if the key does not exist.
     pub fn get_header<K>(&self, key: K) -> OptionResponseHeadersValue
@@ -40,10 +43,12 @@ impl Response {
 
     /// Retrieves the first value of a response header by its key.
     ///
-    /// # Parameters
-    /// - `key`: The header's key, which can be of any type that implements `Into<ResponseHeadersKey>`.
+    /// # Arguments
+    ///
+    /// - `key`: The header's key. It can be any type that can be converted into `ResponseHeadersKey`.
     ///
     /// # Returns
+    ///
     /// - `OptionResponseHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
     ///   or `None` if the key does not exist or has no values.
     pub fn get_header_front<K>(&self, key: K) -> OptionResponseHeadersValueItem
@@ -57,10 +62,12 @@ impl Response {
 
     /// Retrieves the last value of a response header by its key.
     ///
-    /// # Parameters
-    /// - `key`: The header's key, which can be of any type that implements `Into<ResponseHeadersKey>`.
+    /// # Arguments
+    ///
+    /// - `key`: The header's key. It can be any type that can be converted into `ResponseHeadersKey`.
     ///
     /// # Returns
+    ///
     /// - `OptionResponseHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
     ///   or `None` if the key does not exist or has no values.
     pub fn get_header_back<K>(&self, key: K) -> OptionResponseHeadersValueItem
@@ -74,10 +81,12 @@ impl Response {
 
     /// Checks if a header exists in the response.
     ///
-    /// # Parameters
-    /// - `key`: The header key to check, which will be converted into a `ResponseHeadersKey`.
+    /// # Arguments
+    ///
+    /// - `key`: The header key to check. It will be converted into a `ResponseHeadersKey`.
     ///
     /// # Returns
+    ///
     /// - `true`: If the header exists.
     /// - `false`: If the header does not exist.
     pub fn has_header<K>(&self, key: K) -> bool
@@ -90,11 +99,13 @@ impl Response {
 
     /// Checks if a header contains a specific value.
     ///
-    /// # Parameters
-    /// - `key`: The header key to check, which will be converted into a `ResponseHeadersKey`.
-    /// - `value`: The value to search for in the header.
+    /// # Arguments
+    ///
+    /// - `key`: The header key to check. It will be converted into a `ResponseHeadersKey`.
+    /// - `value`: The value to search for within the header's values.
     ///
     /// # Returns
+    ///
     /// - `true`: If the header exists and contains the specified value.
     /// - `false`: If the header does not exist or does not contain the value.
     pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
@@ -114,6 +125,7 @@ impl Response {
     /// Gets the number of headers in the response.
     ///
     /// # Returns
+    ///
     /// - The number of unique header keys in the response.
     pub fn get_headers_length(&self) -> usize {
         self.headers.len()
@@ -121,10 +133,12 @@ impl Response {
 
     /// Gets the number of values for a specific header key.
     ///
-    /// # Parameters
-    /// - `key`: The header key to count values for, which will be converted into a `ResponseHeadersKey`.
+    /// # Arguments
+    ///
+    /// - `key`: The header key to count values for. It will be converted into a `ResponseHeadersKey`.
     ///
     /// # Returns
+    ///
     /// - The number of values for the specified header key. Returns 0 if the header does not exist.
     pub fn get_header_length<K>(&self, key: K) -> usize
     where
@@ -140,31 +154,35 @@ impl Response {
     /// will contribute more than one to the total count.
     ///
     /// # Returns
+    ///
     /// - The total number of header values in the response.
     pub fn get_headers_values_length(&self) -> usize {
         self.headers.values().map(|values| values.len()).sum()
     }
 
-    /// Retrieves the body content of the object as a UTF-8 encoded string.
+    /// Retrieves the body content of the response as a UTF-8 encoded string.
     ///
     /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` into a string.
-    /// If the byte slice contains invalid UTF-8 sequences, they will be replaced with the Unicode replacement character (�).
+    /// If the byte slice contains invalid UTF-8 sequences, they will be replaced with the Unicode replacement character ().
     ///
     /// # Returns
+    ///
     /// A `String` containing the body content.
     pub fn get_body_string(&self) -> String {
         String::from_utf8_lossy(self.get_body()).into_owned()
     }
 
-    /// Deserializes the body content of the object into a specified type `T`.
+    /// Deserializes the body content of the response into a specified type `T`.
     ///
-    /// This method first retrieves the body content as a UTF-8 encoded string using `self.get_body()`.
-    /// It then attempts to deserialize the string into the specified type `T` using `json_from_slice`.
+    /// This method first retrieves the body content as a byte slice using `self.get_body()`.
+    /// It then attempts to deserialize the byte slice into the specified type `T` using `json_from_slice`.
     ///
     /// # Type Parameters
+    ///
     /// - `T`: The target type to deserialize into. It must implement the `DeserializeOwned` trait.
     ///
     /// # Returns
+    ///
     /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
     /// - `Err(ResultJsonError)`: An error if the deserialization fails.
     pub fn get_body_json<T>(&self) -> ResultJsonError<T>
@@ -179,9 +197,14 @@ impl Response {
     /// This function appends a value to the response headers.
     /// If the header already exists, the new value will be added to the existing values.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
     /// - `value`: The value of the header, which will be converted into a String.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -203,9 +226,14 @@ impl Response {
     ///
     /// This function replaces all existing values for a header with a single new value.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
     /// - `value`: The value of the header, which will be converted into a String.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
     pub fn replace_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -226,8 +254,13 @@ impl Response {
     ///
     /// This function removes all values for the specified header key.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `key`: The header key to remove, which will be converted into a `ResponseHeadersKey`.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
     pub fn remove_header<K>(&mut self, key: K) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -243,9 +276,14 @@ impl Response {
     /// If the header has multiple values, only the matching value is removed.
     /// If this was the last value for the header, the entire header is removed.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
     /// - `value`: The specific value to remove from the header.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
     pub fn remove_header_value<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -265,35 +303,28 @@ impl Response {
     /// Clears all headers from the response.
     ///
     /// This function removes all headers, leaving the headers map empty.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
     pub fn clear_headers(&mut self) -> &mut Self {
         self.headers.clear();
         self
     }
 
-    /// Set the body of the response.
+    /// Sets the body of the response.
     ///
     /// This method allows you to set the body of the response by converting the provided
-    /// value into a `ResponseBody` type. The `body` is updated with the converted value,
-    /// and the method returns a mutable reference to the current instance for method chaining.
+    /// value into a `ResponseBody` type. The `body` is updated with the converted value.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `body`: The body of the response to be set. It can be any type that can be converted
     ///   into a `ResponseBody` using the `Into` trait.
     ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
-    /// Set the body of the response.
+    /// # Returns
     ///
-    /// This method allows you to set the body of the response by converting the provided
-    /// value into a `ResponseBody` type. The `body` is updated with the converted value,
-    /// and the method returns a mutable reference to the current instance for method chaining.
-    ///
-    /// # Parameters
-    /// - `body`: The body of the response to be set. It can be any type that can be converted
-    ///   into a `ResponseBody` using the `Into` trait.
-    ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
     pub fn set_body<T>(&mut self, body: T) -> &mut Self
     where
         T: Into<ResponseBody>,
@@ -302,19 +333,20 @@ impl Response {
         self
     }
 
-    /// Set the reason phrase of the response.
+    /// Sets the reason phrase of the response.
     ///
     /// This method allows you to set the reason phrase of the response by converting the
     /// provided value into a `ResponseReasonPhrase` type. The `reason_phrase` is updated
-    /// with the converted value, and the method returns a mutable reference to the current
-    /// instance for method chaining.
+    /// with the converted value.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `reason_phrase`: The reason phrase to be set for the response. It can be any type
     ///   that can be converted into a `ResponseReasonPhrase` using the `Into` trait.
     ///
-    /// # Return Value
-    /// - Returns a mutable reference to the current instance of the struct, enabling method chaining.
+    /// # Returns
+    ///
+    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
     pub fn set_reason_phrase<T>(&mut self, reason_phrase: T) -> &mut Self
     where
         T: Into<ResponseReasonPhrase>,
@@ -325,7 +357,8 @@ impl Response {
 
     /// Pushes a header with a key and value into the response string.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `response_string`: A mutable reference to the string where the header will be added.
     /// - `key`: The header key as a string slice (`&str`).
     /// - `value`: The header value as a string slice (`&str`).
@@ -339,7 +372,8 @@ impl Response {
     /// Pushes the first line of an HTTP response (version, status code, and reason phrase) into the response string.
     /// This corresponds to the status line of the HTTP response.
     ///
-    /// # Parameters
+    /// # Arguments
+    ///
     /// - `response_string`: A mutable reference to the string where the first line will be added.
     fn push_http_first_line(&self, response_string: &mut String) {
         response_string.push_str(&self.get_version().to_string());
@@ -351,8 +385,14 @@ impl Response {
     }
 
     /// Builds the full HTTP response as a byte vector.
+    ///
+    /// This method constructs the complete HTTP response, including the status line,
+    /// headers, and body. It handles content encoding, content type, connection
+    /// management, and content length.
+    ///
     /// # Returns
-    /// - `ResponseData`: response data
+    ///
+    /// - `ResponseData`: The complete HTTP response as a byte vector.
     pub fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(HttpStatus::phrase(*self.get_status_code()));
@@ -415,7 +455,12 @@ impl Response {
 
     /// Converts the response to a formatted string representation.
     ///
-    /// - Returns: A `String` containing formatted response details.
+    /// This method provides a human-readable summary of the response, including its version,
+    /// status code, reason phrase, headers, and body information.
+    ///
+    /// # Returns
+    ///
+    /// A `String` containing formatted response details.
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
         let body_type: &'static str = if std::str::from_utf8(body).is_ok() {

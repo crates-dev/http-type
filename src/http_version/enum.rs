@@ -1,4 +1,8 @@
 /// Represents the HTTP version used in the request or response.
+///
+/// This enum defines the various HTTP protocol versions supported,
+/// including HTTP/0.9, HTTP/1.0, HTTP/1.1, HTTP/2, and HTTP/3.
+/// It also includes an `Unknown` variant for unrecognized versions.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HttpVersion {
     /// HTTP version 0.9

@@ -1,41 +1,40 @@
 use crate::*;
 
-/// HTTP request method.
+/// An alias for `Method`, representing the HTTP request method.
 pub type RequestMethod = Method;
-/// The host part of an HTTP request.
+/// An alias for `String`, representing the host part of an HTTP request.
 pub type RequestHost = String;
-/// The HTTP version.
+/// An alias for `HttpVersion`, representing the HTTP version.
 pub type RequestVersion = HttpVersion;
-/// The path portion of the request URL.
+/// An alias for `String`, representing the path portion of the request URL.
 pub type RequestPath = String;
-/// Key type used in the request query parameters.
+/// An alias for `String`, representing the key type for request query parameters.
 pub type RequestQuerysKey = String;
-/// Value type used in the request query parameters.
+/// An alias for `String`, representing the value type for request query parameters.
 pub type RequestQuerysValue = String;
-/// Optional value for a query parameter.
+/// An alias for `Option<RequestQuerysValue>`, representing an optional query parameter value.
 pub type OptionRequestQuerysValue = Option<RequestQuerysValue>;
-/// All query parameters parsed from the request URL.
+/// An alias for `HashMapXxHash3_64<RequestQuerysKey, RequestQuerysValue>`, representing all query parameters parsed from the request URL.
 pub type RequestQuerys = HashMapXxHash3_64<RequestQuerysKey, RequestQuerysValue>;
-/// The raw binary body of the request.
+/// An alias for `Vec<u8>`, representing the raw binary body of the request.
 pub type RequestBody = Vec<u8>;
-/// The request body as a UTF-8 string.
+/// An alias for `String`, representing the request body as a UTF-8 encoded string.
 pub type RequestBodyString = String;
-/// Key type used in the request headers.
+/// An alias for `String`, representing the key type for request headers.
 pub type RequestHeadersKey = String;
-/// A single value string for an HTTP request header.
-/// This represents one individual value that can be associated with a header key.
+/// An alias for `String`, representing a single value for an HTTP request header.
 pub type RequestHeadersValueItem = String;
-/// Optional value for a header string.
+/// An alias for `Option<RequestHeadersValueItem>`, representing an optional header value item.
 pub type OptionRequestHeadersValueItem = Option<RequestHeadersValueItem>;
-/// A collection of values for a single HTTP request header.
+/// An alias for `VecDeque<RequestHeadersValueItem>`, representing a collection of values for a single HTTP request header.
 pub type RequestHeadersValue = VecDeque<RequestHeadersValueItem>;
-/// Optional value for a header.
+/// An alias for `Option<RequestHeadersValue>`, representing an optional collection of header values.
 pub type OptionRequestHeadersValue = Option<RequestHeadersValue>;
-/// All headers sent with the HTTP request.
+/// An alias for `HashMapXxHash3_64<RequestHeadersKey, RequestHeadersValue>`, representing all headers sent with the HTTP request.
 pub type RequestHeaders = HashMapXxHash3_64<RequestHeadersKey, RequestHeadersValue>;
-/// The result type returned from a request reader handler.
+/// An alias for `Result<Request, RequestError>`, representing the result type returned from a request reader handler.
 pub type RequestReaderHandleResult = Result<Request, RequestError>;
-/// Read guard for a `Request` wrapped in a `RwLock`.
+/// An alias for `RwLockReadGuard<'a, Request>`, representing a read guard for a `Request` wrapped in a `RwLock`.
 pub type RwLockReadGuardRequest<'a> = RwLockReadGuard<'a, Request>;
-/// Write guard for a `Request` wrapped in a `RwLock`.
+/// An alias for `RwLockWriteGuard<'a, Request>`, representing a write guard for a `Request` wrapped in a `RwLock`.
 pub type RwLockWriteGuardRequest<'a> = RwLockWriteGuard<'a, Request>;
