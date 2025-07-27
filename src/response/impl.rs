@@ -1,5 +1,13 @@
 use crate::*;
 
+/// Provides a default value for `Response`.
+///
+/// Initializes a `Response` with default values for its fields:
+/// - `version`: Default `HttpVersion`.
+/// - `status_code`: Default `ResponseStatusCode`.
+/// - `reason_phrase`: Default `ResponseReasonPhrase`.
+/// - `headers`: An empty hash map.
+/// - `body`: An empty vector.
 impl Default for Response {
     fn default() -> Self {
         Self {

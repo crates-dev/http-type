@@ -1,5 +1,8 @@
 use crate::*;
 
+/// Provides a default value for `Protocol`.
+///
+/// The default `Protocol` is `Protocol::Unknown` with an empty string.
 impl Default for Protocol {
     fn default() -> Self {
         Self::Unknown(String::new())

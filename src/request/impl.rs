@@ -1,5 +1,15 @@
 use crate::*;
 
+/// Provides a default value for `Request`.
+///
+/// Initializes a `Request` with default values for its fields:
+/// - `method`: Default `Method`.
+/// - `host`: An empty string.
+/// - `version`: Default `HttpVersion`.
+/// - `path`: An empty string.
+/// - `querys`: An empty hash map.
+/// - `headers`: An empty hash map.
+/// - `body`: An empty vector.
 impl Default for Request {
     fn default() -> Self {
         Self {
