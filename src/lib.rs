@@ -1,3 +1,11 @@
+//! http-type
+//!
+//! A comprehensive Rust library providing essential types for HTTP operations.
+//! Includes core HTTP abstractions (request/response, methods, status codes, versions),
+//! content types, cookies, WebSocket support, and thread-safe
+//! concurrent types (ArcMutex, ArcRwLock). Also provides convenient
+//! Option-wrapped primitive types for flexible HTTP handling.
+
 pub(crate) mod any;
 pub(crate) mod arc_mutex;
 pub(crate) mod arc_rwlock;

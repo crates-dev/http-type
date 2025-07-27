@@ -1,32 +1,32 @@
 use crate::*;
 
-/// A builder for constructing HTTP cookies.
+/// HTTP cookie builder.
 ///
-/// This struct provides a way to create and configure HTTP cookies.
+/// Constructs and configures HTTP cookies.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct CookieBuilder {
-    /// The name of the cookie.
+    /// Cookie name.
     pub(super) name: CookieKey,
-    /// The value of the cookie.
+    /// Cookie value.
     pub(super) value: CookieValue,
-    /// The expiration date of the cookie.
+    /// Cookie expiration date.
     pub(super) expires: OptionCookieExpires,
-    /// The maximum age of the cookie in seconds.
+    /// Cookie max age in seconds.
     pub(super) max_age: OptionCookieMaxAge,
-    /// The domain of the cookie.
+    /// Cookie domain.
     pub(super) domain: OptionCookieDomain,
-    /// The path of the cookie.
+    /// Cookie path.
     pub(super) path: OptionCookiePath,
-    /// The `Secure` flag of the cookie.
+    /// Secure flag.
     pub(super) secure: bool,
-    /// The `HttpOnly` flag of the cookie.
+    /// HttpOnly flag.
     pub(super) http_only: bool,
-    /// The `SameSite` policy of the cookie.
+    /// SameSite policy.
     pub(super) same_site: OptionCookieSameSite,
 }
 
-/// A utility for parsing HTTP `Cookie` headers.
+/// HTTP cookie parser.
 ///
-/// This struct provides a static method to parse the `Cookie` header.
+/// Parses Cookie headers.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Cookie;

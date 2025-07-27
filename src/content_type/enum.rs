@@ -1,31 +1,30 @@
-/// Represents supported HTTP content types.
+/// Supported HTTP content types.
 ///
-/// This enum defines a set of common content types used in HTTP communication,
-/// allowing for easy identification and handling of different data formats.
+/// Defines common content types for HTTP communication.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ContentType {
-    /// The `application/json` content type.
+    /// `application/json` content type.
     ///
-    /// Used for sending and receiving JSON data.
+    /// For JSON data format.
     ApplicationJson,
-    /// The `application/xml` content type.
+    /// `application/xml` content type.
     ///
-    /// Used for sending and receiving XML data.
+    /// For XML data format.
     ApplicationXml,
-    /// The `text/plain` content type.
+    /// `text/plain` content type.
     ///
-    /// Used for plain text data.
+    /// For plain text data.
     TextPlain,
-    /// The `text/html` content type.
+    /// `text/html` content type.
     ///
-    /// Used for HTML documents.
+    /// For HTML documents.
     TextHtml,
-    /// The `application/x-www-form-urlencoded` content type.
+    /// `application/x-www-form-urlencoded` content type.
     ///
-    /// Used for submitting form data in key-value pairs.
+    /// For form data submission.
     FormUrlEncoded,
-    /// An unknown or unrecognized content type.
+    /// Unknown content type.
     ///
-    /// This variant is used when the content type does not match any of the predefined variants.
+    /// For unrecognized content types.
     Unknown,
 }

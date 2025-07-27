@@ -1,20 +1,22 @@
 use crate::*;
 
-/// Represents a parsed HTTP request.
+/// HTTP request representation.
+///
+/// Contains all components of an HTTP request.
 #[derive(Debug, Clone, PartialEq, Eq, Getter, DisplayDebug)]
 pub struct Request {
-    /// The HTTP method of the request.
+    /// HTTP request method.
     pub(super) method: RequestMethod,
-    /// The host of the request.
+    /// Request host.
     pub(super) host: RequestHost,
-    /// The HTTP version used in the request.
+    /// HTTP protocol version.
     pub(super) version: RequestVersion,
-    /// The request path.
+    /// Request path.
     pub(super) path: RequestPath,
-    /// The query string of the request.
+    /// URL query parameters.
     pub(super) querys: RequestQuerys,
-    /// A collection of HTTP headers as key-value pairs.
+    /// HTTP headers collection.
     pub(super) headers: RequestHeaders,
-    /// The binary body of the request.
+    /// Request body content.
     pub(super) body: RequestBody,
 }
