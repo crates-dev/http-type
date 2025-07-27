@@ -126,7 +126,7 @@ impl Response {
     ///
     /// # Returns
     /// - The number of values for the specified header key. Returns 0 if the header does not exist.
-    pub fn get_header_len<K>(&self, key: K) -> usize
+    pub fn get_header_length<K>(&self, key: K) -> usize
     where
         K: Into<ResponseHeadersKey>,
     {
