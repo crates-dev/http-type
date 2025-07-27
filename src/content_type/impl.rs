@@ -5,7 +5,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `data` - The data to be serialized into JSON.
+    /// - `data` - The data to be serialized into JSON.
     ///
     /// # Returns
     ///
@@ -21,7 +21,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `data` - The data to be serialized into XML.
+    /// - `data` - The data to be serialized into XML.
     ///
     /// # Returns
     ///
@@ -37,7 +37,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `data` - The data to be formatted into plain text.
+    /// - `data` - The data to be formatted into plain text.
     ///
     /// # Returns
     ///
@@ -53,7 +53,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `data` - The data to be formatted into HTML.
+    /// - `data` - The data to be formatted into HTML.
     ///
     /// # Returns
     ///
@@ -73,7 +73,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `data` - The data to be serialized into URL-encoded format.
+    /// - `data` - The data to be serialized into URL-encoded format.
     ///
     /// # Returns
     ///
@@ -89,7 +89,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `data` - The data to be formatted into binary representation.
+    /// - `data` - The data to be formatted into binary representation.
     ///
     /// # Returns
     ///
@@ -105,7 +105,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `data` - The data to be formatted into the body string.
+    /// - `data` - The data to be formatted into the body string.
     ///
     /// # Returns
     ///
@@ -128,8 +128,8 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `content_type` - The content type.
-    /// * `charset` - The character set.
+    /// - `content_type` - The content type.
+    /// - `charset` - The character set.
     ///
     /// # Returns
     ///
@@ -149,8 +149,8 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// * `content_type` - The content type.
-    /// * `charset_with_key` - The charset declaration.
+    /// - `content_type` - The content type.
+    /// - `charset_with_key` - The charset declaration.
     ///
     /// # Returns
     ///
@@ -176,7 +176,7 @@ impl FromStr for ContentType {
     ///
     /// # Arguments
     ///
-    /// * `data` - The string slice to parse.
+    /// - `data` - The string slice to parse.
     ///
     /// # Returns
     ///

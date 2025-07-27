@@ -5,8 +5,8 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// * `name` - The name of the cookie.
-    /// * `value` - The value of the cookie.
+    /// - `name` - The name of the cookie.
+    /// - `value` - The value of the cookie.
     ///
     /// # Returns
     ///
@@ -36,7 +36,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// * `cookie_string` - The `Set-Cookie` header string to parse.
+    /// - `cookie_string` - The `Set-Cookie` header string to parse.
     ///
     /// # Returns
     ///
@@ -105,7 +105,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// * `expires` - The expiration date string (e.g., "Wed, 21 Oct 2015 07:28:00 GMT").
+    /// - `expires` - The expiration date string (e.g., "Wed, 21 Oct 2015 07:28:00 GMT").
     ///
     /// # Returns
     ///
@@ -122,7 +122,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// * `max_age` - The maximum age in seconds.
+    /// - `max_age` - The maximum age in seconds.
     ///
     /// # Returns
     ///
@@ -136,7 +136,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// * `domain` - The domain for the cookie (e.g., "example.com").
+    /// - `domain` - The domain for the cookie (e.g., "example.com").
     ///
     /// # Returns
     ///
@@ -153,7 +153,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// * `path` - The path for the cookie (e.g., "/admin").
+    /// - `path` - The path for the cookie (e.g., "/admin").
     ///
     /// # Returns
     ///
@@ -194,7 +194,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// * `same_site` - The `SameSite` policy (e.g., "Strict", "Lax", "None").
+    /// - `same_site` - The `SameSite` policy (e.g., "Strict", "Lax", "None").
     ///
     /// # Returns
     ///
@@ -255,7 +255,7 @@ impl Cookie {
     ///
     /// # Arguments
     ///
-    /// * `cookie_string` - The `Cookie` header string to parse.
+    /// - `cookie_string` - The `Cookie` header string to parse.
     ///
     /// # Returns
     ///

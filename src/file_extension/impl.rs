@@ -11,7 +11,7 @@ impl FileExtension {
     ///
     /// # Arguments
     ///
-    /// * `file_extension` - The string to parse.
+    /// - `file_extension` - The string to parse.
     ///
     /// # Returns
     ///
@@ -24,7 +24,7 @@ impl FileExtension {
     ///
     /// # Arguments
     ///
-    /// * `full_path` - The full path to the file.
+    /// - `full_path` - The full path to the file.
     ///
     /// # Returns
     ///

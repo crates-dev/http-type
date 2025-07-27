@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// * `data` - The data to be wrapped in a `Box<RwLock>`.
+/// - `data` - The data to be wrapped in a `Box<RwLock>`.
 ///
 /// # Returns
 ///
