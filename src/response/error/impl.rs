@@ -11,6 +11,9 @@ impl Display for ResponseError {
             Self::ConnectionClosed => {
                 write!(f, "Connection has been closed")
             }
+            Self::Terminated => {
+                write!(f, "Current processing has been terminated")
+            }
             Self::Unknown(err) => write!(f, "Unknown error{}{}", COLON_SPACE, err),
             Self::Response(data) => write!(f, "Response error{}{}", COLON_SPACE, data),
             Self::WebSocketHandShake(err) => {
