@@ -115,7 +115,7 @@ impl Response {
     ///
     /// # Returns
     /// - The number of unique header keys in the response.
-    pub fn get_headers_len(&self) -> usize {
+    pub fn get_headers_length(&self) -> usize {
         self.headers.len()
     }
 
@@ -141,7 +141,7 @@ impl Response {
     ///
     /// # Returns
     /// - The total number of header values in the response.
-    pub fn get_headers_values_len(&self) -> usize {
+    pub fn get_headers_values_length(&self) -> usize {
         self.headers.values().map(|values| values.len()).sum()
     }
 
