@@ -587,7 +587,7 @@ impl Request {
         self.get_version().is_http()
     }
 
-    /// Checks whether the request method is `GET`.
+    /// Checks whether the request method is GET.
     ///
     /// # Returns
     ///
@@ -596,7 +596,7 @@ impl Request {
         self.get_method().is_get()
     }
 
-    /// Checks whether the request method is `POST`.
+    /// Checks whether the request method is POST.
     ///
     /// # Returns
     ///
@@ -605,7 +605,7 @@ impl Request {
         self.get_method().is_post()
     }
 
-    /// Checks whether the request method is `PUT`.
+    /// Checks whether the request method is PUT.
     ///
     /// # Returns
     ///
@@ -614,7 +614,7 @@ impl Request {
         self.get_method().is_put()
     }
 
-    /// Checks whether the request method is `DELETE`.
+    /// Checks whether the request method is DELETE.
     ///
     /// # Returns
     ///
@@ -623,7 +623,7 @@ impl Request {
         self.get_method().is_delete()
     }
 
-    /// Checks whether the request method is `PATCH`.
+    /// Checks whether the request method is PATCH.
     ///
     /// # Returns
     ///
@@ -632,7 +632,7 @@ impl Request {
         self.get_method().is_patch()
     }
 
-    /// Checks whether the request method is `HEAD`.
+    /// Checks whether the request method is HEAD.
     ///
     /// # Returns
     ///
@@ -641,7 +641,7 @@ impl Request {
         self.get_method().is_head()
     }
 
-    /// Checks whether the request method is `OPTIONS`.
+    /// Checks whether the request method is OPTIONS.
     ///
     /// # Returns
     ///
@@ -650,7 +650,7 @@ impl Request {
         self.get_method().is_options()
     }
 
-    /// Checks whether the request method is `CONNECT`.
+    /// Checks whether the request method is CONNECT.
     ///
     /// # Returns
     ///
@@ -659,7 +659,7 @@ impl Request {
         self.get_method().is_connect()
     }
 
-    /// Checks whether the request method is `TRACE`.
+    /// Checks whether the request method is TRACE.
     ///
     /// # Returns
     ///
@@ -668,7 +668,7 @@ impl Request {
         self.get_method().is_trace()
     }
 
-    /// Checks whether the request method is `UNKNOWN`.
+    /// Checks whether the request method is UNKNOWN.
     ///
     /// # Returns
     ///

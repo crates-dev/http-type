@@ -1,5 +1,6 @@
 use crate::*;
 
+/// Implementation for `ContentType` enum.
 impl ContentType {
     /// Serializes data into JSON format.
     ///
@@ -169,6 +170,7 @@ impl ContentType {
     }
 }
 
+/// Implements `FromStr` for `ContentType`.
 impl FromStr for ContentType {
     type Err = ();
 
@@ -180,7 +182,7 @@ impl FromStr for ContentType {
     ///
     /// # Returns
     ///
-    /// - `Result<ContentType, ()>` - Parse result
+    /// - `Result<Self, Self::Err>` - Parse result
     fn from_str(data: &str) -> Result<Self, Self::Err> {
         match data.to_ascii_lowercase().as_str() {
             APPLICATION_JSON => Ok(Self::ApplicationJson),
@@ -193,12 +195,13 @@ impl FromStr for ContentType {
     }
 }
 
+/// Implements `Default` for `ContentType`.
 impl Default for ContentType {
     /// Gets default ContentType.
     ///
     /// # Returns
     ///
-    /// - `ContentType` - Default variant
+    /// - `Self` - Default variant
     fn default() -> Self {
         Self::Unknown
     }

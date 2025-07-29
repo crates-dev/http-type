@@ -1,12 +1,13 @@
 use crate::*;
 
+/// Implementation for `CookieBuilder`.
 impl CookieBuilder {
     /// Creates a new cookie builder instance.
     ///
     /// # Arguments
     ///
-    /// - `N: Into<CookieKey>` - The cookie name type.
-    /// - `V: Into<CookieValue>` - The cookie value type.
+    /// - `N` - The cookie name type.
+    /// - `V` - The cookie value type.
     ///
     /// # Returns
     ///
@@ -105,7 +106,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `expires` - The expiration date string (e.g., "Wed, 21 Oct 2015 07:28:00 GMT").
+    /// - `T` - The expiration date string (e.g., "Wed, 21 Oct 2015 07:28:00 GMT").
     ///
     /// # Returns
     ///
@@ -122,7 +123,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `max_age` - The maximum age in seconds.
+    /// - `i64` - The maximum age in seconds.
     ///
     /// # Returns
     ///
@@ -136,7 +137,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `domain` - The domain for the cookie (e.g., "example.com").
+    /// - `T` - The domain for the cookie (e.g., "example.com").
     ///
     /// # Returns
     ///
@@ -153,7 +154,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `path` - The path for the cookie (e.g., "/admin").
+    /// - `T` - The path for the cookie (e.g., "/admin").
     ///
     /// # Returns
     ///
@@ -194,7 +195,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `same_site` - The `SameSite` policy (e.g., "Strict", "Lax", "None").
+    /// - `T` - The `SameSite` policy (e.g., "Strict", "Lax", "None").
     ///
     /// # Returns
     ///
@@ -211,7 +212,7 @@ impl CookieBuilder {
     ///
     /// # Returns
     ///
-    /// A formatted cookie string ready to be sent in a `Set-Cookie` header.
+    /// - `String` - A formatted cookie string ready to be sent in a `Set-Cookie` header.
     pub fn build(&self) -> String {
         if self.name.is_empty() {
             return String::new();
@@ -247,6 +248,7 @@ impl CookieBuilder {
     }
 }
 
+/// Implementation for `Cookie`.
 impl Cookie {
     /// Parses a `Cookie` header string into a collection of key-value pairs.
     ///
