@@ -150,7 +150,7 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `data`: The raw data slice from the WebSocket stream.
+    /// - `&[u8]` - The raw data slice from the WebSocket stream.
     ///
     /// # Returns
     ///
@@ -218,7 +218,7 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `body`: A reference to a response body (payload) as a byte slice.
+    /// - `&ResponseBody` - A reference to a response body (payload) as a byte slice.
     ///
     /// # Returns
     ///
@@ -280,7 +280,7 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `data`: A byte slice containing the input data to be hashed.
+    /// - `&[u8]` - A byte slice containing the input data to be hashed.
     ///
     /// # Returns
     ///
@@ -352,7 +352,7 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `key`: A string slice containing the client-provided key (typically from the `Sec-WebSocket-Key` header).
+    /// - `&str` - A string slice containing the client-provided key (typically from the `Sec-WebSocket-Key` header).
     ///
     /// # Returns
     ///
@@ -373,7 +373,7 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `data`: A byte slice containing the data to encode in base64.
+    /// - `&[u8]` - A byte slice containing the data to encode in base64.
     ///
     /// # Returns
     ///

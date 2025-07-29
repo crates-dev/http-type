@@ -1,6 +1,7 @@
-/// Represents various file extensions.
+/// Enumeration of supported file extensions.
 ///
-/// This enum provides a comprehensive list of file extensions.
+/// Contains all known file extensions with their corresponding MIME types.
+/// Used for content type detection and file handling.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FileExtension {
     /// The `123` file extension.

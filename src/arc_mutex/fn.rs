@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `data` - The data to be wrapped in an `Arc<Mutex>`.
+/// - `T` - The data to be wrapped in an `Arc<Mutex>`.
 ///
 /// # Returns
 ///

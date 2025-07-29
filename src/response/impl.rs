@@ -2,12 +2,7 @@ use crate::*;
 
 /// Provides a default value for `Response`.
 ///
-/// Initializes a `Response` with default values for its fields:
-/// - `version`: Default `HttpVersion`.
-/// - `status_code`: Default `ResponseStatusCode`.
-/// - `reason_phrase`: Default `ResponseReasonPhrase`.
-/// - `headers`: An empty hash map.
-/// - `body`: An empty vector.
+/// Returns a new `Response` instance with all fields initialized to their default values.
 impl Default for Response {
     fn default() -> Self {
         Self {
@@ -25,7 +20,7 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// An initialized `Response` with default values.
+    /// - `Response` - A new response instance with default values.
     pub fn new() -> Self {
         Self::default()
     }
@@ -34,12 +29,11 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header's key. It can be any type that can be converted into `ResponseHeadersKey`.
+    /// - `K` - The header's key (must implement Into<ResponseHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `OptionResponseHeadersValue`: Returns `Some(value)` if the key exists in the response headers,
-    ///   or `None` if the key does not exist.
+    /// - `OptionResponseHeadersValue` - The optional header values.
     pub fn get_header<K>(&self, key: K) -> OptionResponseHeadersValue
     where
         K: Into<ResponseHeadersKey>,
@@ -53,12 +47,11 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header's key. It can be any type that can be converted into `ResponseHeadersKey`.
+    /// - `K` - The header's key (must implement Into<ResponseHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `OptionResponseHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
-    ///   or `None` if the key does not exist or has no values.
+    /// - `OptionResponseHeadersValueItem` - The first header value if exists.
     pub fn get_header_front<K>(&self, key: K) -> OptionResponseHeadersValueItem
     where
         K: Into<ResponseHeadersKey>,
@@ -72,12 +65,11 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header's key. It can be any type that can be converted into `ResponseHeadersKey`.
+    /// - `K` - The header's key (must implement Into<ResponseHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `OptionResponseHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
-    ///   or `None` if the key does not exist or has no values.
+    /// - `OptionResponseHeadersValueItem` - The last header value if exists.
     pub fn get_header_back<K>(&self, key: K) -> OptionResponseHeadersValueItem
     where
         K: Into<ResponseHeadersKey>,
@@ -91,12 +83,11 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key to check. It will be converted into a `ResponseHeadersKey`.
+    /// - `K` - The header key to check (must implement Into<ResponseHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `true`: If the header exists.
-    /// - `false`: If the header does not exist.
+    /// - `bool` - Whether the header exists.
     pub fn has_header<K>(&self, key: K) -> bool
     where
         K: Into<ResponseHeadersKey>,
@@ -109,13 +100,12 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key to check. It will be converted into a `ResponseHeadersKey`.
-    /// - `value`: The value to search for within the header's values.
+    /// - `K` - The header key to check (must implement Into<ResponseHeadersKey>).
+    /// - `V` - The value to search for (must implement Into<ResponseHeadersValueItem>).
     ///
     /// # Returns
     ///
-    /// - `true`: If the header exists and contains the specified value.
-    /// - `false`: If the header does not exist or does not contain the value.
+    /// - `bool` - Whether the header contains the value.
     pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
     where
         K: Into<ResponseHeadersKey>,
@@ -134,7 +124,7 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - The number of unique header keys in the response.
+    /// - `usize` - The count of unique header keys.
     pub fn get_headers_length(&self) -> usize {
         self.headers.len()
     }
@@ -143,11 +133,11 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key to count values for. It will be converted into a `ResponseHeadersKey`.
+    /// - `K` - The header key to count (must implement Into<ResponseHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - The number of values for the specified header key. Returns 0 if the header does not exist.
+    /// - `usize` - The count of values for the header.
     pub fn get_header_length<K>(&self, key: K) -> usize
     where
         K: Into<ResponseHeadersKey>,
@@ -163,7 +153,7 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - The total number of header values in the response.
+    /// - `usize` - The total count of all header values.
     pub fn get_headers_values_length(&self) -> usize {
         self.headers.values().map(|values| values.len()).sum()
     }
@@ -175,7 +165,7 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// A `String` containing the body content.
+    /// - `String` - The body content as a string.
     pub fn get_body_string(&self) -> String {
         String::from_utf8_lossy(self.get_body()).into_owned()
     }
@@ -187,12 +177,11 @@ impl Response {
     ///
     /// # Type Parameters
     ///
-    /// - `T`: The target type to deserialize into. It must implement the `DeserializeOwned` trait.
+    /// - `T` - The target type to deserialize into (must implement DeserializeOwned).
     ///
     /// # Returns
     ///
-    /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
-    /// - `Err(ResultJsonError)`: An error if the deserialization fails.
+    /// - `ResultJsonError<T>` - The deserialization result.
     pub fn get_body_json<T>(&self) -> ResultJsonError<T>
     where
         T: DeserializeOwned,
@@ -207,12 +196,12 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
-    /// - `value`: The value of the header, which will be converted into a String.
+    /// - `K` - The header key (must implement Into<ResponseHeadersKey>).
+    /// - `V` - The header value (must implement Into<String>).
     ///
     /// # Returns
     ///
-    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
+    /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -236,12 +225,12 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
-    /// - `value`: The value of the header, which will be converted into a String.
+    /// - `K` - The header key (must implement Into<ResponseHeadersKey>).
+    /// - `V` - The header value (must implement Into<String>).
     ///
     /// # Returns
     ///
-    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
+    /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn replace_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -264,11 +253,11 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key to remove, which will be converted into a `ResponseHeadersKey`.
+    /// - `K` - The header key to remove (must implement Into<ResponseHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
+    /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn remove_header<K>(&mut self, key: K) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -286,12 +275,12 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key, which will be converted into a `ResponseHeadersKey`.
-    /// - `value`: The specific value to remove from the header.
+    /// - `K` - The header key (must implement Into<ResponseHeadersKey>).
+    /// - `V` - The value to remove (must implement Into<String>).
     ///
     /// # Returns
     ///
-    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
+    /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn remove_header_value<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
@@ -314,7 +303,7 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
+    /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn clear_headers(&mut self) -> &mut Self {
         self.headers.clear();
         self
@@ -327,12 +316,11 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `body`: The body of the response to be set. It can be any type that can be converted
-    ///   into a `ResponseBody` using the `Into` trait.
+    /// - `T` - The body content (must implement Into<ResponseBody>).
     ///
     /// # Returns
     ///
-    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
+    /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn set_body<T>(&mut self, body: T) -> &mut Self
     where
         T: Into<ResponseBody>,
@@ -349,12 +337,11 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `reason_phrase`: The reason phrase to be set for the response. It can be any type
-    ///   that can be converted into a `ResponseReasonPhrase` using the `Into` trait.
+    /// - `T` - The reason phrase (must implement Into<ResponseReasonPhrase>).
     ///
     /// # Returns
     ///
-    /// - `&mut Self`: A mutable reference to the current instance for method chaining.
+    /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn set_reason_phrase<T>(&mut self, reason_phrase: T) -> &mut Self
     where
         T: Into<ResponseReasonPhrase>,
@@ -400,7 +387,7 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - `ResponseData`: The complete HTTP response as a byte vector.
+    /// - `ResponseData` - The complete HTTP response bytes.
     pub fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(HttpStatus::phrase(*self.get_status_code()));

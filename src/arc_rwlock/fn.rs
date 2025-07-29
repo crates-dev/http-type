@@ -1,14 +1,14 @@
 use crate::*;
 
-/// Creates a new `ArcRwLock` from the given data.
+/// Creates a new thread-safe reference-counted read-write lock.
 ///
 /// # Arguments
 ///
-/// - `data` - The data to be wrapped in an `Arc<RwLock>`.
+/// - `T` - The data type to be wrapped.
 ///
 /// # Returns
 ///
-/// An `ArcRwLock` containing the provided data.
+/// - `ArcRwLock<T>` - A new atomic reference-counted read-write lock.
 pub fn arc_rwlock<T>(data: T) -> ArcRwLock<T> {
     Arc::new(RwLock::new(data))
 }

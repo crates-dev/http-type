@@ -2,14 +2,7 @@ use crate::*;
 
 /// Provides a default value for `Request`.
 ///
-/// Initializes a `Request` with default values for its fields:
-/// - `method`: Default `Method`.
-/// - `host`: An empty string.
-/// - `version`: Default `HttpVersion`.
-/// - `path`: An empty string.
-/// - `querys`: An empty hash map.
-/// - `headers`: An empty hash map.
-/// - `body`: An empty vector.
+/// Returns a new `Request` instance with all fields initialized to their default values.
 impl Default for Request {
     fn default() -> Self {
         Self {
@@ -29,26 +22,23 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// An initialized `Request` with default values.
+    /// - `Request` - A new request instance with default values.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Creates a new `Request` object from a TCP stream reader.
+    /// Parses an HTTP request from a buffered TCP stream reader.
     ///
-    /// This function reads and parses an HTTP request from the provided `BufReader`.
-    /// It handles the request line, headers, and body, returning a `Request` object
-    /// or an error if the request is malformed or cannot be read.
+    /// Reads request line, headers and body from the stream and constructs a Request object.
     ///
     /// # Arguments
     ///
-    /// - `reader`: A mutable reference to a `BufReader` wrapping a `TcpStream`.
-    /// - `buffer_size`: The size of the buffer to use for reading the request.
+    /// - `&mut BufReader<&mut TcpStream>` - The buffered TCP stream reader.
+    /// - `usize` - The buffer size for reading.
     ///
     /// # Returns
     ///
-    /// - `Ok(Request)`: A `Request` object populated with the HTTP request data.
-    /// - `Err(RequestError)`: An error if the request is invalid or cannot be read.
+    /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn http_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
@@ -123,20 +113,18 @@ impl Request {
         })
     }
 
-    /// Creates a new `Request` object from a TCP stream.
+    /// Parses an HTTP request from a TCP stream.
     ///
-    /// This function wraps the `TcpStream` in a `BufReader` and then calls `http_from_reader`
-    /// to parse the HTTP request.
+    /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
     ///
     /// # Arguments
     ///
-    /// - `stream`: A reference to an `ArcRwLockStream` representing the incoming connection.
-    /// - `buffer_size`: The size of the buffer to use for reading the request.
+    /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
+    /// - `usize` - The buffer size for reading.
     ///
     /// # Returns
     ///
-    /// - `Ok(Request)`: A `Request` object populated with the HTTP request data.
-    /// - `Err(RequestError)`: An error if the request is invalid or cannot be read.
+    /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn http_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
@@ -146,21 +134,19 @@ impl Request {
         Self::http_from_reader(&mut reader, buffer_size).await
     }
 
-    /// Creates a new `Request` object from a TCP stream for WebSocket communication.
+    /// Parses a WebSocket request from a TCP stream.
     ///
-    /// This function wraps the `TcpStream` in a `BufReader` and then calls `ws_from_reader`
-    /// to parse the WebSocket request.
+    /// Wraps the stream in a buffered reader and delegates to `ws_from_reader`.
     ///
     /// # Arguments
     ///
-    /// - `stream`: A reference to an `ArcRwLockStream` representing the incoming connection.
-    /// - `buffer_size`: The size of the buffer to use for reading the request.
-    /// - `request`: A mutable reference to a `Request` object, used as a template for the new request.
+    /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
+    /// - `usize` - The buffer size for reading.
+    /// - `&mut Request` - The request template to populate.
     ///
     /// # Returns
     ///
-    /// - `Ok(Request)`: A `Request` object populated with the WebSocket request data.
-    /// - `Err(RequestError)`: An error if the request is invalid or cannot be read.
+    /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
     pub async fn ws_from_stream(
         stream: &ArcRwLockStream,
         buffer_size: usize,
@@ -171,24 +157,20 @@ impl Request {
         Self::ws_from_reader(&mut reader, buffer_size, request).await
     }
 
-    /// Reads a WebSocket request from a TCP stream and constructs a `Request` object.
+    /// Parses a WebSocket request from a buffered TCP stream.
     ///
-    /// This function reads data from the provided `BufReader` wrapped around a `TcpStream`.
-    /// It handles WebSocket frames, including text, binary, ping, pong, and close frames.
-    /// The request body is assembled from the payload data of the frames.
+    /// Handles WebSocket frames including text, binary, ping, pong and close frames.
+    /// Assembles the request body from frame payload data.
     ///
     /// # Arguments
     ///
-    /// - `reader`: A mutable reference to a `BufReader` wrapping a `TcpStream`.
-    ///   This reader is used to read the incoming WebSocket request data.
-    /// - `buffer_size`: The size of the buffer to use for reading WebSocket frames.
-    /// - `request`: A mutable reference to a `Request` object, used as a template for the new request.
+    /// - `&mut BufReader<&mut TcpStream>` - The buffered TCP stream reader.
+    /// - `usize` - The buffer size for reading frames.
+    /// - `&mut Request` - The request template to populate.
     ///
     /// # Returns
     ///
-    /// - `Ok(Request)`: A `Request` object constructed from the received WebSocket data.
-    /// - `Err(RequestError)`: An error if the WebSocket request is incomplete, invalid,
-    ///   or if the client disconnects or closes the connection.
+    /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
     pub async fn ws_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
@@ -247,18 +229,17 @@ impl Request {
         }
     }
 
-    /// Parses a query string into a map of key-value pairs.
+    /// Parses a query string into key-value pairs.
     ///
-    /// The query string is expected to be in the format "key1=value1&key2=value2".
-    /// Keys and values are extracted and stored in a `RequestQuerys` map.
+    /// Expects format "key1=value1&key2=value2". Empty values are allowed.
     ///
     /// # Arguments
     ///
-    /// - `query`: A string slice representing the query string.
+    /// - `&str` - The query string to parse.
     ///
     /// # Returns
     ///
-    /// A `RequestQuerys` map containing the parsed query parameters.
+    /// - `HashMap<String, String>` - The parsed query parameters.
     fn parse_querys(query: &str) -> RequestQuerys {
         let mut query_map: RequestQuerys = hash_map_xx_hash3_64();
         for pair in query.split(AND) {
@@ -273,16 +254,17 @@ impl Request {
         query_map
     }
 
-    /// Retrieves the value of a query parameter by its key.
+    /// Gets a query parameter value by key.
+    ///
+    /// The key type must implement Into<String> conversion.
     ///
     /// # Arguments
     ///
-    /// - `key`: The query parameter's key. It can be any type that can be converted into `RequestQuerysKey`.
+    /// - `K` - The query parameter key (implements Into<String>).
     ///
     /// # Returns
     ///
-    /// - `OptionRequestQuerysValue`: Returns `Some(value)` if the key exists in the query parameters,
-    ///   or `None` if the key does not exist.
+    /// - `Option<String>` - The parameter value if exists.
     pub fn get_query<K>(&self, key: K) -> OptionRequestQuerysValue
     where
         K: Into<RequestQuerysKey>,
@@ -294,12 +276,11 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header's key. It can be any type that can be converted into `RequestHeadersKey`.
+    /// - `K` - The header's key (must implement Into<RequestHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `OptionRequestHeadersValue`: Returns `Some(value)` if the key exists in the request headers,
-    ///   or `None` if the key does not exist.
+    /// - `OptionRequestHeadersValue` - The optional header values.
     pub fn get_header<K>(&self, key: K) -> OptionRequestHeadersValue
     where
         K: Into<RequestHeadersKey>,
@@ -311,12 +292,11 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header's key. It can be any type that can be converted into `RequestHeadersKey`.
+    /// - `K` - The header's key (must implement Into<RequestHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `OptionRequestHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
-    ///   or `None` if the key does not exist or has no values.
+    /// - `OptionRequestHeadersValueItem` - The first header value if exists.
     pub fn get_header_front<K>(&self, key: K) -> OptionRequestHeadersValueItem
     where
         K: Into<RequestHeadersKey>,
@@ -330,12 +310,11 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header's key. It can be any type that can be converted into `RequestHeadersKey`.
+    /// - `K` - The header's key (must implement Into<RequestHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `OptionRequestHeadersValueItem`: Returns `Some(value)` if the key exists and has at least one value,
-    ///   or `None` if the key does not exist or has no values.
+    /// - `OptionRequestHeadersValueItem` - The last header value if exists.
     pub fn get_header_back<K>(&self, key: K) -> OptionRequestHeadersValueItem
     where
         K: Into<RequestHeadersKey>,
@@ -349,11 +328,11 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header's key. It can be any type that can be converted into `RequestHeadersKey`.
+    /// - `K` - The header's key (must implement Into<RequestHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `usize`: The number of values for the specified header. Returns 0 if the header does not exist.
+    /// - `usize` - The count of values for the header.
     pub fn get_header_length<K>(&self, key: K) -> usize
     where
         K: Into<RequestHeadersKey>,
@@ -368,7 +347,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `usize`: The total count of all header values.
+    /// - `usize` - The total count of all header values.
     pub fn get_headers_values_length(&self) -> usize {
         self.headers.values().map(|values| values.len()).sum()
     }
@@ -377,7 +356,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `usize`: The number of unique header keys.
+    /// - `usize` - The count of unique header keys.
     pub fn get_headers_length(&self) -> usize {
         self.headers.len()
     }
@@ -386,11 +365,11 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key to check. It will be converted into a `RequestHeadersKey`.
+    /// - `K` - The header key to check (must implement Into<RequestHeadersKey>).
     ///
     /// # Returns
     ///
-    /// - `bool`: Returns `true` if the header exists, `false` otherwise.
+    /// - `bool` - Whether the header exists.
     pub fn has_header<K>(&self, key: K) -> bool
     where
         K: Into<RequestHeadersKey>,
@@ -402,12 +381,12 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `key`: The header key to check. It will be converted into a `RequestHeadersKey`.
-    /// - `value`: The value to search for within the header's values.
+    /// - `K` - The header key to check (must implement Into<RequestHeadersKey>).
+    /// - `V` - The value to search for (must implement Into<RequestHeadersValueItem>).
     ///
     /// # Returns
     ///
-    /// - `bool`: Returns `true` if the header exists and contains the specified value, `false` otherwise.
+    /// - `bool` - Whether the header contains the value.
     pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
     where
         K: Into<RequestHeadersKey>,
@@ -429,7 +408,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// A `String` containing the body content.
+    /// - `String` - The body content as a string.
     pub fn get_body_string(&self) -> String {
         String::from_utf8_lossy(self.get_body()).into_owned()
     }
@@ -441,12 +420,11 @@ impl Request {
     ///
     /// # Type Parameters
     ///
-    /// - `T`: The target type to deserialize into. It must implement the `DeserializeOwned` trait.
+    /// - `T` - The target type to deserialize into (must implement DeserializeOwned).
     ///
     /// # Returns
     ///
-    /// - `Ok(T)`: The deserialized object of type `T` if the deserialization is successful.
-    /// - `Err(ResultJsonError)`: An error if the deserialization fails.
+    /// - `ResultJsonError<T>` - The deserialization result.
     pub fn get_body_json<T>(&self) -> ResultJsonError<T>
     where
         T: DeserializeOwned,
@@ -461,7 +439,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// A `String` containing formatted request details.
+    /// - `String` - The formatted request details.
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
         let body_type: &'static str = if std::str::from_utf8(body).is_ok() {
@@ -490,7 +468,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// The `UpgradeType` extracted from the `UPGRADE` header.
+    /// - `UpgradeType` - The parsed upgrade type.
     pub fn get_upgrade_type(&self) -> UpgradeType {
         let upgrade_type: UpgradeType = self
             .get_header_back(UPGRADE)
@@ -505,7 +483,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the upgrade type is WebSocket; otherwise, `false`.
+    /// - `bool` - Whether WebSocket upgrade is enabled.
     pub fn is_ws(&self) -> bool {
         self.get_upgrade_type().is_ws()
     }
@@ -514,7 +492,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the upgrade type is `h2c`, otherwise `false`.
+    /// - `bool` - Whether the upgrade type is h2c.
     pub fn is_h2c(&self) -> bool {
         self.get_upgrade_type().is_h2c()
     }
@@ -523,7 +501,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the upgrade type is any `Tls` variant, otherwise `false`.
+    /// - `bool` - Whether the upgrade type is TLS.
     pub fn is_tls(&self) -> bool {
         self.get_upgrade_type().is_tls()
     }
@@ -532,7 +510,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the upgrade type is unknown; otherwise, `false`.
+    /// - `bool` - Whether the upgrade type is unknown.
     pub fn is_unknown_upgrade(&self) -> bool {
         self.get_upgrade_type().is_unknown()
     }
@@ -541,7 +519,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the HTTP version is 1.1 or higher; otherwise, `false`.
+    /// - `bool` - Whether the version is HTTP/1.1 or higher.
     pub fn is_http1_1_or_higher(&self) -> bool {
         self.get_version().is_http1_1_or_higher()
     }
@@ -550,7 +528,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the version is HTTP/0.9; otherwise, `false`.
+    /// - `bool` - Whether the version is HTTP/0.9.
     pub fn is_http0_9(&self) -> bool {
         self.get_version().is_http0_9()
     }
@@ -559,7 +537,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the version is HTTP/1.0; otherwise, `false`.
+    /// - `bool` - Whether the version is HTTP/1.0.
     pub fn is_http1_0(&self) -> bool {
         self.get_version().is_http1_0()
     }
@@ -568,7 +546,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the version is HTTP/1.1; otherwise, `false`.
+    /// - `bool` - Whether the version is HTTP/1.1.
     pub fn is_http1_1(&self) -> bool {
         self.get_version().is_http1_1()
     }
@@ -577,7 +555,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the version is HTTP/2; otherwise, `false`.
+    /// - `bool` - Whether the version is HTTP/2.
     pub fn is_http2(&self) -> bool {
         self.get_version().is_http2()
     }
@@ -586,7 +564,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the version is HTTP/3; otherwise, `false`.
+    /// - `bool` - Whether the version is HTTP/3.
     pub fn is_http3(&self) -> bool {
         self.get_version().is_http3()
     }
@@ -595,7 +573,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the version is unknown; otherwise, `false`.
+    /// - `bool` - Whether the version is unknown.
     pub fn is_unknown_version(&self) -> bool {
         self.get_version().is_unknown()
     }
@@ -604,7 +582,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the version is a valid HTTP version; otherwise, `false`.
+    /// - `bool` - Whether the version is HTTP.
     pub fn is_http(&self) -> bool {
         self.get_version().is_http()
     }
@@ -613,7 +591,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `GET`; otherwise, `false`.
+    /// - `bool` - Whether the method is GET.
     pub fn is_get(&self) -> bool {
         self.get_method().is_get()
     }
@@ -622,7 +600,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `POST`; otherwise, `false`.
+    /// - `bool` - Whether the method is POST.
     pub fn is_post(&self) -> bool {
         self.get_method().is_post()
     }
@@ -631,7 +609,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `PUT`; otherwise, `false`.
+    /// - `bool` - Whether the method is PUT.
     pub fn is_put(&self) -> bool {
         self.get_method().is_put()
     }
@@ -640,7 +618,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `DELETE`; otherwise, `false`.
+    /// - `bool` - Whether the method is DELETE.
     pub fn is_delete(&self) -> bool {
         self.get_method().is_delete()
     }
@@ -649,7 +627,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `PATCH`; otherwise, `false`.
+    /// - `bool` - Whether the method is PATCH.
     pub fn is_patch(&self) -> bool {
         self.get_method().is_patch()
     }
@@ -658,7 +636,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `HEAD`; otherwise, `false`.
+    /// - `bool` - Whether the method is HEAD.
     pub fn is_head(&self) -> bool {
         self.get_method().is_head()
     }
@@ -667,7 +645,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `OPTIONS`; otherwise, `false`.
+    /// - `bool` - Whether the method is OPTIONS.
     pub fn is_options(&self) -> bool {
         self.get_method().is_options()
     }
@@ -676,7 +654,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `CONNECT`; otherwise, `false`.
+    /// - `bool` - Whether the method is CONNECT.
     pub fn is_connect(&self) -> bool {
         self.get_method().is_connect()
     }
@@ -685,7 +663,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `TRACE`; otherwise, `false`.
+    /// - `bool` - Whether the method is TRACE.
     pub fn is_trace(&self) -> bool {
         self.get_method().is_trace()
     }
@@ -694,7 +672,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// `true` if the method is `UNKNOWN`; otherwise, `false`.
+    /// - `bool` - Whether the method is UNKNOWN.
     pub fn is_unknown_method(&self) -> bool {
         self.get_method().is_unknown()
     }
@@ -713,7 +691,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `bool`: `true` if keep-alive should be enabled, `false` otherwise.
+    /// - `bool` - Whether keep-alive should be enabled.
     pub fn is_enable_keep_alive(&self) -> bool {
         if let Some(connection_value) = self.get_header_back(CONNECTION) {
             if connection_value.eq_ignore_ascii_case(KEEP_ALIVE) {

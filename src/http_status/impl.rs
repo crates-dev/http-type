@@ -6,19 +6,17 @@ use crate::*;
 /// the corresponding numeric code as well as the associated status text. Additionally, it implements
 /// conversion from a string representation of the status code.
 impl HttpStatus {
-    /// Returns the numeric HTTP status code associated with this status code variant.
+    /// Gets the numeric HTTP status code.
     ///
-    /// This method returns the corresponding HTTP numeric status code based on the `HttpStatus` variant.
-    /// For example:
-    /// - `Self::Ok` returns 200.
-    /// - `Self::BadRequest` returns 400.
-    /// - `Self::Unknown` returns 0 (the default for unrecognized status codes).
+    /// Returns the corresponding HTTP status code number for the enum variant.
     ///
-    /// # Parameters
-    /// - `&self`: A reference to the `HttpStatus` enum instance. This represents the specific variant of the `HttpStatus` enum that the method is called on.
+    /// # Arguments
     ///
-    /// # Return Value
-    /// - `ResponseStatusCode`: The numeric HTTP status code associated with the `HttpStatus` variant. For example:
+    /// - `&self` - The HttpStatus instance.
+    ///
+    /// # Returns
+    ///
+    /// - `u16` - The numeric status code.
     pub fn code(&self) -> ResponseStatusCode {
         match self {
             Self::Continue => 100,
@@ -87,16 +85,17 @@ impl HttpStatus {
         }
     }
 
-    /// Converts an HTTP status code to its corresponding textual description.
+    /// Gets the textual description for a status code.
     ///
-    /// This method matches a given numeric HTTP status code and returns the corresponding
-    /// textual representation defined in the `HttpStatus` enum.
+    /// Returns the standard HTTP status text for the given numeric code.
     ///
-    /// # Parameters
-    /// - `code`: A `ResponseStatusCode` representing the HTTP status code to convert.
+    /// # Arguments
     ///
-    /// # Return Value
-    /// - `String`: A string representing the textual description of the HTTP status code.
+    /// - `u16` - The numeric HTTP status code.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The standard status text description.
     pub fn phrase(code: ResponseStatusCode) -> String {
         match code {
             100 => Self::Continue.to_string(),
@@ -165,18 +164,18 @@ impl HttpStatus {
         }
     }
 
-    /// Compares the current status code with a given string representation.
+    /// Checks if status matches a string representation.
     ///
-    /// This method checks if the given `code_str` matches either the numeric HTTP status code
-    /// returned by `code()` or the string representation of the status code variant.
-    /// The comparison is case-insensitive.
+    /// Compares case-insensitively against both numeric code and text description.
     ///
-    /// # Parameters
-    /// - `&self`: A reference to the `HttpStatus` enum instance.
-    /// - `code_str`: A string slice containing the status code to compare against.
+    /// # Arguments
     ///
-    /// # Return Value
-    /// - `bool`: Returns `true` if `code_str` matches the numeric code or the string representation of `self`, otherwise `false`.
+    /// - `&self` - The HttpStatus instance.
+    /// - `&str` - The string to compare against.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - True if the string matches either code or description.
     pub fn same(&self, code_str: &str) -> bool {
         self.to_string().eq_ignore_ascii_case(code_str)
     }
@@ -184,15 +183,15 @@ impl HttpStatus {
 
 /// Implements the `Display` trait for `HttpStatus`, allowing it to be formatted as a string.
 impl Display for HttpStatus {
-    /// Formats the `HttpStatus` variant into a human-readable string.
+    /// Formats the status code as text.
     ///
     /// # Arguments
     ///
-    /// - `f` - The formatter to write the string into.
+    /// - `&mut fmt::Formatter` - The formatter to write to.
     ///
     /// # Returns
     ///
-    /// A `fmt::Result` indicating success or failure of the formatting operation.
+    /// - `fmt::Result` - The formatting result.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::Continue => CONTINUE,
@@ -268,19 +267,17 @@ impl FromStr for HttpStatus {
     /// The error type returned when conversion fails.
     type Err = ();
 
-    /// Converts a string slice into an `HttpStatus` variant.
+    /// Parses a string into an HttpStatus.
     ///
-    /// This method attempts to parse the input string as a numeric HTTP status code.
-    /// If successful, it returns the corresponding `HttpStatus` variant.
-    /// If parsing fails or the code is unrecognized, it defaults to `HttpStatus::Unknown`.
+    /// Attempts to convert the string to a numeric code and match known status codes.
     ///
     /// # Arguments
     ///
-    /// - `code_str` - The string slice to convert.
+    /// - `&str` - The string to parse.
     ///
     /// # Returns
     ///
-    /// A `Result` containing the `HttpStatus` variant if successful, or `Self::Err` on failure.
+    /// - `Result<HttpStatus, ()>` - The parsed status or error.
     fn from_str(code_str: &str) -> Result<Self, Self::Err> {
         if let Ok(code) = code_str.parse::<ResponseStatusCode>() {
             match code {
@@ -356,11 +353,11 @@ impl FromStr for HttpStatus {
 
 /// Implements the `Default` trait for `HttpStatus`.
 impl Default for HttpStatus {
-    /// Returns the default `HttpStatus` variant, which is `HttpStatus::Ok`.
+    /// Gets the default HTTP status code.
     ///
     /// # Returns
     ///
-    /// The default `HttpStatus` variant.
+    /// - `HttpStatus` - The default status (200 OK).
     fn default() -> Self {
         Self::Ok
     }

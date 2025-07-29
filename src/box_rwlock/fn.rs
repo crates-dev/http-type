@@ -1,14 +1,14 @@
 use crate::*;
 
-/// Creates a new `BoxRwLock` from the given data.
+/// Creates a new boxed read-write lock.
 ///
 /// # Arguments
 ///
-/// - `data` - The data to be wrapped in a `Box<RwLock>`.
+/// - `T` - The data type to be wrapped.
 ///
 /// # Returns
 ///
-/// A `BoxRwLock` containing the provided data.
+/// - `BoxRwLock<T>` - A new boxed read-write lock.
 pub fn box_rwlock<T>(data: T) -> BoxRwLock<T> {
     Box::new(RwLock::new(data))
 }

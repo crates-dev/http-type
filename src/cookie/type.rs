@@ -1,22 +1,43 @@
 use crate::*;
 
-/// The raw cookie string from an HTTP request header.
+/// Represents the raw cookie string from an HTTP request header.
+///
+/// Contains the complete cookie header value as received from the client.
 pub type CookieString = String;
-/// The key of a cookie.
+/// Represents the key/name of an HTTP cookie.
+///
+/// Used to identify individual cookies in requests and responses.
 pub type CookieKey = String;
-/// The value of a cookie.
+/// Represents the value/content of an HTTP cookie.
+///
+/// Stores the actual data associated with a cookie name/key.
 pub type CookieValue = String;
-/// An optional cookie value.
+/// Represents an optional cookie value.
+///
+/// Used when a cookie value may or may not be present.
 pub type OptionCookiesValue = Option<CookieValue>;
-/// An optional cookie expiration date.
+/// Represents an optional cookie expiration date.
+///
+/// Stores the RFC 1123 formatted date string when present.
 pub type OptionCookieExpires = Option<String>;
-/// An optional cookie maximum age in seconds.
+/// Represents an optional cookie maximum age in seconds.
+///
+/// Specifies the lifetime of the cookie in seconds when present.
 pub type OptionCookieMaxAge = Option<i64>;
-/// An optional cookie domain.
+/// Represents an optional cookie domain scope.
+///
+/// Specifies which hosts can receive the cookie when present.
 pub type OptionCookieDomain = Option<String>;
-/// An optional cookie path.
+/// Represents an optional cookie path scope.
+///
+/// Specifies URL path that must exist in the requested URL when present.
 pub type OptionCookiePath = Option<String>;
-/// An optional cookie `SameSite` policy.
+/// Represents an optional cookie SameSite policy.
+///
+/// Specifies if/how cookies should be restricted to first-party sites when present.
+/// Possible values: "Strict", "Lax", or "None".
 pub type OptionCookieSameSite = Option<String>;
-/// A collection of cookies.
+/// Represents a collection of HTTP cookies.
+///
+/// Stores multiple cookies as key-value pairs using a high-performance hash map.
 pub type Cookies = HashMapXxHash3_64<CookieKey, CookieValue>;

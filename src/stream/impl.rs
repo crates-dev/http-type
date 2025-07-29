@@ -1,68 +1,65 @@
 use crate::*;
 
 impl ArcRwLockStream {
-    /// Creates a new `ArcRwLockStream` from an `Arc<RwLock<TcpStream>>`.
+    /// Creates a new ArcRwLockStream from an Arc<RwLock<TcpStream>>.
     ///
     /// # Arguments
     ///
-    /// - `arc_rw_lock_stream`: An `Arc<RwLock<TcpStream>>` that will be wrapped in the new `ArcRwLockStream`.
+    /// - `Arc<RwLock<TcpStream>>` - The stream to wrap.
     ///
     /// # Returns
     ///
-    /// A new `ArcRwLockStream` instance containing the provided stream.
+    /// - `ArcRwLockStream` - The new stream wrapper.
     pub fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
         Self(arc_rw_lock_stream)
     }
 
-    /// Creates a new `ArcRwLockStream` from a `TcpStream`.
+    /// Creates a new ArcRwLockStream from a TcpStream.
     ///
-    /// This method wraps the provided `TcpStream` in an `Arc<RwLock<_>>` to create the `ArcRwLockStream`.
+    /// Wraps the stream in an Arc<RwLock<_>>.
     ///
     /// # Arguments
     ///
-    /// - `stream`: A `TcpStream` that will be wrapped in the new `ArcRwLockStream`.
+    /// - `TcpStream` - The raw stream to wrap.
     ///
     /// # Returns
     ///
-    /// A new `ArcRwLockStream` instance containing the provided stream.
+    /// - `ArcRwLockStream` - The new thread-safe stream wrapper.
     pub fn from_stream(stream: TcpStream) -> Self {
         Self(arc_rwlock(stream))
     }
 
-    /// Returns a reference to the inner `TcpStream`.
+    /// Gets a read lock on the inner TcpStream.
     ///
-    /// This method acquires a read lock on the underlying stream, allowing shared access
-    /// to the TCP stream while preventing concurrent writes.
+    /// Allows shared read access to the stream.
     ///
     /// # Returns
     ///
-    /// A read guard that provides shared access to the TCP stream.
+    /// - `RwLockReadGuardTcpStream` - The read guard for the stream.
     pub async fn read(&self) -> RwLockReadGuardTcpStream {
         self.get_0().read().await
     }
 
-    /// Returns a mutable reference to the inner `TcpStream`.
+    /// Gets a write lock on the inner TcpStream.
     ///
-    /// This method acquires a write lock on the underlying stream, allowing exclusive access
-    /// for writing operations while preventing any concurrent access.
+    /// Allows exclusive write access to the stream.
     ///
     /// # Returns
     ///
-    /// A write guard that provides exclusive access to the TCP stream.
+    /// - `RwLockWriteGuardTcpStream` - The write guard for the stream.
     pub(crate) async fn write(&self) -> RwLockWriteGuardTcpStream {
         self.get_0().write().await
     }
 
-    /// Sends the HTTP response over a TCP stream.
+    /// Sends HTTP response data over the stream.
     ///
     /// # Arguments
     ///
-    /// - `data`: The response data to be sent.
+    /// - `&ResponseData` - The response data to send.
     ///
     /// # Returns
     ///
-    /// - `Ok(())`: If the response is successfully sent.
-    /// - `Err(ResponseError)`: If an error occurs during sending.
+    /// - `ResponseResult` - Result indicating success or failure.
     pub async fn send(&self, data: &ResponseData) -> ResponseResult {
         self.write()
             .await
@@ -72,20 +69,18 @@ impl ArcRwLockStream {
         Ok(())
     }
 
-    /// Sends the HTTP or WebSocket response body over a TCP stream.
+    /// Sends response body with WebSocket framing condition.
     ///
-    /// This method handles the conditional framing of the body data based on whether
-    /// it's for a WebSocket connection.
+    /// Handles both HTTP and WebSocket response formats.
     ///
     /// # Arguments
     ///
-    /// - `body`: The response body to be sent.
-    /// - `is_websocket`: A boolean indicating if the connection is a WebSocket connection.
+    /// - `&ResponseBody` - The response body data.
+    /// - `bool` - Whether to use WebSocket framing.
     ///
     /// # Returns
     ///
-    /// - `Ok(())`: If the response body is successfully sent.
-    /// - `Err(ResponseError)`: If an error occurs during sending.
+    /// - `ResponseResult` - Result indicating success or failure.
     pub async fn send_body_conditional(
         &self,
         body: &ResponseBody,
@@ -106,45 +101,41 @@ impl ArcRwLockStream {
         Ok(())
     }
 
-    /// Sends the HTTP response body over a TCP stream.
+    /// Sends HTTP response body (non-WebSocket).
     ///
-    /// This is a convenience method that calls `send_body_conditional` with `is_websocket` set to `false`.
+    /// Convenience wrapper for send_body_conditional with WebSocket disabled.
     ///
     /// # Arguments
     ///
-    /// - `body`: The response body to be sent.
+    /// - `&ResponseBody` - The response body data.
     ///
     /// # Returns
     ///
-    /// - `Ok(())`: If the response body is successfully sent.
-    /// - `Err(ResponseError)`: If an error occurs during sending.
+    /// - `ResponseResult` - Result indicating success or failure.
     pub async fn send_body(&self, body: &ResponseBody) -> ResponseResult {
         self.send_body_conditional(body, false).await
     }
 
-    /// Sends the HTTP WebSocket response body over a TCP stream.
+    /// Sends WebSocket response body.
     ///
-    /// This is a convenience method that calls `send_body_conditional` with `is_websocket` set to `true`.
+    /// Convenience wrapper for send_body_conditional with WebSocket enabled.
     ///
     /// # Arguments
     ///
-    /// - `body`: The response body to be sent.
+    /// - `&ResponseBody` - The WebSocket frame data.
     ///
     /// # Returns
     ///
-    /// - `Ok(())`: If the response body is successfully sent.
-    /// - `Err(ResponseError)`: If an error occurs during sending.
+    /// - `ResponseResult` - Result indicating success or failure.
     pub async fn send_ws_body(&self, body: &ResponseBody) -> ResponseResult {
         self.send_body_conditional(body, true).await
     }
 
-    /// Flushes the TCP stream.
-    ///
-    /// This ensures that all buffered data is written to the underlying stream.
+    /// Flushes all buffered data to the stream.
     ///
     /// # Returns
     ///
-    /// - `&Self`: A reference to the `ArcRwLockStream` instance, allowing for method chaining.
+    /// - `&Self` - Reference to self for method chaining.
     pub async fn flush(&self) -> &Self {
         let _ = self.write().await.flush();
         self

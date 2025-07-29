@@ -21,18 +21,17 @@ impl Default for HttpUrlComponents {
 }
 
 impl HttpUrlComponents {
-    /// Parses a URL string into a `HttpUrlComponents ` instance.
+    /// Parses a URL string into its components.
     ///
-    /// This method attempts to parse a given URL string into its components such as
-    /// scheme, username, password, host, port, path, query, and fragment. If the URL
-    /// is invalid, it returns an `Error::InvalidUrl` error.
+    /// Extracts protocol, host, port, path, query and fragment from the URL string.
     ///
-    /// # Parameters
-    /// - `url_str`: A string slice representing the URL to be parsed.
+    /// # Arguments
+    ///
+    /// - `&str` - The URL string to parse.
     ///
     /// # Returns
-    /// Returns a `Result` containing either a `HttpUrlComponents ` instance populated with the
-    /// parsed components or an `Error::InvalidUrl` if the parsing fails.
+    ///
+    /// - `Result<HttpUrlComponents, HttpUrlError>` - Either the parsed components or an error.
     pub fn parse(url_str: &str) -> Result<Self, HttpUrlError> {
         let parsed_url: UrlParser =
             UrlParser::parse(url_str).map_err(|_| HttpUrlError::InvalidUrl)?;

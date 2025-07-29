@@ -1,16 +1,16 @@
 use crate::*;
 
 impl CookieBuilder {
-    /// Creates a new `CookieBuilder`.
+    /// Creates a new cookie builder instance.
     ///
     /// # Arguments
     ///
-    /// - `name` - The name of the cookie.
-    /// - `value` - The value of the cookie.
+    /// - `N: Into<CookieKey>` - The cookie name type.
+    /// - `V: Into<CookieValue>` - The cookie value type.
     ///
     /// # Returns
     ///
-    /// A new `CookieBuilder` instance with the specified name and value.
+    /// - `CookieBuilder` - A new builder instance.
     pub fn new<N, V>(name: N, value: V) -> Self
     where
         N: Into<CookieKey>,
@@ -36,7 +36,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `cookie_string` - The `Set-Cookie` header string to parse.
+    /// - `&str` - The `Set-Cookie` header string to parse.
     ///
     /// # Returns
     ///
@@ -255,7 +255,7 @@ impl Cookie {
     ///
     /// # Arguments
     ///
-    /// - `cookie_string` - The `Cookie` header string to parse.
+    /// - `&str` - The `Cookie` header string to parse.
     ///
     /// # Returns
     ///
