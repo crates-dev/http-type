@@ -24,27 +24,21 @@ fn test_protocol_from_str() {
         "".parse::<Protocol>().unwrap(),
         Protocol::Unknown("".to_string())
     );
-    assert_eq!(
-        "HTTP".parse::<Protocol>().unwrap(),
-        Protocol::Unknown("HTTP".to_string())
-    );
-    assert_eq!(
-        "HTTPS".parse::<Protocol>().unwrap(),
-        Protocol::Unknown("HTTPS".to_string())
-    );
+    assert_eq!("HTTP".parse::<Protocol>().unwrap(), Protocol::HTTP);
+    assert_eq!("HTTPS".parse::<Protocol>().unwrap(), Protocol::HTTPS);
 }
 
 #[test]
 fn test_protocol_default() {
     use super::*;
-    assert_eq!(Protocol::default(), Protocol::HTTP);
+    assert_eq!(Protocol::default(), Protocol::Unknown(String::new()));
 }
 
 #[test]
 fn test_protocol_new() {
     use super::*;
     assert_eq!(Protocol::new(), Protocol::default());
-    assert_eq!(Protocol::new(), Protocol::HTTP);
+    assert_eq!(Protocol::new(), Protocol::default());
 }
 
 #[test]
@@ -119,18 +113,12 @@ fn test_protocol_case_sensitivity() {
     use super::*;
     use http_constant::*;
     assert_eq!(HTTP_LOWERCASE.parse::<Protocol>().unwrap(), Protocol::HTTP);
-    assert_eq!(
-        "HTTP".parse::<Protocol>().unwrap(),
-        Protocol::Unknown("HTTP".to_string())
-    );
+    assert_eq!("HTTP".parse::<Protocol>().unwrap(), Protocol::HTTP);
     assert_eq!(
         HTTPS_LOWERCASE.parse::<Protocol>().unwrap(),
         Protocol::HTTPS
     );
-    assert_eq!(
-        "HTTPS".parse::<Protocol>().unwrap(),
-        Protocol::Unknown("HTTPS".to_string())
-    );
+    assert_eq!("HTTPS".parse::<Protocol>().unwrap(), Protocol::HTTPS);
 }
 
 #[test]

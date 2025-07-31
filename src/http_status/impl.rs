@@ -357,8 +357,8 @@ impl Default for HttpStatus {
     ///
     /// # Returns
     ///
-    /// - `HttpStatus` - The default status (200 OK).
+    /// - `HttpStatus` - The default status.
     fn default() -> Self {
-        Self::Ok
+        Self::Unknown
     }
 }

@@ -164,39 +164,22 @@ fn test_http_status_same() {
 #[test]
 fn test_http_status_from_str() {
     use super::*;
+    assert_eq!("100".parse::<HttpStatus>().unwrap(), HttpStatus::Continue);
+    assert_eq!("200".parse::<HttpStatus>().unwrap(), HttpStatus::Ok);
+    assert_eq!("404".parse::<HttpStatus>().unwrap(), HttpStatus::NotFound);
     assert_eq!(
-        "Continue".parse::<HttpStatus>().unwrap(),
-        HttpStatus::Continue
-    );
-    assert_eq!("OK".parse::<HttpStatus>().unwrap(), HttpStatus::Ok);
-    assert_eq!("ok".parse::<HttpStatus>().unwrap(), HttpStatus::Ok);
-    assert_eq!(
-        "Not Found".parse::<HttpStatus>().unwrap(),
-        HttpStatus::NotFound
-    );
-    assert_eq!(
-        "not found".parse::<HttpStatus>().unwrap(),
-        HttpStatus::NotFound
-    );
-    assert_eq!(
-        "Internal Server Error".parse::<HttpStatus>().unwrap(),
+        "500".parse::<HttpStatus>().unwrap(),
         HttpStatus::InternalServerError
     );
-    assert_eq!(
-        "Bad Request".parse::<HttpStatus>().unwrap(),
-        HttpStatus::BadRequest
-    );
-    assert_eq!(
-        "Unknown Status".parse::<HttpStatus>().unwrap(),
-        HttpStatus::Unknown
-    );
+    assert_eq!("400".parse::<HttpStatus>().unwrap(), HttpStatus::BadRequest);
+    assert_eq!("666".parse::<HttpStatus>().unwrap(), HttpStatus::Unknown);
     assert_eq!("".parse::<HttpStatus>().unwrap(), HttpStatus::Unknown);
 }
 
 #[test]
 fn test_http_status_default() {
     use super::*;
-    assert_eq!(HttpStatus::default(), HttpStatus::Ok);
+    assert_eq!(HttpStatus::default(), HttpStatus::Unknown);
 }
 
 #[test]
