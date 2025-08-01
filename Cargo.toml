@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "4.55.2"
+version = "4.55.3"
 edition = "2024"
 authors = ["root@ltpp.vip"]
 license = "MIT"
@@ -20,7 +20,7 @@ hex = "0.4.3"
 http-constant = "1.59.2"
 lombok-macros = "1.13.7"
 serde = "1.0.219"
-serde_json = "1.0.141"
+serde_json = "1.0.142"
 serde-xml-rs = "0.8.1"
 serde_urlencoded = "0.7.1"
 url = "2.5.4"
