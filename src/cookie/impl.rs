@@ -106,7 +106,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `T` - The expiration date string (e.g., "Wed, 21 Oct 2015 07:28:00 GMT").
+    /// - `T` - The expiration date string.
     ///
     /// # Returns
     ///
@@ -137,7 +137,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `T` - The domain for the cookie (e.g., "example.com").
+    /// - `T` - The domain for the cookie.
     ///
     /// # Returns
     ///
@@ -154,7 +154,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `T` - The path for the cookie (e.g., "/admin").
+    /// - `T` - The path for the cookie.
     ///
     /// # Returns
     ///
@@ -195,7 +195,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `T` - The `SameSite` policy (e.g., "Strict", "Lax", "None").
+    /// - `T` - The `SameSite` policy.
     ///
     /// # Returns
     ///
