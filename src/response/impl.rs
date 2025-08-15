@@ -189,10 +189,17 @@ impl Response {
         json_from_slice(self.get_body())
     }
 
-    /// Adds a header to the response.
+    /// Determines whether the header should be skipped during setting.
     ///
-    /// This function appends a value to the response headers.
-    /// If the header already exists, the new value will be added to the existing values.
+    /// - Returns `true` if the header is empty or not allowed.
+    /// - Returns `false` if the header can be set.
+    fn should_skip_header(&self, key: &ResponseHeadersKey) -> bool {
+        key.trim().is_empty() || *key == CONTENT_LENGTH
+    }
+
+    /// Sets a header in the response, replacing any existing values.
+    ///
+    /// This function replaces all existing values for a header with a single new value.
     ///
     /// # Arguments
     ///
@@ -208,20 +215,20 @@ impl Response {
         V: Into<String>,
     {
         let key: ResponseHeadersKey = key.into().to_lowercase();
-        if key.trim().is_empty() || key == CONTENT_LENGTH {
+        if self.should_skip_header(&key) {
             return self;
         }
         let value: String = value.into();
-        self.headers
-            .entry(key)
-            .or_insert_with(VecDeque::new)
-            .push_back(value);
+        let mut deque: VecDeque<String> = VecDeque::new();
+        deque.push_back(value);
+        self.headers.insert(key, deque);
         self
     }
 
-    /// Replaces all values for a header in the response.
+    /// Adds a header to the response.
     ///
-    /// This function replaces all existing values for a header with a single new value.
+    /// This function appends a value to the response headers.
+    /// If the header already exists, the new value will be added to the existing values.
     ///
     /// # Arguments
     ///
@@ -231,19 +238,20 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
-    pub fn replace_header<K, V>(&mut self, key: K, value: V) -> &mut Self
+    pub fn add_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: Into<ResponseHeadersKey>,
         V: Into<String>,
     {
         let key: ResponseHeadersKey = key.into().to_lowercase();
-        if key.trim().is_empty() {
+        if self.should_skip_header(&key) {
             return self;
         }
         let value: String = value.into();
-        let mut deque: VecDeque<String> = VecDeque::new();
-        deque.push_back(value);
-        self.headers.insert(key, deque);
+        self.headers
+            .entry(key)
+            .or_insert_with(VecDeque::new)
+            .push_back(value);
         self
     }
 
