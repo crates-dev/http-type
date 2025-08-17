@@ -854,6 +854,76 @@ pub enum FileExtension {
     FileExtensionM4u,
     /// The `m4v` file extension.
     FileExtensionM4v,
+    /// The file extension for markdown.
+    FileExtensionMarkdown,
+    /// The file extension for toml.
+    FileExtensionToml,
+    /// The file extension for yaml.
+    FileExtensionYaml,
+    /// The file extension for yaml.
+    FileExtensionYml,
+    /// The file extension for ini.
+    FileExtensionIni,
+    /// The file extension for cfg.
+    FileExtensionCfg,
+    /// The file extension for Python.
+    FileExtensionPython,
+    /// The file extension for Go.
+    FileExtensionGo,
+    /// The file extension for TypeScript.
+    FileExtensionTypeScript,
+    /// The file extension for C#.
+    FileExtensionCSharp,
+    /// The file extension for PHP.
+    FileExtensionPhp,
+    /// The file extension for Ruby.
+    FileExtensionRuby,
+    /// The file extension for Swift.
+    FileExtensionSwift,
+    /// The file extension for Kotlin.
+    FileExtensionKotlin,
+    /// The file extension for Kotlin Script.
+    FileExtensionKotlinScript,
+    /// The file extension for Scala.
+    FileExtensionScala,
+    /// The file extension for IBM Secure Container or Scala Script.
+    FileExtensionIbmScOrScalaScript,
+    /// The file extension for Perl.
+    FileExtensionPerl,
+    /// The file extension for Perl Module.
+    FileExtensionPerlModule,
+    /// The file extension for Lua.
+    FileExtensionLua,
+    /// The file extension for PowerShell.
+    FileExtensionPowerShell,
+    /// The file extension for C++ Header.
+    FileExtensionCppHeader,
+    /// The file extension for Objective-C.
+    FileExtensionObjectiveC,
+    /// The file extension for Objective-C++.
+    FileExtensionObjectiveCpp,
+    /// The file extension for Groovy.
+    FileExtensionGroovy,
+    /// The file extension for R.
+    FileExtensionR,
+    /// The file extension for SCSS.
+    FileExtensionScss,
+    /// The file extension for SASS.
+    FileExtensionSass,
+    /// The file extension for LESS.
+    FileExtensionLess,
+    /// The file extension for Vue.
+    FileExtensionVue,
+    /// The file extension for JSX.
+    FileExtensionJsx,
+    /// The file extension for TSX.
+    FileExtensionTsx,
+    /// The file extension for Dockerfile.
+    FileExtensionDockerfile,
+    /// The file extension for Makefile.
+    FileExtensionMakefile,
+    /// The file extension for Gitignore.
+    FileExtensionGitignore,
     /// The `ma` file extension.
     FileExtensionMa,
     /// The `mac` file extension.
