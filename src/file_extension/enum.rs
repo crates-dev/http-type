@@ -922,6 +922,38 @@ pub enum FileExtension {
     FileExtensionDockerfile,
     /// The file extension for Makefile.
     FileExtensionMakefile,
+    /// The file extension for RLS Services XML or Rust.
+    FileExtensionRs,
+    /// The file extension for Haskell.
+    FileExtensionHaskell,
+    /// The file extension for Erlang.
+    FileExtensionErlang,
+    /// The file extension for Elixir.
+    FileExtensionElixir,
+    /// The file extension for Elixir Script.
+    FileExtensionElixirScript,
+    /// The file extension for Clojure.
+    FileExtensionClojure,
+    /// The file extension for ClojureScript.
+    FileExtensionClojureScript,
+    /// The file extension for Clojure Common.
+    FileExtensionClojureCommon,
+    /// The file extension for F#.
+    FileExtensionFSharp,
+    /// The file extension for F# Script.
+    FileExtensionFSharpScript,
+    /// The file extension for OCaml.
+    FileExtensionOCaml,
+    /// The file extension for OCaml Interface.
+    FileExtensionOCamlInterface,
+    /// The file extension for Bash.
+    FileExtensionBash,
+    /// The file extension for Zsh.
+    FileExtensionZsh,
+    /// The file extension for env.
+    FileExtensionEnv,
+    /// The file extension for cj.
+    FileExtensionCj,
     /// The file extension for Gitignore.
     FileExtensionGitignore,
     /// The `ma` file extension.
@@ -1452,8 +1484,6 @@ pub enum FileExtension {
     FileExtensionRpst,
     /// The `rq` file extension.
     FileExtensionRq,
-    /// The `rs` file extension.
-    FileExtensionRs,
     /// The `rsd` file extension.
     FileExtensionRsd,
     /// The `rss` file extension.
