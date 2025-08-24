@@ -265,7 +265,7 @@ impl Request {
     /// # Returns
     ///
     /// - `Option<String>` - The parameter value if exists.
-    pub fn get_query<K>(&self, key: K) -> OptionRequestQuerysValue
+    pub fn try_get_query<K>(&self, key: K) -> OptionRequestQuerysValue
     where
         K: Into<RequestQuerysKey>,
     {
@@ -281,7 +281,7 @@ impl Request {
     /// # Returns
     ///
     /// - `OptionRequestHeadersValue` - The optional header values.
-    pub fn get_header<K>(&self, key: K) -> OptionRequestHeadersValue
+    pub fn try_get_header<K>(&self, key: K) -> OptionRequestHeadersValue
     where
         K: Into<RequestHeadersKey>,
     {
@@ -297,7 +297,7 @@ impl Request {
     /// # Returns
     ///
     /// - `OptionRequestHeadersValueItem` - The first header value if exists.
-    pub fn get_header_front<K>(&self, key: K) -> OptionRequestHeadersValueItem
+    pub fn try_get_header_front<K>(&self, key: K) -> OptionRequestHeadersValueItem
     where
         K: Into<RequestHeadersKey>,
     {
@@ -315,7 +315,7 @@ impl Request {
     /// # Returns
     ///
     /// - `OptionRequestHeadersValueItem` - The last header value if exists.
-    pub fn get_header_back<K>(&self, key: K) -> OptionRequestHeadersValueItem
+    pub fn try_get_header_back<K>(&self, key: K) -> OptionRequestHeadersValueItem
     where
         K: Into<RequestHeadersKey>,
     {
@@ -471,7 +471,7 @@ impl Request {
     /// - `UpgradeType` - The parsed upgrade type.
     pub fn get_upgrade_type(&self) -> UpgradeType {
         let upgrade_type: UpgradeType = self
-            .get_header_back(UPGRADE)
+            .try_get_header_back(UPGRADE)
             .and_then(|data| data.parse::<UpgradeType>().ok())
             .unwrap_or_default();
         upgrade_type
@@ -693,7 +693,7 @@ impl Request {
     ///
     /// - `bool` - Whether keep-alive should be enabled.
     pub fn is_enable_keep_alive(&self) -> bool {
-        if let Some(connection_value) = self.get_header_back(CONNECTION) {
+        if let Some(connection_value) = self.try_get_header_back(CONNECTION) {
             if connection_value.eq_ignore_ascii_case(KEEP_ALIVE) {
                 return true;
             } else if connection_value.eq_ignore_ascii_case(CLOSE) {

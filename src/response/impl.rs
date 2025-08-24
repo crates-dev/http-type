@@ -34,7 +34,7 @@ impl Response {
     /// # Returns
     ///
     /// - `OptionResponseHeadersValue` - The optional header values.
-    pub fn get_header<K>(&self, key: K) -> OptionResponseHeadersValue
+    pub fn try_get_header<K>(&self, key: K) -> OptionResponseHeadersValue
     where
         K: Into<ResponseHeadersKey>,
     {
@@ -52,7 +52,7 @@ impl Response {
     /// # Returns
     ///
     /// - `OptionResponseHeadersValueItem` - The first header value if exists.
-    pub fn get_header_front<K>(&self, key: K) -> OptionResponseHeadersValueItem
+    pub fn try_get_header_front<K>(&self, key: K) -> OptionResponseHeadersValueItem
     where
         K: Into<ResponseHeadersKey>,
     {
@@ -70,7 +70,7 @@ impl Response {
     /// # Returns
     ///
     /// - `OptionResponseHeadersValueItem` - The last header value if exists.
-    pub fn get_header_back<K>(&self, key: K) -> OptionResponseHeadersValueItem
+    pub fn try_get_header_back<K>(&self, key: K) -> OptionResponseHeadersValueItem
     where
         K: Into<ResponseHeadersKey>,
     {
