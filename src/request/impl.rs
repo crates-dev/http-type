@@ -702,4 +702,13 @@ impl Request {
         }
         self.is_http1_1_or_higher() || self.is_ws()
     }
+
+    /// Determines if keep-alive should be disabled for this request.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether keep-alive should be disabled.
+    pub fn is_disable_keep_alive(&self) -> bool {
+        !self.is_enable_keep_alive()
+    }
 }
