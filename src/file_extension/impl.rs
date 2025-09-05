@@ -1,14 +1,5 @@
 use crate::*;
 
-/// Provides a default value for `FileExtension`.
-///
-/// The default `FileExtension` is `FileExtensionEmpty`.
-impl Default for FileExtension {
-    fn default() -> Self {
-        Self::FileExtensionEmpty
-    }
-}
-
 impl FileExtension {
     /// Parses a string into a `FileExtension`.
     ///

@@ -1,7 +1,7 @@
 /// Supported HTTP content types.
 ///
 /// Defines common content types for HTTP communication.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum ContentType {
     /// `application/json` content type.
     ///
@@ -26,5 +26,6 @@ pub enum ContentType {
     /// Unknown content type.
     ///
     /// For unrecognized content types.
+    #[default]
     Unknown,
 }

@@ -350,15 +350,3 @@ impl FromStr for HttpStatus {
         }
     }
 }
-
-/// Implements the `Default` trait for `HttpStatus`.
-impl Default for HttpStatus {
-    /// Gets the default HTTP status code.
-    ///
-    /// # Returns
-    ///
-    /// - `HttpStatus` - The default status.
-    fn default() -> Self {
-        Self::Unknown
-    }
-}

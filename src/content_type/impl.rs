@@ -194,15 +194,3 @@ impl FromStr for ContentType {
         }
     }
 }
-
-/// Implements `Default` for `ContentType`.
-impl Default for ContentType {
-    /// Gets default ContentType.
-    ///
-    /// # Returns
-    ///
-    /// - `Self` - Default variant
-    fn default() -> Self {
-        Self::Unknown
-    }
-}

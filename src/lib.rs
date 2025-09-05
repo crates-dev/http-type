@@ -105,3 +105,4 @@ pub(crate) use tokio::{
     net::TcpStream,
     sync::{Mutex, MutexGuard, RwLock, RwLockReadGuard, RwLockWriteGuard},
 };
+pub(crate) use url::Url as UrlParser;

@@ -1,7 +1,7 @@
 /// Standard HTTP status codes.
 ///
 /// Includes informational, success, redirection, client and server error codes.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum HttpStatus {
     /// HTTP 100 Continue
     Continue,
@@ -128,5 +128,6 @@ pub enum HttpStatus {
     /// HTTP 511 Network Authentication Required
     NetworkAuthenticationRequired,
     /// HTTP Unknown status code
+    #[default]
     Unknown,
 }
