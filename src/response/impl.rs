@@ -5,10 +5,11 @@ use crate::*;
 /// Returns a new `Response` instance with all fields initialized to their default values.
 impl Default for Response {
     fn default() -> Self {
+        let http_status: HttpStatus = HttpStatus::Ok;
         Self {
             version: HttpVersion::default(),
-            status_code: ResponseStatusCode::default(),
-            reason_phrase: ResponseReasonPhrase::default(),
+            status_code: http_status.code(),
+            reason_phrase: http_status.to_string(),
             headers: hash_map_xx_hash3_64(),
             body: Vec::new(),
         }

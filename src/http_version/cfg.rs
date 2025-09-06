@@ -16,7 +16,7 @@ fn test_http_version_display() {
 #[test]
 fn test_http_version_default() {
     use super::*;
-    assert_eq!(HttpVersion::default(), HttpVersion::Unknown(String::new()));
+    assert_eq!(HttpVersion::default(), HttpVersion::HTTP1_1);
 }
 
 #[test]

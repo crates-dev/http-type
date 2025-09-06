@@ -1,17 +1,5 @@
 use crate::*;
 
-/// Implements the `Default` trait for `HttpVersion`.
-impl Default for HttpVersion {
-    /// Returns the default `HttpVersion` variant, which is `Unknown` with an empty string.
-    ///
-    /// # Returns
-    ///
-    /// The default `HttpVersion` variant.
-    fn default() -> Self {
-        Self::Unknown(String::new())
-    }
-}
-
 /// Implements the `Display` trait for `HttpVersion`, allowing it to be formatted as a string.
 impl fmt::Display for HttpVersion {
     /// Formats the `HttpVersion` variant into its string representation.
