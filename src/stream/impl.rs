@@ -55,33 +55,39 @@ impl ArcRwLockStream {
     ///
     /// # Arguments
     ///
-    /// - `ResponseData` - The response data to send.
+    /// - `Into<ResponseData>` - The response data to send (must implement Into<ResponseData>).
     ///
     /// # Returns
     ///
     /// - `ResponseResult` - Result indicating success or failure.
-    pub async fn send(&self, data: ResponseData) -> ResponseResult {
+    pub async fn send<D>(&self, data: D) -> ResponseResult
+    where
+        D: Into<ResponseData>,
+    {
         self.write()
             .await
-            .write_all(&data)
+            .write_all(&data.into())
             .await
             .map_err(|err| ResponseError::Response(err.to_string()))?;
         Ok(())
     }
 
-    /// Sends HTTP response body (non-WebSocket).
+    /// Sends HTTP response body.
     ///
     /// # Arguments
     ///
-    /// - `ResponseBody` - The response body data.
+    /// - `Into<ResponseBody>` - The response body data (must implement Into<ResponseBody>).
     ///
     /// # Returns
     ///
     /// - `ResponseResult` - Result indicating success or failure.
-    pub async fn send_body(&self, body: ResponseBody) -> ResponseResult {
+    pub async fn send_body<D>(&self, data: D) -> ResponseResult
+    where
+        D: Into<ResponseBody>,
+    {
         self.write()
             .await
-            .write_all(&body)
+            .write_all(&data.into())
             .await
             .map_err(|err| ResponseError::Response(err.to_string()))?;
         Ok(())
