@@ -218,18 +218,22 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `&ResponseBody` - A reference to a response body (payload) as a byte slice.
+    /// - `Into<ResponseBody>` - A reference to a response body (payload) as a byte slice.
     ///
     /// # Returns
     ///
     /// - A vector of `ResponseBody` (byte vectors), where each element represents a framed WebSocket message.
-    pub fn create_response_frame_list(body: &ResponseBody) -> Vec<ResponseBody> {
-        let total_len: usize = body.len();
+    pub fn create_response_frame_list<D>(data: D) -> Vec<ResponseBody>
+    where
+        D: Into<ResponseBody>,
+    {
+        let data_into: &[u8] = &data.into();
+        let total_len: usize = data_into.len();
         let mut offset: usize = 0;
         let mut frames_list: Vec<ResponseBody> =
             Vec::with_capacity((total_len / MAX_FRAME_SIZE) + 1);
         let mut is_first_frame: bool = true;
-        let is_valid_utf8: bool = std::str::from_utf8(body).is_ok();
+        let is_valid_utf8: bool = std::str::from_utf8(data_into).is_ok();
         let base_opcode: WebSocketOpcode = if is_valid_utf8 {
             WebSocketOpcode::Text
         } else {
@@ -239,7 +243,7 @@ impl WebSocketFrame {
             let remaining: usize = total_len - offset;
             let mut frame_size: usize = remaining.min(MAX_FRAME_SIZE);
             if is_valid_utf8 && frame_size < remaining {
-                while frame_size > 0 && (body[offset + frame_size] & 0xC0) == 0x80 {
+                while frame_size > 0 && (data_into[offset + frame_size] & 0xC0) == 0x80 {
                     frame_size -= 1;
                 }
                 if frame_size == 0 {
@@ -265,7 +269,7 @@ impl WebSocketFrame {
                 frame.extend_from_slice(&(frame_size as u16).to_be_bytes());
             }
             let end: usize = offset + frame_size;
-            frame.extend_from_slice(&body[offset..end]);
+            frame.extend_from_slice(&data_into[offset..end]);
             frames_list.push(frame);
             offset = end;
             is_first_frame = false;
