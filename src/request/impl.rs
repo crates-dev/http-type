@@ -41,9 +41,9 @@ impl Request {
     /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn http_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
-        buffer_size: usize,
+        buffer: usize,
     ) -> RequestReaderHandleResult {
-        let mut request_line: String = String::with_capacity(buffer_size);
+        let mut request_line: String = String::with_capacity(buffer);
         let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         let parts_len: usize = parts.len();
@@ -75,7 +75,7 @@ impl Request {
         let mut host: RequestHost = String::new();
         let mut content_length: usize = 0;
         loop {
-            let mut header_line: String = String::with_capacity(buffer_size);
+            let mut header_line: String = String::with_capacity(buffer);
             let _ = AsyncBufReadExt::read_line(reader, &mut header_line).await;
             let header_line: &str = header_line.trim();
             if header_line.is_empty() {
@@ -127,11 +127,11 @@ impl Request {
     /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn http_from_stream(
         stream: &ArcRwLockStream,
-        buffer_size: usize,
+        buffer: usize,
     ) -> RequestReaderHandleResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::http_from_reader(&mut reader, buffer_size).await
+        Self::http_from_reader(&mut reader, buffer).await
     }
 
     /// Parses a WebSocket request from a TCP stream.
@@ -149,12 +149,12 @@ impl Request {
     /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
     pub async fn ws_from_stream(
         stream: &ArcRwLockStream,
-        buffer_size: usize,
+        buffer: usize,
         request: &mut Self,
     ) -> RequestReaderHandleResult {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::ws_from_reader(&mut reader, buffer_size, request).await
+        Self::ws_from_reader(&mut reader, buffer, request).await
     }
 
     /// Parses a WebSocket request from a buffered TCP stream.
@@ -173,11 +173,11 @@ impl Request {
     /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
     pub async fn ws_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
-        buffer_size: usize,
+        buffer: usize,
         request: &mut Self,
     ) -> RequestReaderHandleResult {
-        let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
-        let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
+        let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer);
+        let mut temp_buffer: Vec<u8> = vec![0; buffer];
         let mut full_frame: Vec<u8> = Vec::new();
         let mut error_handle = || {
             request.body.clear();
