@@ -93,6 +93,30 @@ impl ArcRwLockStream {
         Ok(())
     }
 
+    /// Sends multiple HTTP response bodies sequentially.
+    ///
+    /// # Arguments
+    ///
+    /// - `IntoIterator<Item = Into<ResponseBody>>` - The response body data list to send.
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseResult` - Result indicating success or failure.
+    pub async fn send_body_list<I, D>(&self, data_iter: I) -> ResponseResult
+    where
+        I: IntoIterator<Item = D>,
+        D: Into<ResponseBody>,
+    {
+        let mut stream: RwLockWriteGuardTcpStream = self.write().await;
+        for data in data_iter {
+            stream
+                .write_all(&data.into())
+                .await
+                .map_err(|err| ResponseError::Response(err.to_string()))?;
+        }
+        Ok(())
+    }
+
     /// Flushes all buffered data to the stream.
     ///
     /// # Returns
