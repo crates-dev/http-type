@@ -73,7 +73,7 @@ impl ArcRwLockStream {
     ///
     /// # Arguments
     ///
-    /// - `&ResponseBody` - The response body data.
+    /// - `ResponseBody` - The response body data.
     ///
     /// # Returns
     ///
