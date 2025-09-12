@@ -150,51 +150,55 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `&[u8]` - The raw data slice from the WebSocket stream.
+    /// - `Into<RequestBody>` - The raw data to decode into a WebSocket frame.
     ///
     /// # Returns
     ///
     /// - `Some((WebSocketFrame, usize))`: If the frame is successfully decoded, returns the decoded frame
     ///   and the number of bytes consumed from the input slice.
     /// - `None`: If the frame is incomplete or malformed.
-    pub fn decode_ws_frame(data: &[u8]) -> WebsocketFrameWithLengthOption {
-        if data.len() < 2 {
+    pub fn decode_ws_frame<D>(data: D) -> WebsocketFrameWithLengthOption
+    where
+        D: Into<RequestBody>,
+    {
+        let data_into: RequestBody = data.into();
+        if data_into.len() < 2 {
             return None;
         }
         let mut index: usize = 0;
-        let fin: bool = (data[index] & 0b1000_0000) != 0;
-        let opcode: WebSocketOpcode = WebSocketOpcode::from_u8(data[index] & 0b0000_1111);
+        let fin: bool = (data_into[index] & 0b1000_0000) != 0;
+        let opcode: WebSocketOpcode = WebSocketOpcode::from_u8(data_into[index] & 0b0000_1111);
         index += 1;
-        let mask: bool = (data[index] & 0b1000_0000) != 0;
-        let mut payload_len: usize = (data[index] & 0b0111_1111) as usize;
+        let mask: bool = (data_into[index] & 0b1000_0000) != 0;
+        let mut payload_len: usize = (data_into[index] & 0b0111_1111) as usize;
         index += 1;
         if payload_len == 126 {
-            if data.len() < index + 2 {
+            if data_into.len() < index + 2 {
                 return None;
             }
-            payload_len = u16::from_be_bytes(data[index..index + 2].try_into().ok()?) as usize;
+            payload_len = u16::from_be_bytes(data_into[index..index + 2].try_into().ok()?) as usize;
             index += 2;
         } else if payload_len == 127 {
-            if data.len() < index + 8 {
+            if data_into.len() < index + 8 {
                 return None;
             }
-            payload_len = u64::from_be_bytes(data[index..index + 8].try_into().ok()?) as usize;
+            payload_len = u64::from_be_bytes(data_into[index..index + 8].try_into().ok()?) as usize;
             index += 8;
         }
         let mask_key: Option<[u8; 4]> = if mask {
-            if data.len() < index + 4 {
+            if data_into.len() < index + 4 {
                 return None;
             }
-            let key: [u8; 4] = data[index..index + 4].try_into().ok()?;
+            let key: [u8; 4] = data_into[index..index + 4].try_into().ok()?;
             index += 4;
             Some(key)
         } else {
             None
         };
-        if data.len() < index + payload_len {
+        if data_into.len() < index + payload_len {
             return None;
         }
-        let mut payload: Vec<u8> = data[index..index + payload_len].to_vec();
+        let mut payload: Vec<u8> = data_into[index..index + payload_len].to_vec();
         if let Some(mask_key) = mask_key {
             for (i, byte) in payload.iter_mut().enumerate() {
                 *byte ^= mask_key[i % 4];
@@ -223,7 +227,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// - A vector of `ResponseBody` (byte vectors), where each element represents a framed WebSocket message.
-    pub fn create_response_frame_list<D>(data: D) -> Vec<ResponseBody>
+    pub fn create_frame_list<D>(data: D) -> Vec<ResponseBody>
     where
         D: Into<ResponseBody>,
     {
@@ -284,14 +288,18 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `&[u8]` - A byte slice containing the input data to be hashed.
+    /// - `Into<Vec<u8>>` - The input data to be hashed.
     ///
     /// # Returns
     ///
     /// - A 20-byte array representing the SHA-1 hash of the input data.
-    pub fn sha1(data: &[u8]) -> [u8; 20] {
+    pub fn sha1<D>(data: D) -> [u8; 20]
+    where
+        D: Into<Vec<u8>>,
+    {
+        let data_into: Vec<u8> = data.into();
         let mut hash_state: [u32; 5] = HASH_STATE;
-        let mut padded_data: Vec<u8> = Vec::from(data);
+        let mut padded_data: Vec<u8> = Vec::from(data_into.as_slice());
         let original_length_bits: u64 = (padded_data.len() * 8) as u64;
         padded_data.push(0x80);
         while (padded_data.len() + 8) % 64 != 0 {
@@ -356,14 +364,18 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `&str` - A string slice containing the client-provided key (typically from the `Sec-WebSocket-Key` header).
+    /// - `Into<String>` - The client-provided key (typically from the `Sec-WebSocket-Key` header).
     ///
     /// # Returns
     ///
     /// - A string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
-    pub fn generate_accept_key(key: &str) -> String {
+    pub fn generate_accept_key<K>(key: K) -> String
+    where
+        K: Into<String>,
+    {
+        let key_into: String = key.into();
         let mut data: [u8; 60] = [0u8; 60];
-        data[..24].copy_from_slice(&key.as_bytes()[..24.min(key.len())]);
+        data[..24].copy_from_slice(&key_into.as_bytes()[..24.min(key_into.len())]);
         data[24..].copy_from_slice(GUID);
         let hash: [u8; 20] = Self::sha1(&data);
         Self::base64_encode(&hash)
@@ -377,14 +389,18 @@ impl WebSocketFrame {
     ///
     /// # Arguments
     ///
-    /// - `&[u8]` - A byte slice containing the data to encode in base64.
+    /// - `Into<Vec<u8>>` - The data to encode in base64.
     ///
     /// # Returns
     ///
     /// - A string with the base64 encoded representation of the input data.
-    pub fn base64_encode(data: &[u8]) -> String {
-        let mut encoded_data: Vec<u8> = Vec::with_capacity((data.len() + 2) / 3 * 4);
-        for chunk in data.chunks(3) {
+    pub fn base64_encode<D>(data: D) -> String
+    where
+        D: Into<Vec<u8>>,
+    {
+        let data_into: Vec<u8> = data.into();
+        let mut encoded_data: Vec<u8> = Vec::with_capacity((data_into.len() + 2) / 3 * 4);
+        for chunk in data_into.chunks(3) {
             let mut buffer: [u8; 3] = [0u8; 3];
             buffer[..chunk.len()].copy_from_slice(chunk);
             let indices: [u8; 4] = [

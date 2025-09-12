@@ -200,7 +200,7 @@ impl Request {
                 return Err(RequestError::IncompleteWebSocketFrame);
             }
             dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
-            while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&dynamic_buffer) {
+            while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&*dynamic_buffer) {
                 dynamic_buffer.drain(0..consumed);
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
