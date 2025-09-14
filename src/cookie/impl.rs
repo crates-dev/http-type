@@ -14,12 +14,12 @@ impl CookieBuilder {
     /// - `CookieBuilder` - A new builder instance.
     pub fn new<N, V>(name: N, value: V) -> Self
     where
-        N: Into<CookieKey>,
-        V: Into<CookieValue>,
+        N: AsRef<str>,
+        V: AsRef<str>,
     {
         Self {
-            name: name.into(),
-            value: value.into(),
+            name: name.as_ref().to_owned(),
+            value: value.as_ref().to_owned(),
             expires: None,
             max_age: None,
             domain: None,
@@ -37,14 +37,17 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `&str` - The `Set-Cookie` header string to parse.
+    /// - `AsRef<str>` - The `Set-Cookie` header string to parse.
     ///
     /// # Returns
     ///
     /// A `CookieBuilder` instance populated with the parsed cookie attributes.
-    pub fn parse(cookie_string: &str) -> Self {
+    pub fn parse<C>(cookie: C) -> Self
+    where
+        C: AsRef<str>,
+    {
         let mut cookie_builder: Self = Self::default();
-        let parts: Vec<&str> = cookie_string.split(SEMICOLON).collect();
+        let parts: Vec<&str> = cookie.as_ref().split(SEMICOLON).collect();
         if parts.is_empty() {
             return cookie_builder;
         }
@@ -106,16 +109,16 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `T` - The expiration date string.
+    /// - `AsRef<str>` - The expiration date string.
     ///
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
     pub fn expires<T>(&mut self, expires: T) -> &mut Self
     where
-        T: Into<String>,
+        T: AsRef<str>,
     {
-        self.expires = Some(expires.into());
+        self.expires = Some(expires.as_ref().to_owned());
         self
     }
 
@@ -137,16 +140,16 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `T` - The domain for the cookie.
+    /// - `AsRef<str>` - The domain for the cookie.
     ///
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
     pub fn domain<T>(&mut self, domain: T) -> &mut Self
     where
-        T: Into<String>,
+        T: AsRef<str>,
     {
-        self.domain = Some(domain.into());
+        self.domain = Some(domain.as_ref().to_owned());
         self
     }
 
@@ -154,16 +157,16 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `T` - The path for the cookie.
+    /// - `AsRef<str>` - The path for the cookie.
     ///
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
     pub fn path<T>(&mut self, path: T) -> &mut Self
     where
-        T: Into<String>,
+        T: AsRef<str>,
     {
-        self.path = Some(path.into());
+        self.path = Some(path.as_ref().to_owned());
         self
     }
 
@@ -202,9 +205,9 @@ impl CookieBuilder {
     /// The `CookieBuilder` instance for method chaining.
     pub fn same_site<T>(&mut self, same_site: T) -> &mut Self
     where
-        T: Into<String>,
+        T: AsRef<str>,
     {
-        self.same_site = Some(same_site.into());
+        self.same_site = Some(same_site.as_ref().to_owned());
         self
     }
 
@@ -262,12 +265,16 @@ impl Cookie {
     /// # Returns
     ///
     /// A `Cookies` collection (a hash map) containing all parsed cookie key-value pairs.
-    pub fn parse(cookie_string: &str) -> Cookies {
+    pub fn parse<C>(cookie: C) -> Cookies
+    where
+        C: AsRef<str>,
+    {
+        let cookie_ref: &str = cookie.as_ref();
         let mut cookies: Cookies = hash_map_xx_hash3_64();
-        if cookie_string.trim().is_empty() {
+        if cookie_ref.trim().is_empty() {
             return cookies;
         }
-        let parts: Vec<&str> = cookie_string.split(SEMICOLON).collect();
+        let parts: Vec<&str> = cookie_ref.split(SEMICOLON).collect();
         for part in parts {
             let part: &str = part.trim();
             if part.is_empty() {

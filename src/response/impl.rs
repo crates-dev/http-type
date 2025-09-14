@@ -29,17 +29,17 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement Into<ResponseHeadersKey>).
+    /// - `K` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `OptionResponseHeadersValue` - The optional header values.
     pub fn try_get_header<K>(&self, key: K) -> OptionResponseHeadersValue
     where
-        K: Into<ResponseHeadersKey>,
+        K: AsRef<str>,
     {
         self.headers
-            .get(&key.into())
+            .get(key.as_ref())
             .and_then(|data| Some(data.clone()))
     }
 
@@ -47,17 +47,17 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement Into<ResponseHeadersKey>).
+    /// - `K` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `OptionResponseHeadersValueItem` - The first header value if exists.
     pub fn try_get_header_front<K>(&self, key: K) -> OptionResponseHeadersValueItem
     where
-        K: Into<ResponseHeadersKey>,
+        K: AsRef<str>,
     {
         self.headers
-            .get(&key.into())
+            .get(key.as_ref())
             .and_then(|values| values.front().cloned())
     }
 
@@ -65,17 +65,17 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement Into<ResponseHeadersKey>).
+    /// - `K` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `OptionResponseHeadersValueItem` - The last header value if exists.
     pub fn try_get_header_back<K>(&self, key: K) -> OptionResponseHeadersValueItem
     where
-        K: Into<ResponseHeadersKey>,
+        K: AsRef<str>,
     {
         self.headers
-            .get(&key.into())
+            .get(key.as_ref())
             .and_then(|values| values.back().cloned())
     }
 
@@ -83,16 +83,16 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to check (must implement Into<ResponseHeadersKey>).
+    /// - `K` - The header key to check (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `bool` - Whether the header exists.
     pub fn has_header<K>(&self, key: K) -> bool
     where
-        K: Into<ResponseHeadersKey>,
+        K: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.into().to_lowercase();
+        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
         self.headers.contains_key(&key)
     }
 
@@ -100,21 +100,19 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to check (must implement Into<ResponseHeadersKey>).
-    /// - `V` - The value to search for (must implement Into<ResponseHeadersValueItem>).
+    /// - `K` - The header key to check (must implement AsRef<str>).
+    /// - `V` - The value to search for (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `bool` - Whether the header contains the value.
     pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
     where
-        K: Into<ResponseHeadersKey>,
-        V: Into<ResponseHeadersValueItem>,
+        K: AsRef<str>,
+        V: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.into();
-        let value: ResponseHeadersValueItem = value.into();
-        if let Some(values) = self.headers.get(&key) {
-            values.contains(&value)
+        if let Some(values) = self.headers.get(key.as_ref()) {
+            values.contains(&value.as_ref().to_owned())
         } else {
             false
         }
@@ -133,17 +131,18 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to count (must implement Into<ResponseHeadersKey>).
+    /// - `K` - The header key to count (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `usize` - The count of values for the header.
     pub fn get_header_length<K>(&self, key: K) -> usize
     where
-        K: Into<ResponseHeadersKey>,
+        K: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.into().to_lowercase();
-        self.headers.get(&key).map_or(0, |values| values.len())
+        self.headers
+            .get(&key.as_ref().to_lowercase())
+            .map_or(0, |values| values.len())
     }
 
     /// Gets the total number of header values in the response.
@@ -160,7 +159,7 @@ impl Response {
 
     /// Retrieves the body content of the response as a UTF-8 encoded string.
     ///
-    /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` into a string.
+    /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` as_ref a string.
     /// If the byte slice contains invalid UTF-8 sequences, they will be replaced with the Unicode replacement character ().
     ///
     /// # Returns
@@ -170,14 +169,14 @@ impl Response {
         String::from_utf8_lossy(self.get_body()).into_owned()
     }
 
-    /// Deserializes the body content of the response into a specified type `T`.
+    /// Deserializes the body content of the response as_ref a specified type `T`.
     ///
     /// This method first retrieves the body content as a byte slice using `self.get_body()`.
-    /// It then attempts to deserialize the byte slice into the specified type `T` using `json_from_slice`.
+    /// It then attempts to deserialize the byte slice as_ref the specified type `T` using `json_from_slice`.
     ///
     /// # Type Parameters
     ///
-    /// - `T` - The target type to deserialize into (must implement DeserializeOwned).
+    /// - `T` - The target type to deserialize as_ref (must implement DeserializeOwned).
     ///
     /// # Returns
     ///
@@ -203,24 +202,23 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key (must implement Into<ResponseHeadersKey>).
-    /// - `V` - The header value (must implement Into<String>).
+    /// - `K` - The header key (must implement AsRef<str>).
+    /// - `V` - The header value (must implement AsRef<String>).
     ///
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
-        K: Into<ResponseHeadersKey>,
-        V: Into<String>,
+        K: AsRef<str>,
+        V: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.into().to_lowercase();
+        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
         if self.should_skip_header(&key) {
             return self;
         }
-        let value: String = value.into();
         let mut deque: VecDeque<String> = VecDeque::new();
-        deque.push_back(value);
+        deque.push_back(value.as_ref().to_owned());
         self.headers.insert(key, deque);
         self
     }
@@ -232,26 +230,25 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key (must implement Into<ResponseHeadersKey>).
-    /// - `V` - The header value (must implement Into<String>).
+    /// - `K` - The header key (must implement AsRef<str>).
+    /// - `V` - The header value (must implement AsRef<String>).
     ///
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn add_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
-        K: Into<ResponseHeadersKey>,
-        V: Into<String>,
+        K: AsRef<str>,
+        V: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.into().to_lowercase();
+        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
         if self.should_skip_header(&key) {
             return self;
         }
-        let value: String = value.into();
         self.headers
             .entry(key)
             .or_insert_with(VecDeque::new)
-            .push_back(value);
+            .push_back(value.as_ref().to_owned());
         self
     }
 
@@ -261,17 +258,16 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to remove (must implement Into<ResponseHeadersKey>).
+    /// - `K` - The header key to remove (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn remove_header<K>(&mut self, key: K) -> &mut Self
     where
-        K: Into<ResponseHeadersKey>,
+        K: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.into().to_lowercase();
-        let _ = self.headers.remove(&key).is_some();
+        let _ = self.headers.remove(&key.as_ref().to_lowercase()).is_some();
         self
     }
 
@@ -283,21 +279,20 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key (must implement Into<ResponseHeadersKey>).
-    /// - `V` - The value to remove (must implement Into<String>).
+    /// - `K` - The header key (must implement AsRef<str>).
+    /// - `V` - The value to remove (must implement AsRef<String>).
     ///
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn remove_header_value<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
-        K: Into<ResponseHeadersKey>,
-        V: Into<String>,
+        K: AsRef<str>,
+        V: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.into().to_lowercase();
-        let value: String = value.into();
+        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
         if let Some(values) = self.headers.get_mut(&key) {
-            values.retain(|v| v != &value);
+            values.retain(|v| v != &value.as_ref().to_owned());
             if values.is_empty() {
                 self.headers.remove(&key);
             }
@@ -320,45 +315,45 @@ impl Response {
     /// Sets the body of the response.
     ///
     /// This method allows you to set the body of the response by converting the provided
-    /// value into a `ResponseBody` type. The `body` is updated with the converted value.
+    /// value as_ref a `ResponseBody` type. The `body` is updated with the converted value.
     ///
     /// # Arguments
     ///
-    /// - `T` - The body content (must implement Into<ResponseBody>).
+    /// - `T` - The body content (must implement AsRef<[u8]>).
     ///
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn set_body<T>(&mut self, body: T) -> &mut Self
     where
-        T: Into<ResponseBody>,
+        T: AsRef<[u8]>,
     {
-        self.body = body.into();
+        self.body = body.as_ref().to_owned();
         self
     }
 
     /// Sets the reason phrase of the response.
     ///
     /// This method allows you to set the reason phrase of the response by converting the
-    /// provided value into a `ResponseReasonPhrase` type. The `reason_phrase` is updated
+    /// provided value as_ref a `ResponseReasonPhrase` type. The `reason_phrase` is updated
     /// with the converted value.
     ///
     /// # Arguments
     ///
-    /// - `T` - The reason phrase (must implement Into<ResponseReasonPhrase>).
+    /// - `T` - The reason phrase (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
     pub fn set_reason_phrase<T>(&mut self, reason_phrase: T) -> &mut Self
     where
-        T: Into<ResponseReasonPhrase>,
+        T: AsRef<str>,
     {
-        self.reason_phrase = reason_phrase.into();
+        self.reason_phrase = reason_phrase.as_ref().to_owned();
         self
     }
 
-    /// Pushes a header with a key and value into the response string.
+    /// Pushes a header with a key and value as_ref the response string.
     ///
     /// # Arguments
     ///
@@ -372,7 +367,7 @@ impl Response {
         response_string.push_str(HTTP_BR);
     }
 
-    /// Pushes the first line of an HTTP response (version, status code, and reason phrase) into the response string.
+    /// Pushes the first line of an HTTP response (version, status code, and reason phrase) as_ref the response string.
     /// This corresponds to the status line of the HTTP response.
     ///
     /// # Arguments

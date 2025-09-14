@@ -200,7 +200,7 @@ impl Request {
                 return Err(RequestError::IncompleteWebSocketFrame);
             }
             dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
-            while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&*dynamic_buffer) {
+            while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&dynamic_buffer) {
                 dynamic_buffer.drain(0..consumed);
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
@@ -221,7 +221,7 @@ impl Request {
                     _ => {
                         error_handle();
                         return Err(RequestError::InvalidWebSocketFrame(
-                            "Unsupported opcode".into(),
+                            "Unsupported opcode".to_owned(),
                         ));
                     }
                 }
@@ -229,7 +229,7 @@ impl Request {
         }
     }
 
-    /// Parses a query string into key-value pairs.
+    /// Parses a query string as_ref key-value pairs.
     ///
     /// Expects format "key1=value1&key2=value2". Empty values are allowed.
     ///
@@ -240,9 +240,12 @@ impl Request {
     /// # Returns
     ///
     /// - `HashMap<String, String>` - The parsed query parameters.
-    fn parse_querys(query: &str) -> RequestQuerys {
+    fn parse_querys<Q>(query: Q) -> RequestQuerys
+    where
+        Q: AsRef<str>,
+    {
         let mut query_map: RequestQuerys = hash_map_xx_hash3_64();
-        for pair in query.split(AND) {
+        for pair in query.as_ref().split(AND) {
             if let Some((key, value)) = pair.split_once(EQUAL) {
                 if !key.is_empty() {
                     query_map.insert(key.to_string(), value.to_string());
@@ -256,53 +259,53 @@ impl Request {
 
     /// Gets a query parameter value by key.
     ///
-    /// The key type must implement Into<String> conversion.
+    /// The key type must implement AsRef<str> conversion.
     ///
     /// # Arguments
     ///
-    /// - `K` - The query parameter key (implements Into<String>).
+    /// - `K` - The query parameter key (implements AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `Option<String>` - The parameter value if exists.
     pub fn try_get_query<K>(&self, key: K) -> OptionRequestQuerysValue
     where
-        K: Into<RequestQuerysKey>,
+        K: AsRef<str>,
     {
-        self.querys.get(&key.into()).cloned()
+        self.querys.get(key.as_ref()).cloned()
     }
 
     /// Retrieves the value of a request header by its key.
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement Into<RequestHeadersKey>).
+    /// - `K` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `OptionRequestHeadersValue` - The optional header values.
     pub fn try_get_header<K>(&self, key: K) -> OptionRequestHeadersValue
     where
-        K: Into<RequestHeadersKey>,
+        K: AsRef<str>,
     {
-        self.headers.get(&key.into()).cloned()
+        self.headers.get(key.as_ref()).cloned()
     }
 
     /// Retrieves the first value of a request header by its key.
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement Into<RequestHeadersKey>).
+    /// - `K` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `OptionRequestHeadersValueItem` - The first header value if exists.
     pub fn try_get_header_front<K>(&self, key: K) -> OptionRequestHeadersValueItem
     where
-        K: Into<RequestHeadersKey>,
+        K: AsRef<str>,
     {
         self.headers
-            .get(&key.into())
+            .get(key.as_ref())
             .and_then(|values| values.front().cloned())
     }
 
@@ -310,17 +313,17 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement Into<RequestHeadersKey>).
+    /// - `K` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `OptionRequestHeadersValueItem` - The last header value if exists.
     pub fn try_get_header_back<K>(&self, key: K) -> OptionRequestHeadersValueItem
     where
-        K: Into<RequestHeadersKey>,
+        K: AsRef<str>,
     {
         self.headers
-            .get(&key.into())
+            .get(key.as_ref())
             .and_then(|values| values.back().cloned())
     }
 
@@ -328,17 +331,17 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement Into<RequestHeadersKey>).
+    /// - `K` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `usize` - The count of values for the header.
     pub fn get_header_length<K>(&self, key: K) -> usize
     where
-        K: Into<RequestHeadersKey>,
+        K: AsRef<str>,
     {
         self.headers
-            .get(&key.into())
+            .get(key.as_ref())
             .map(|values| values.len())
             .unwrap_or(0)
     }
@@ -365,37 +368,35 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to check (must implement Into<RequestHeadersKey>).
+    /// - `K` - The header key to check (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `bool` - Whether the header exists.
     pub fn has_header<K>(&self, key: K) -> bool
     where
-        K: Into<RequestHeadersKey>,
+        K: AsRef<str>,
     {
-        self.headers.contains_key(&key.into())
+        self.headers.contains_key(key.as_ref())
     }
 
     /// Checks if a header contains a specific value.
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to check (must implement Into<RequestHeadersKey>).
-    /// - `V` - The value to search for (must implement Into<RequestHeadersValueItem>).
+    /// - `K` - The header key to check (must implement AsRef<str>).
+    /// - `V` - The value to search for (must implement AsRef<str>).
     ///
     /// # Returns
     ///
     /// - `bool` - Whether the header contains the value.
     pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
     where
-        K: Into<RequestHeadersKey>,
-        V: Into<RequestHeadersValueItem>,
+        K: AsRef<str>,
+        V: AsRef<str>,
     {
-        let key: RequestHeadersKey = key.into();
-        let value: RequestHeadersValueItem = value.into();
-        if let Some(values) = self.headers.get(&key) {
-            values.contains(&value)
+        if let Some(values) = self.headers.get(key.as_ref()) {
+            values.contains(&value.as_ref().to_owned())
         } else {
             false
         }
@@ -403,7 +404,7 @@ impl Request {
 
     /// Retrieves the body content of the request as a UTF-8 encoded string.
     ///
-    /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` into a string.
+    /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` as_ref a string.
     /// If the byte slice contains invalid UTF-8 sequences, they will be replaced with the Unicode replacement character ().
     ///
     /// # Returns
@@ -413,14 +414,14 @@ impl Request {
         String::from_utf8_lossy(self.get_body()).into_owned()
     }
 
-    /// Deserializes the body content of the request into a specified type `T`.
+    /// Deserializes the body content of the request as_ref a specified type `T`.
     ///
     /// This method first retrieves the body content as a byte slice using `self.get_body()`.
-    /// It then attempts to deserialize the byte slice into the specified type `T` using `json_from_slice`.
+    /// It then attempts to deserialize the byte slice as_ref the specified type `T` using `json_from_slice`.
     ///
     /// # Type Parameters
     ///
-    /// - `T` - The target type to deserialize into (must implement DeserializeOwned).
+    /// - `T` - The target type to deserialize as_ref (must implement DeserializeOwned).
     ///
     /// # Returns
     ///
@@ -463,7 +464,7 @@ impl Request {
     /// Retrieves the upgrade type from the request headers.
     ///
     /// This method looks for the `UPGRADE` header and attempts to parse its value
-    /// into an `UpgradeType`. If the header is missing or the value is invalid,
+    /// as_ref an `UpgradeType`. If the header is missing or the value is invalid,
     /// it returns the default `UpgradeType`.
     ///
     /// # Returns

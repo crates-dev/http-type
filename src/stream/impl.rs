@@ -55,18 +55,18 @@ impl ArcRwLockStream {
     ///
     /// # Arguments
     ///
-    /// - `Into<ResponseData>` - The response data to send (must implement Into<ResponseData>).
+    /// - `AsRef<[u8]>` - The response data to send (must implement AsRef<[u8]>).
     ///
     /// # Returns
     ///
     /// - `ResponseResult` - Result indicating success or failure.
     pub async fn send<D>(&self, data: D) -> ResponseResult
     where
-        D: Into<ResponseData>,
+        D: AsRef<[u8]>,
     {
         self.write()
             .await
-            .write_all(&data.into())
+            .write_all(data.as_ref())
             .await
             .map_err(|err| ResponseError::Response(err.to_string()))?;
         Ok(())
@@ -76,18 +76,18 @@ impl ArcRwLockStream {
     ///
     /// # Arguments
     ///
-    /// - `Into<ResponseBody>` - The response body data (must implement Into<ResponseBody>).
+    /// - `AsRef<[u8]>` - The response body data (must implement AsRef<[u8]>).
     ///
     /// # Returns
     ///
     /// - `ResponseResult` - Result indicating success or failure.
     pub async fn send_body<D>(&self, data: D) -> ResponseResult
     where
-        D: Into<ResponseBody>,
+        D: AsRef<[u8]>,
     {
         self.write()
             .await
-            .write_all(&data.into())
+            .write_all(data.as_ref())
             .await
             .map_err(|err| ResponseError::Response(err.to_string()))?;
         Ok(())
@@ -97,7 +97,7 @@ impl ArcRwLockStream {
     ///
     /// # Arguments
     ///
-    /// - `IntoIterator<Item = Into<ResponseBody>>` - The response body data list to send.
+    /// - `IntoIterator<Item = AsRef<[u8]>>` - The response body data list to send.
     ///
     /// # Returns
     ///
@@ -105,12 +105,12 @@ impl ArcRwLockStream {
     pub async fn send_body_list<I, D>(&self, data_iter: I) -> ResponseResult
     where
         I: IntoIterator<Item = D>,
-        D: Into<ResponseBody>,
+        D: AsRef<[u8]>,
     {
         let mut stream: RwLockWriteGuardTcpStream = self.write().await;
         for data in data_iter {
             stream
-                .write_all(&data.into())
+                .write_all(data.as_ref())
                 .await
                 .map_err(|err| ResponseError::Response(err.to_string()))?;
         }
