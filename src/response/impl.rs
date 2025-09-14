@@ -217,7 +217,7 @@ impl Response {
         if self.should_skip_header(&key) {
             return self;
         }
-        let mut deque: VecDeque<String> = VecDeque::new();
+        let mut deque: VecDeque<String> = VecDeque::with_capacity(1);
         deque.push_back(value.as_ref().to_owned());
         self.headers.insert(key, deque);
         self
