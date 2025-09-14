@@ -6,8 +6,8 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `N` - The cookie name type.
-    /// - `V` - The cookie value type.
+    /// - `AsRef<str>` - The cookie name type.
+    /// - `AsRef<str>` - The cookie value type.
     ///
     /// # Returns
     ///
@@ -114,9 +114,9 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    pub fn expires<T>(&mut self, expires: T) -> &mut Self
+    pub fn expires<E>(&mut self, expires: E) -> &mut Self
     where
-        T: AsRef<str>,
+        E: AsRef<str>,
     {
         self.expires = Some(expires.as_ref().to_owned());
         self
@@ -145,9 +145,9 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    pub fn domain<T>(&mut self, domain: T) -> &mut Self
+    pub fn domain<D>(&mut self, domain: D) -> &mut Self
     where
-        T: AsRef<str>,
+        D: AsRef<str>,
     {
         self.domain = Some(domain.as_ref().to_owned());
         self
@@ -198,7 +198,7 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `T` - The `SameSite` policy.
+    /// - `AsRef<str>` - The `SameSite` policy.
     ///
     /// # Returns
     ///
@@ -260,7 +260,7 @@ impl Cookie {
     ///
     /// # Arguments
     ///
-    /// - `&str` - The `Cookie` header string to parse.
+    /// - `AsRef<str>` - The `Cookie` header string to parse.
     ///
     /// # Returns
     ///

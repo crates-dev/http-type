@@ -7,14 +7,17 @@ impl HttpUrlComponents {
     ///
     /// # Arguments
     ///
-    /// - `&str` - The URL string to parse.
+    /// - `AsRef<str>` - The URL string to parse.
     ///
     /// # Returns
     ///
     /// - `Result<HttpUrlComponents, HttpUrlError>` - Either the parsed components or an error.
-    pub fn parse(url_str: &str) -> Result<Self, HttpUrlError> {
+    pub fn parse<U>(url_str: U) -> Result<Self, HttpUrlError>
+    where
+        U: AsRef<str>,
+    {
         let parsed_url: UrlParser =
-            UrlParser::parse(url_str).map_err(|_| HttpUrlError::InvalidUrl)?;
+            UrlParser::parse(url_str.as_ref()).map_err(|_| HttpUrlError::InvalidUrl)?;
         let res: Self = Self {
             protocol: parsed_url
                 .scheme()

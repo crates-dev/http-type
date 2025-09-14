@@ -5,28 +5,35 @@ impl FileExtension {
     ///
     /// # Arguments
     ///
-    /// - `file_extension` - The string to parse.
+    /// - `AsRef<str>` - The string to parse.
     ///
     /// # Returns
     ///
     /// The parsed `FileExtension`.
-    pub fn parse(file_extension: &str) -> Self {
-        file_extension.parse::<Self>().unwrap_or_default()
+    pub fn parse<F>(file_extension: F) -> Self
+    where
+        F: AsRef<str>,
+    {
+        file_extension.as_ref().parse::<Self>().unwrap_or_default()
     }
 
     /// Gets the extension name from a full path.
     ///
     /// # Arguments
     ///
-    /// - `full_path` - The full path to the file.
+    /// - `AsRef<str>` - The full path to the file.
     ///
     /// # Returns
     ///
     /// The extension name.
-    pub fn get_extension_name(full_path: &str) -> String {
-        full_path
+    pub fn get_extension_name<F>(full_path: F) -> String
+    where
+        F: AsRef<str>,
+    {
+        let full_path_ref: &str = full_path.as_ref();
+        full_path_ref
             .rfind(POINT)
-            .map(|pos| full_path[pos + 1..].to_string())
+            .map(|pos| full_path_ref[pos + 1..].to_string())
             .unwrap_or_default()
     }
 

@@ -6,7 +6,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&T` - Data to serialize
+    /// - `&(Serialize + Display)` - Data to serialize
     ///
     /// # Returns
     ///
@@ -22,7 +22,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&T` - Data to serialize
+    /// - `&(Serialize + Display)` - Data to serialize
     ///
     /// # Returns
     ///
@@ -38,7 +38,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&T` - Data to format
+    /// - `&(Serialize + Debug + Clone + Default + Display)` - Data to format
     ///
     /// # Returns
     ///
@@ -54,7 +54,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&T` - Data to format
+    /// - `&(Serialize + Debug + Clone + Default)` - Data to format
     ///
     /// # Returns
     ///
@@ -74,7 +74,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&T` - Data to serialize
+    /// - `&(Serialize + Display)` - Data to serialize
     ///
     /// # Returns
     ///
@@ -90,7 +90,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&T` - Data to format
+    /// - `&(Serialize + Debug + Clone + Default + Display)` - Data to format
     ///
     /// # Returns
     ///
@@ -106,7 +106,7 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&T` - Data to format
+    /// - `&(Serialize + Debug + Clone + Default + Display)` - Data to format
     ///
     /// # Returns
     ///
@@ -129,20 +129,29 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&str` - Content type
-    /// - `&str` - Charset
+    /// - `AsRef<str>` - Content type
+    /// - `AsRef<str>` - Charset
     ///
     /// # Returns
     ///
     /// - `String` - Formatted string
-    pub fn format_content_type_with_charset(content_type: &str, charset: &str) -> String {
+    pub fn format_content_type_with_charset<T, S>(content_type: T, charset: S) -> String
+    where
+        T: AsRef<str>,
+        S: AsRef<str>,
+    {
+        let content_type_ref: &str = content_type.as_ref();
+        let charset_ref: &str = charset.as_ref();
         let mut result: String = String::with_capacity(
-            content_type.len() + SEMICOLON_SPACE.len() + CHARSET_EQUAL.len() + charset.len(),
+            content_type_ref.len()
+                + SEMICOLON_SPACE.len()
+                + CHARSET_EQUAL.len()
+                + charset_ref.len(),
         );
-        result.push_str(content_type);
+        result.push_str(content_type_ref);
         result.push_str(SEMICOLON_SPACE);
         result.push_str(CHARSET_EQUAL);
-        result.push_str(charset);
+        result.push_str(charset_ref);
         result
     }
 
@@ -150,22 +159,28 @@ impl ContentType {
     ///
     /// # Arguments
     ///
-    /// - `&str` - Content type
-    /// - `&str` - Charset declaration
+    /// - `AsRef<str>` - Content type
+    /// - `AsRef<str>` - Charset declaration
     ///
     /// # Returns
     ///
     /// - `String` - Formatted string
-    pub fn format_content_type_with_charset_declaration(
-        content_type: &str,
-        charset_with_key: &str,
-    ) -> String {
+    pub fn format_content_type_with_charset_declaration<T, S>(
+        content_type: T,
+        charset_with_key: S,
+    ) -> String
+    where
+        T: AsRef<str>,
+        S: AsRef<str>,
+    {
+        let content_type_ref: &str = content_type.as_ref();
+        let charset_with_key_ref: &str = charset_with_key.as_ref();
         let mut result: String = String::with_capacity(
-            content_type.len() + SEMICOLON_SPACE.len() + charset_with_key.len(),
+            content_type_ref.len() + SEMICOLON_SPACE.len() + charset_with_key_ref.len(),
         );
-        result.push_str(content_type);
+        result.push_str(content_type_ref);
         result.push_str(SEMICOLON_SPACE);
-        result.push_str(charset_with_key);
+        result.push_str(charset_with_key_ref);
         result
     }
 }

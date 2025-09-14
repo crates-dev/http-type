@@ -97,7 +97,7 @@ impl ArcRwLockStream {
     ///
     /// # Arguments
     ///
-    /// - `IntoIterator<Item = AsRef<[u8]>>` - The response body data list to send.
+    /// - `I: IntoIterator<Item = D>, D: AsRef<[u8]>` - The response body data list to send.
     ///
     /// # Returns
     ///

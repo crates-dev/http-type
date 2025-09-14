@@ -54,7 +54,6 @@ impl FromStr for HttpVersion {
     /// # Returns
     ///
     /// A `Result` containing the `HttpVersion` variant if successful, or `Self::Err` on failure.
-    #[allow(warnings)]
     fn from_str(version_str: &str) -> Result<Self, Self::Err> {
         match version_str {
             HTTP_VERSION_0_9 => Ok(Self::HTTP0_9),

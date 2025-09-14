@@ -29,7 +29,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -47,7 +47,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -65,7 +65,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -83,7 +83,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to check (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header key to check (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -100,8 +100,8 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to check (must implement AsRef<str>).
-    /// - `V` - The value to search for (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header key to check (must implement AsRef<str>).
+    /// - `AsRef<str>` - The value to search for (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -131,7 +131,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to count (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header key to count (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -174,9 +174,9 @@ impl Response {
     /// This method first retrieves the body content as a byte slice using `self.get_body()`.
     /// It then attempts to deserialize the byte slice as_ref the specified type `T` using `json_from_slice`.
     ///
-    /// # Type Parameters
+    /// # Arguments
     ///
-    /// - `T` - The target type to deserialize as_ref (must implement DeserializeOwned).
+    /// - `DeserializeOwned` - The target type to deserialize as_ref (must implement DeserializeOwned).
     ///
     /// # Returns
     ///
@@ -202,8 +202,8 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key (must implement AsRef<str>).
-    /// - `V` - The header value (must implement AsRef<String>).
+    /// - `AsRef<str>` - The header key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header value (must implement AsRef<String>).
     ///
     /// # Returns
     ///
@@ -230,8 +230,8 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key (must implement AsRef<str>).
-    /// - `V` - The header value (must implement AsRef<String>).
+    /// - `AsRef<str>` - The header key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header value (must implement AsRef<String>).
     ///
     /// # Returns
     ///
@@ -258,7 +258,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to remove (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header key to remove (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -279,8 +279,8 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key (must implement AsRef<str>).
-    /// - `V` - The value to remove (must implement AsRef<String>).
+    /// - `AsRef<str>` - The header key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The value to remove (must implement AsRef<String>).
     ///
     /// # Returns
     ///
@@ -319,7 +319,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `T` - The body content (must implement AsRef<[u8]>).
+    /// - `AsRef<[u8]>` - The body content (must implement AsRef<[u8]>).
     ///
     /// # Returns
     ///
@@ -340,7 +340,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `T` - The reason phrase (must implement AsRef<str>).
+    /// - `AsRef<str>` - The reason phrase (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -357,9 +357,9 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `response_string`: A mutable reference to the string where the header will be added.
-    /// - `key`: The header key as a string slice (`&str`).
-    /// - `value`: The header value as a string slice (`&str`).
+    /// - `&mut String`: A mutable reference to the string where the header will be added.
+    /// - `&str`: The header key as a string slice (`&str`).
+    /// - `&str`: The header value as a string slice (`&str`).
     fn push_header(response_string: &mut String, key: &str, value: &str) {
         response_string.push_str(key);
         response_string.push_str(COLON_SPACE);

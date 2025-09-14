@@ -263,7 +263,7 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The query parameter key (implements AsRef<str>).
+    /// - `AsRef<str>` - The query parameter key (implements AsRef<str>).
     ///
     /// # Returns
     ///
@@ -279,7 +279,7 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -295,7 +295,7 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -313,7 +313,7 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -331,7 +331,7 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header's key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -368,7 +368,7 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to check (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header key to check (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -384,8 +384,8 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `K` - The header key to check (must implement AsRef<str>).
-    /// - `V` - The value to search for (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header key to check (must implement AsRef<str>).
+    /// - `AsRef<str>` - The value to search for (must implement AsRef<str>).
     ///
     /// # Returns
     ///
@@ -419,9 +419,9 @@ impl Request {
     /// This method first retrieves the body content as a byte slice using `self.get_body()`.
     /// It then attempts to deserialize the byte slice as_ref the specified type `T` using `json_from_slice`.
     ///
-    /// # Type Parameters
+    /// # Arguments
     ///
-    /// - `T` - The target type to deserialize as_ref (must implement DeserializeOwned).
+    /// - `DeserializeOwned` - The target type to deserialize as_ref (must implement DeserializeOwned).
     ///
     /// # Returns
     ///

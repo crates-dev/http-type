@@ -171,13 +171,16 @@ impl HttpStatus {
     /// # Arguments
     ///
     /// - `&self` - The HttpStatus instance.
-    /// - `&str` - The string to compare against.
+    /// - `AsRef<str>` - The string to compare against.
     ///
     /// # Returns
     ///
     /// - `bool` - True if the string matches either code or description.
-    pub fn same(&self, code_str: &str) -> bool {
-        self.to_string().eq_ignore_ascii_case(code_str)
+    pub fn same<C>(&self, code_str: C) -> bool
+    where
+        C: AsRef<str>,
+    {
+        self.to_string().eq_ignore_ascii_case(code_str.as_ref())
     }
 }
 
