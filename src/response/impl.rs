@@ -438,18 +438,16 @@ impl Response {
                 self.set_header_without_check(CONTENT_TYPE, &content_type);
                 content_type
             });
-        if !content_type.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
-            let body: &ResponseBody = self.get_body();
-            let mut len: String = body.len().to_string();
-            if let Some(compress_type) = compress_type_opt {
-                if !compress_type.is_unknown() {
-                    len = compress_type
-                        .encode(body, DEFAULT_BUFFER_SIZE)
-                        .len()
-                        .to_string();
-                }
+        let mut body: ResponseBody = self.get_body().clone();
+        if let Some(compress_type) = compress_type_opt {
+            if !compress_type.is_unknown() {
+                body = compress_type
+                    .encode(&body, DEFAULT_BUFFER_SIZE)
+                    .into_owned();
             }
-            self.set_header_without_check(CONTENT_LENGTH.to_owned(), len);
+        }
+        if !content_type.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
+            self.set_header_without_check(CONTENT_LENGTH.to_owned(), body.len().to_string());
         }
         self.get_headers().iter().for_each(|(key, values)| {
             for value in values.iter() {
@@ -458,7 +456,7 @@ impl Response {
         });
         response_string.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_string.into_bytes();
-        response_bytes.extend_from_slice(self.get_body());
+        response_bytes.extend_from_slice(&body);
         response_bytes
     }
 
