@@ -193,7 +193,31 @@ impl Response {
     /// - Returns `true` if the header is empty or not allowed.
     /// - Returns `false` if the header can be set.
     fn should_skip_header(&self, key: &ResponseHeadersKey) -> bool {
-        key.trim().is_empty() || *key == CONTENT_LENGTH
+        key.trim().is_empty() || key == CONTENT_LENGTH
+    }
+
+    /// Sets a header in the response, replacing any existing values.
+    ///
+    /// This function replaces all existing values for a header with a single new value.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header key (must implement AsRef<str>).
+    /// - `AsRef<str>` - The header value (must implement AsRef<String>).
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self` - A mutable reference to self for chaining.
+    fn set_header_without_check<K, V>(&mut self, key: K, value: V) -> &mut Self
+    where
+        K: AsRef<str>,
+        V: AsRef<str>,
+    {
+        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
+        let mut deque: VecDeque<String> = VecDeque::with_capacity(1);
+        deque.push_back(value.as_ref().to_owned());
+        self.headers.insert(key, deque);
+        self
     }
 
     /// Sets a header in the response, replacing any existing values.
@@ -395,59 +419,46 @@ impl Response {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(HttpStatus::phrase(*self.get_status_code()));
         }
-        let mut response_string: String = String::new();
+        let mut response_string: String = String::with_capacity(DEFAULT_BUFFER_SIZE);
         self.push_http_first_line(&mut response_string);
-        let mut compress_type_opt: OptionCompress = None;
-        let mut connection_opt: OptionString = None;
-        let mut content_type_opt: OptionString = None;
-        let headers: ResponseHeaders = self
-            .get_mut_headers()
-            .drain()
-            .map(|(key, value)| (key.to_lowercase(), value))
-            .collect();
-        let mut unset_content_length: bool = false;
-        for (key, values) in headers.iter() {
-            for value in values.iter() {
-                if key == CONTENT_ENCODING {
-                    compress_type_opt = Some(value.parse::<Compress>().unwrap_or_default());
-                } else if key == CONNECTION {
-                    connection_opt = Some(value.to_owned());
-                } else if key == CONTENT_TYPE {
-                    content_type_opt = Some(value.to_owned());
-                    if value.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
-                        unset_content_length = true;
-                    }
-                }
-                Self::push_header(&mut response_string, key, value);
-            }
+        let compress_type_opt: OptionCompress = self
+            .try_get_header_back(CONTENT_ENCODING)
+            .map(|value| value.parse::<Compress>().unwrap_or_default());
+        if self.try_get_header_back(CONNECTION).is_none() {
+            self.set_header_without_check(CONNECTION, KEEP_ALIVE);
         }
-        if connection_opt.is_none() {
-            Self::push_header(&mut response_string, CONNECTION, KEEP_ALIVE);
-        }
-        if content_type_opt.is_none() {
-            let mut content_type: String = String::with_capacity(
-                TEXT_HTML.len() + SEMICOLON_SPACE.len() + CHARSET_UTF_8.len(),
-            );
-            content_type.push_str(TEXT_HTML);
-            content_type.push_str(SEMICOLON_SPACE);
-            content_type.push_str(CHARSET_UTF_8);
-            Self::push_header(&mut response_string, CONTENT_TYPE, &content_type);
-        }
-        let mut body: Cow<Vec<u8>> = Cow::Borrowed(self.get_body());
-        if !unset_content_length {
+        let content_type: ResponseHeadersValueItem =
+            self.try_get_header_back(CONTENT_TYPE).unwrap_or_else(|| {
+                let mut content_type: String = String::with_capacity(
+                    TEXT_HTML.len() + SEMICOLON_SPACE.len() + CHARSET_UTF_8.len(),
+                );
+                content_type.push_str(TEXT_HTML);
+                content_type.push_str(SEMICOLON_SPACE);
+                content_type.push_str(CHARSET_UTF_8);
+                self.set_header_without_check(CONTENT_TYPE, &content_type);
+                content_type
+            });
+        if !content_type.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
+            let body: &ResponseBody = self.get_body();
+            let mut len: String = body.len().to_string();
             if let Some(compress_type) = compress_type_opt {
                 if !compress_type.is_unknown() {
-                    let tmp_body: Cow<'_, Vec<u8>> =
-                        compress_type.encode(&body, DEFAULT_BUFFER_SIZE);
-                    body = Cow::Owned(tmp_body.into_owned());
+                    len = compress_type
+                        .encode(body, DEFAULT_BUFFER_SIZE)
+                        .len()
+                        .to_string();
                 }
             }
-            let len_string: String = body.len().to_string();
-            Self::push_header(&mut response_string, CONTENT_LENGTH, &len_string);
+            self.set_header_without_check(CONTENT_LENGTH.to_owned(), len);
         }
+        self.get_headers().iter().for_each(|(key, values)| {
+            for value in values.iter() {
+                Self::push_header(&mut response_string, key, value);
+            }
+        });
         response_string.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_string.into_bytes();
-        response_bytes.extend_from_slice(&body);
+        response_bytes.extend_from_slice(self.get_body());
         response_bytes
     }
 

@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "5.4.4"
+version = "5.4.5"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]

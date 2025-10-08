@@ -87,7 +87,6 @@ pub(crate) use lombok_macros::*;
 pub(crate) use serde::{Serialize, de::DeserializeOwned};
 pub(crate) use std::{
     any::Any,
-    borrow::Cow,
     collections::{HashMap, HashSet, VecDeque},
     error::Error as StdError,
     fmt::{self, Debug, Display},
