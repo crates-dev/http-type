@@ -21,6 +21,7 @@ impl Response {
     /// # Returns
     ///
     /// - `Response` - A new response instance with default values.
+    #[inline]
     pub fn new() -> Self {
         Self::default()
     }
@@ -34,6 +35,7 @@ impl Response {
     /// # Returns
     ///
     /// - `OptionResponseHeadersValue` - The optional header values.
+    #[inline]
     pub fn try_get_header<K>(&self, key: K) -> OptionResponseHeadersValue
     where
         K: AsRef<str>,
@@ -52,6 +54,7 @@ impl Response {
     /// # Returns
     ///
     /// - `OptionResponseHeadersValueItem` - The first header value if exists.
+    #[inline]
     pub fn try_get_header_front<K>(&self, key: K) -> OptionResponseHeadersValueItem
     where
         K: AsRef<str>,
@@ -70,6 +73,7 @@ impl Response {
     /// # Returns
     ///
     /// - `OptionResponseHeadersValueItem` - The last header value if exists.
+    #[inline]
     pub fn try_get_header_back<K>(&self, key: K) -> OptionResponseHeadersValueItem
     where
         K: AsRef<str>,
@@ -88,6 +92,7 @@ impl Response {
     /// # Returns
     ///
     /// - `bool` - Whether the header exists.
+    #[inline]
     pub fn has_header<K>(&self, key: K) -> bool
     where
         K: AsRef<str>,
@@ -106,6 +111,7 @@ impl Response {
     /// # Returns
     ///
     /// - `bool` - Whether the header contains the value.
+    #[inline]
     pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
     where
         K: AsRef<str>,
@@ -123,6 +129,7 @@ impl Response {
     /// # Returns
     ///
     /// - `usize` - The count of unique header keys.
+    #[inline]
     pub fn get_headers_length(&self) -> usize {
         self.headers.len()
     }
@@ -136,6 +143,7 @@ impl Response {
     /// # Returns
     ///
     /// - `usize` - The count of values for the header.
+    #[inline]
     pub fn get_header_length<K>(&self, key: K) -> usize
     where
         K: AsRef<str>,
@@ -153,6 +161,7 @@ impl Response {
     /// # Returns
     ///
     /// - `usize` - The total count of all header values.
+    #[inline]
     pub fn get_headers_values_length(&self) -> usize {
         self.headers.values().map(|values| values.len()).sum()
     }
@@ -165,6 +174,7 @@ impl Response {
     /// # Returns
     ///
     /// - `String` - The body content as a string.
+    #[inline]
     pub fn get_body_string(&self) -> String {
         String::from_utf8_lossy(self.get_body()).into_owned()
     }
@@ -192,6 +202,7 @@ impl Response {
     ///
     /// - Returns `true` if the header is empty or not allowed.
     /// - Returns `false` if the header can be set.
+    #[inline]
     fn should_skip_header(&self, key: &ResponseHeadersKey) -> bool {
         key.trim().is_empty() || key == CONTENT_LENGTH
     }
@@ -208,6 +219,7 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline]
     fn set_header_without_check<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: AsRef<str>,
@@ -232,6 +244,7 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline]
     pub fn set_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: AsRef<str>,
@@ -260,6 +273,7 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline]
     pub fn add_header<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: AsRef<str>,
@@ -287,6 +301,7 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline]
     pub fn remove_header<K>(&mut self, key: K) -> &mut Self
     where
         K: AsRef<str>,
@@ -309,6 +324,7 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline]
     pub fn remove_header_value<K, V>(&mut self, key: K, value: V) -> &mut Self
     where
         K: AsRef<str>,
@@ -331,6 +347,7 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline]
     pub fn clear_headers(&mut self) -> &mut Self {
         self.headers.clear();
         self
@@ -348,6 +365,7 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline]
     pub fn set_body<T>(&mut self, body: T) -> &mut Self
     where
         T: AsRef<[u8]>,
@@ -369,6 +387,7 @@ impl Response {
     /// # Returns
     ///
     /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline]
     pub fn set_reason_phrase<T>(&mut self, reason_phrase: T) -> &mut Self
     where
         T: AsRef<str>,
@@ -384,6 +403,7 @@ impl Response {
     /// - `&mut String`: A mutable reference to the string where the header will be added.
     /// - `&str`: The header key as a string slice (`&str`).
     /// - `&str`: The header value as a string slice (`&str`).
+    #[inline]
     fn push_header(response_string: &mut String, key: &str, value: &str) {
         response_string.push_str(key);
         response_string.push_str(COLON_SPACE);
@@ -397,6 +417,7 @@ impl Response {
     /// # Arguments
     ///
     /// - `response_string`: A mutable reference to the string where the first line will be added.
+    #[inline]
     fn push_http_first_line(&self, response_string: &mut String) {
         response_string.push_str(&self.get_version().to_string());
         response_string.push_str(SPACE);
@@ -468,6 +489,7 @@ impl Response {
     /// # Returns
     ///
     /// A `String` containing formatted response details.
+    #[inline]
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
         let body_type: &'static str = if std::str::from_utf8(body).is_ok() {

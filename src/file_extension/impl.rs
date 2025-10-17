@@ -10,6 +10,7 @@ impl FileExtension {
     /// # Returns
     ///
     /// The parsed `FileExtension`.
+    #[inline]
     pub fn parse<F>(file_extension: F) -> Self
     where
         F: AsRef<str>,
@@ -26,6 +27,7 @@ impl FileExtension {
     /// # Returns
     ///
     /// The extension name.
+    #[inline]
     pub fn get_extension_name<F>(full_path: F) -> String
     where
         F: AsRef<str>,

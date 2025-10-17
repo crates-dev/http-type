@@ -82,6 +82,7 @@ impl Method {
     /// # Returns
     ///
     /// A new `Method` instance.
+    #[inline]
     pub fn new() -> Self {
         Self::default()
     }
@@ -91,6 +92,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `GET`, `false` otherwise.
+    #[inline]
     pub fn is_get(&self) -> bool {
         matches!(self, Self::GET)
     }
@@ -100,6 +102,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `POST`, `false` otherwise.
+    #[inline]
     pub fn is_post(&self) -> bool {
         matches!(self, Self::POST)
     }
@@ -109,6 +112,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `PUT`, `false` otherwise.
+    #[inline]
     pub fn is_put(&self) -> bool {
         matches!(self, Self::PUT)
     }
@@ -118,6 +122,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `DELETE`, `false` otherwise.
+    #[inline]
     pub fn is_delete(&self) -> bool {
         matches!(self, Self::DELETE)
     }
@@ -127,6 +132,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `PATCH`, `false` otherwise.
+    #[inline]
     pub fn is_patch(&self) -> bool {
         matches!(self, Self::PATCH)
     }
@@ -136,6 +142,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `HEAD`, `false` otherwise.
+    #[inline]
     pub fn is_head(&self) -> bool {
         matches!(self, Self::HEAD)
     }
@@ -145,6 +152,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `OPTIONS`, `false` otherwise.
+    #[inline]
     pub fn is_options(&self) -> bool {
         matches!(self, Self::OPTIONS)
     }
@@ -154,6 +162,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `CONNECT`, `false` otherwise.
+    #[inline]
     pub fn is_connect(&self) -> bool {
         matches!(self, Self::CONNECT)
     }
@@ -163,6 +172,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `TRACE`, `false` otherwise.
+    #[inline]
     pub fn is_trace(&self) -> bool {
         matches!(self, Self::TRACE)
     }
@@ -172,6 +182,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `UNKNOWN`, `false` otherwise.
+    #[inline]
     pub fn is_unknown(&self) -> bool {
         matches!(self, Self::UNKNOWN(_))
     }

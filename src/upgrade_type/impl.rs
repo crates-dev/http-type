@@ -71,6 +71,7 @@ impl UpgradeType {
     /// # Returns
     ///
     /// `true` if `self` is `Self::WebSocket`, otherwise `false`.
+    #[inline]
     pub fn is_ws(&self) -> bool {
         matches!(self, &Self::WebSocket)
     }
@@ -80,6 +81,7 @@ impl UpgradeType {
     /// # Returns
     ///
     /// `true` if `self` is `Self::H2c`, otherwise `false`.
+    #[inline]
     pub fn is_h2c(&self) -> bool {
         matches!(self, &Self::H2c)
     }
@@ -89,6 +91,7 @@ impl UpgradeType {
     /// # Returns
     ///
     /// `true` if `self` matches `Self::Tls(_)`, otherwise `false`.
+    #[inline]
     pub fn is_tls(&self) -> bool {
         matches!(self, Self::Tls(_))
     }
@@ -98,6 +101,7 @@ impl UpgradeType {
     /// # Returns
     ///
     /// `true` if `self` is none of the known upgrade types, otherwise `false`.
+    #[inline]
     pub fn is_unknown(&self) -> bool {
         !self.is_ws() && !self.is_h2c() && !self.is_tls()
     }

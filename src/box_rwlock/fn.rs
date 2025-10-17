@@ -9,6 +9,7 @@ use crate::*;
 /// # Returns
 ///
 /// - `BoxRwLock<T>` - A new boxed read-write lock.
+#[inline]
 pub fn box_rwlock<T>(data: T) -> BoxRwLock<T> {
     Box::new(RwLock::new(data))
 }

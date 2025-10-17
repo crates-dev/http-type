@@ -16,6 +16,7 @@ impl Protocol {
     /// # Returns
     ///
     /// A new `Protocol` instance, defaulting to `Protocol::HTTP`.
+    #[inline]
     pub fn new() -> Self {
         Self::default()
     }
@@ -29,6 +30,7 @@ impl Protocol {
     /// # Returns
     ///
     /// `true` if the protocol is `HTTP`, otherwise returns `false`.
+    #[inline]
     pub fn is_http(&self) -> bool {
         self.to_owned() == Self::HTTP.to_owned()
     }
@@ -42,6 +44,7 @@ impl Protocol {
     /// # Returns
     ///
     /// `true` if the protocol is `HTTPS`, otherwise returns `false`.
+    #[inline]
     pub fn is_https(&self) -> bool {
         self.to_owned() == Self::HTTPS.to_owned()
     }
@@ -56,6 +59,7 @@ impl Protocol {
     ///
     /// The default port number for the protocol. Returns `80` for `HTTP` and unknown protocols,
     /// and `443` for `HTTPS`.
+    #[inline]
     pub fn get_port(&self) -> u16 {
         match self {
             Self::HTTP => 80,
