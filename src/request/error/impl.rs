@@ -24,30 +24,30 @@ impl Display for RequestError {
                 f,
                 "WebSocket connection closed before a complete frame was received"
             ),
-            Self::Request(err) => write!(f, "Request error{}{}", COLON_SPACE, err),
-            Self::Unknown(err) => write!(f, "Unknown error{}{}", COLON_SPACE, err),
-            Self::InvalidUrl(err) => write!(f, "Invalid url{}{}", COLON_SPACE, err),
+            Self::Request(err) => write!(f, "Request error{COLON_SPACE}{err}"),
+            Self::Unknown(err) => write!(f, "Unknown error{COLON_SPACE}{err}"),
+            Self::InvalidUrl(err) => write!(f, "Invalid url{COLON_SPACE}{err}"),
             Self::SetReadTimeout(err) => {
-                write!(f, "Failed to set read timeout{}{}", COLON_SPACE, err)
+                write!(f, "Failed to set read timeout{COLON_SPACE}{err}")
             }
             Self::SetWriteTimeout(err) => {
-                write!(f, "Failed to set write timeout{}{}", COLON_SPACE, err)
+                write!(f, "Failed to set write timeout{COLON_SPACE}{err}")
             }
             Self::TcpStreamConnect(err) => {
-                write!(f, "Tcp stream connection error{}{}", COLON_SPACE, err)
+                write!(f, "Tcp stream connection error{COLON_SPACE}{err}")
             }
             Self::TlsConnectorBuild(err) => {
-                write!(f, "Tls connector build error{}{}", COLON_SPACE, err)
+                write!(f, "Tls connector build error{COLON_SPACE}{err}")
             }
             Self::InvalidWebSocketFrame(err) => {
-                write!(f, "Invalid websocket frame{}{}", COLON_SPACE, err)
+                write!(f, "Invalid websocket frame{COLON_SPACE}{err}")
             }
 
             Self::InvalidWebSocketRequest(err) => {
-                write!(f, "Invalid websocket request{}{}", COLON_SPACE, err)
+                write!(f, "Invalid websocket request{COLON_SPACE}{err}")
             }
             Self::InvalidHttpRequestPartsLength(len) => {
-                write!(f, "Invalid http request parts length{}{}", COLON_SPACE, len)
+                write!(f, "Invalid http request parts length{COLON_SPACE}{len}")
             }
         }
     }

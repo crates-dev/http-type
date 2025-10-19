@@ -32,7 +32,7 @@ impl fmt::Display for HttpVersion {
             Self::HTTP3 => HTTP_VERSION_3,
             Self::Unknown(version) => version,
         };
-        write!(f, "{}", version_str)
+        write!(f, "{version_str}")
     }
 }
 

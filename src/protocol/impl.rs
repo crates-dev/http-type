@@ -76,7 +76,7 @@ impl Display for Protocol {
             Self::HTTPS => HTTPS_LOWERCASE,
             Self::Unknown(protocol) => protocol,
         };
-        write!(f, "{}", res)
+        write!(f, "{res}")
     }
 }
 

@@ -3279,6 +3279,6 @@ impl Display for FileExtension {
             Self::FileExtensionZmm => FILE_EXTENSION_ZMM,
             Self::FileExtensionEmpty => EMPTY_STR,
         };
-        write!(f, "{}", version_str)
+        write!(f, "{version_str}")
     }
 }

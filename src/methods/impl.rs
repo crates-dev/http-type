@@ -36,7 +36,7 @@ impl Display for Method {
             Self::OPTIONS => OPTIONS,
             Self::UNKNOWN(methods) => methods,
         };
-        write!(f, "{}", res)
+        write!(f, "{res}")
     }
 }
 

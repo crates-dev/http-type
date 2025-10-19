@@ -65,7 +65,7 @@ impl ContentType {
     {
         let mut html: String = String::with_capacity(64);
         html.push_str("<table><tr><td>");
-        html.push_str(&format!("{:?}", data));
+        html.push_str(&format!("{data:?}"));
         html.push_str("</td></tr></table>");
         html
     }

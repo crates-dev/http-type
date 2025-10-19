@@ -261,7 +261,7 @@ impl Display for HttpStatus {
             Self::NetworkAuthenticationRequired => NETWORK_AUTHENTICATION_REQUIRED,
             Self::Unknown => UNKNOWN,
         };
-        write!(f, "{}", res)
+        write!(f, "{res}")
     }
 }
 
