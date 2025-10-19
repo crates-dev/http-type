@@ -313,7 +313,7 @@ impl WebSocketFrame {
         let mut padded_data: Vec<u8> = Vec::from(data_ref);
         let original_length_bits: u64 = (padded_data.len() * 8) as u64;
         padded_data.push(0x80);
-        while (padded_data.len() + 8) % 64 != 0 {
+        while !(padded_data.len() + 8).is_multiple_of(64) {
             padded_data.push(0);
         }
         padded_data.extend_from_slice(&original_length_bits.to_be_bytes());
@@ -423,7 +423,7 @@ impl WebSocketFrame {
             for &idx in &indices[..chunk.len() + 1] {
                 encoded_data.push(BASE64_CHARSET_TABLE[idx as usize]);
             }
-            while encoded_data.len() % 4 != 0 {
+            while !encoded_data.len().is_multiple_of(4) {
                 encoded_data.push(EQUAL_BYTES[0]);
             }
         }
