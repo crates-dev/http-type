@@ -93,10 +93,7 @@ impl Request {
                 } else if key == CONTENT_LENGTH {
                     content_length = value.parse().unwrap_or(0);
                 }
-                headers
-                    .entry(key)
-                    .or_insert_with(VecDeque::new)
-                    .push_back(value);
+                headers.entry(key).or_default().push_back(value);
             }
         }
         let mut body: RequestBody = vec![0; content_length];

@@ -125,7 +125,7 @@ impl ArcRwLockStream {
     ///
     /// - `&Self` - Reference to self for method chaining.
     pub async fn flush(&self) -> &Self {
-        let _ = self.write().await.flush();
+        self.write().await.flush().await.ok();
         self
     }
 }

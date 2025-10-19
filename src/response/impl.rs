@@ -40,9 +40,7 @@ impl Response {
     where
         K: AsRef<str>,
     {
-        self.headers
-            .get(key.as_ref())
-            .and_then(|data| Some(data.clone()))
+        self.headers.get(key.as_ref()).cloned()
     }
 
     /// Retrieves the first value of a response header by its key.
@@ -285,7 +283,7 @@ impl Response {
         }
         self.headers
             .entry(key)
-            .or_insert_with(VecDeque::new)
+            .or_default()
             .push_back(value.as_ref().to_owned());
         self
     }
@@ -460,15 +458,15 @@ impl Response {
                 content_type
             });
         let mut body: ResponseBody = self.get_body().clone();
-        if let Some(compress_type) = compress_type_opt {
-            if !compress_type.is_unknown() {
-                body = compress_type
-                    .encode(&body, DEFAULT_BUFFER_SIZE)
-                    .into_owned();
-            }
+        if let Some(compress_type) = compress_type_opt
+            && !compress_type.is_unknown()
+        {
+            body = compress_type
+                .encode(&body, DEFAULT_BUFFER_SIZE)
+                .into_owned();
         }
         if !content_type.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
-            self.set_header_without_check(CONTENT_LENGTH.to_owned(), body.len().to_string());
+            self.set_header_without_check(CONTENT_LENGTH, body.len().to_string());
         }
         self.get_headers().iter().for_each(|(key, values)| {
             for value in values.iter() {

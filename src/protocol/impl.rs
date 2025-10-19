@@ -32,7 +32,7 @@ impl Protocol {
     /// `true` if the protocol is `HTTP`, otherwise returns `false`.
     #[inline]
     pub fn is_http(&self) -> bool {
-        self.to_owned() == Self::HTTP.to_owned()
+        *self == Self::HTTP
     }
 
     /// Checks if the current protocol is `HTTPS`.
@@ -46,7 +46,7 @@ impl Protocol {
     /// `true` if the protocol is `HTTPS`, otherwise returns `false`.
     #[inline]
     pub fn is_https(&self) -> bool {
-        self.to_owned() == Self::HTTPS.to_owned()
+        *self == Self::HTTPS
     }
 
     /// Returns the default port associated with the protocol.

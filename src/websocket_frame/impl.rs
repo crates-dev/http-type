@@ -388,8 +388,8 @@ impl WebSocketFrame {
         let mut data: [u8; 60] = [0u8; 60];
         data[..24].copy_from_slice(&key_ref.as_bytes()[..24.min(key_ref.len())]);
         data[24..].copy_from_slice(GUID);
-        let hash: [u8; 20] = Self::sha1(&data);
-        Self::base64_encode(&hash)
+        let hash: [u8; 20] = Self::sha1(data);
+        Self::base64_encode(hash)
     }
 
     /// Encodes the input data as a base64 string.
@@ -410,7 +410,7 @@ impl WebSocketFrame {
         D: AsRef<[u8]>,
     {
         let data_ref: &[u8] = data.as_ref();
-        let mut encoded_data: Vec<u8> = Vec::with_capacity((data_ref.len() + 2) / 3 * 4);
+        let mut encoded_data: Vec<u8> = Vec::with_capacity(data_ref.len().div_ceil(3) * 4);
         for chunk in data_ref.chunks(3) {
             let mut buffer: [u8; 3] = [0u8; 3];
             buffer[..chunk.len()].copy_from_slice(chunk);
