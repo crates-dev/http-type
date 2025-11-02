@@ -54,17 +54,14 @@ impl Request {
         let method: RequestMethod = parts[0].parse::<RequestMethod>().unwrap_or_default();
         let full_path: RequestPath = parts[1].to_string();
         let version: RequestVersion = parts[2].parse::<RequestVersion>().unwrap_or_default();
-        let hash_index: OptionUsize = full_path.find(HASH_SYMBOL);
-        let query_index: OptionUsize = full_path.find(QUERY_SYMBOL);
+        let hash_index: OptionUsize = full_path.find(HASH);
+        let query_index: OptionUsize = full_path.find(QUERY);
         let query_string: String = query_index.map_or(String::new(), |i| {
             let temp: &str = &full_path[i + 1..];
             if hash_index.is_none() || hash_index.unwrap() <= i {
                 return temp.to_string();
             }
-            temp.split(HASH_SYMBOL)
-                .next()
-                .unwrap_or_default()
-                .to_string()
+            temp.split(HASH).next().unwrap_or_default().to_string()
         });
         let querys: RequestQuerys = Self::parse_querys(&query_string);
         let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
@@ -82,7 +79,7 @@ impl Request {
             if header_line.is_empty() {
                 break;
             }
-            if let Some((key_part, value_part)) = header_line.split_once(COLON_SPACE_SYMBOL) {
+            if let Some((key_part, value_part)) = header_line.split_once(COLON_SPACE) {
                 let key: String = key_part.trim().to_ascii_lowercase();
                 if key.is_empty() {
                     continue;
