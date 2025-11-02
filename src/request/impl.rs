@@ -79,7 +79,7 @@ impl Request {
             if header_line.is_empty() {
                 break;
             }
-            if let Some((key_part, value_part)) = header_line.split_once(COLON_SPACE) {
+            if let Some((key_part, value_part)) = header_line.split_once(COLON) {
                 let key: String = key_part.trim().to_ascii_lowercase();
                 if key.is_empty() {
                     continue;

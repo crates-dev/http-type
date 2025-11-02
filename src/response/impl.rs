@@ -404,7 +404,7 @@ impl Response {
     #[inline]
     fn push_header(response_string: &mut String, key: &str, value: &str) {
         response_string.push_str(key);
-        response_string.push_str(COLON_SPACE);
+        response_string.push_str(COLON);
         response_string.push_str(value);
         response_string.push_str(HTTP_BR);
     }
