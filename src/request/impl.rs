@@ -44,7 +44,7 @@ impl Request {
         reader: &mut BufReader<&mut TcpStream>,
         buffer: usize,
     ) -> RequestReaderHandleResult {
-        let mut request_line: String = String::with_capacity(buffer);
+        let mut request_line: String = String::with_capacity(buffer.min(8192));
         let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         let parts_len: usize = parts.len();
@@ -56,24 +56,27 @@ impl Request {
         let version: RequestVersion = parts[2].parse::<RequestVersion>().unwrap_or_default();
         let hash_index: OptionUsize = full_path.find(HASH);
         let query_index: OptionUsize = full_path.find(QUERY);
-        let query_string: String = query_index.map_or(String::new(), |i| {
-            let temp: &str = &full_path[i + 1..];
-            if hash_index.is_none() || hash_index.unwrap() <= i {
-                return temp.to_string();
-            }
-            temp.split(HASH).next().unwrap_or_default().to_string()
-        });
+        let query_string: String = query_index.map_or_else(
+            || String::new(),
+            |i| {
+                let temp: &str = &full_path[i + 1..];
+                if hash_index.is_none() || hash_index.unwrap() <= i {
+                    return temp.to_owned();
+                }
+                temp.split(HASH).next().unwrap_or_default().to_owned()
+            },
+        );
         let querys: RequestQuerys = Self::parse_querys(&query_string);
         let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
-            full_path[..i].to_string()
+            full_path[..i].to_owned()
         } else {
-            full_path
+            full_path.to_owned()
         };
         let mut headers: RequestHeaders = hash_map_xx_hash3_64();
         let mut host: RequestHost = String::new();
         let mut content_length: usize = 0;
         loop {
-            let mut header_line: String = String::with_capacity(buffer);
+            let mut header_line: String = String::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
             let _ = AsyncBufReadExt::read_line(reader, &mut header_line).await;
             let header_line: &str = header_line.trim();
             if header_line.is_empty() {
@@ -171,9 +174,10 @@ impl Request {
         buffer: usize,
         request: &mut Self,
     ) -> RequestReaderHandleResult {
-        let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer);
-        let mut temp_buffer: Vec<u8> = vec![0; buffer];
-        let mut full_frame: Vec<u8> = Vec::new();
+        let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
+        let temp_buffer_size: usize = buffer.min(DEFAULT_BUFFER_SIZE);
+        let mut temp_buffer: Vec<u8> = vec![0; temp_buffer_size];
+        let mut full_frame: Vec<u8> = Vec::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
         let mut error_handle = || {
             request.body.clear();
         };
