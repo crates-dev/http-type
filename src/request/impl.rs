@@ -177,7 +177,7 @@ impl Request {
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
         let temp_buffer_size: usize = buffer.min(DEFAULT_BUFFER_SIZE);
         let mut temp_buffer: Vec<u8> = vec![0; temp_buffer_size];
-        let mut full_frame: Vec<u8> = Vec::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
+        let mut full_frame: Vec<u8> = Vec::with_capacity(buffer.min(MAX_FRAME_SIZE));
         let mut error_handle = || {
             request.body.clear();
         };
