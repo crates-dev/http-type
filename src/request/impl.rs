@@ -44,7 +44,7 @@ impl Request {
         reader: &mut BufReader<&mut TcpStream>,
         buffer: usize,
     ) -> RequestReaderHandleResult {
-        let mut request_line: String = String::with_capacity(buffer.min(8192));
+        let mut request_line: String = String::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
         let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         let parts_len: usize = parts.len();
