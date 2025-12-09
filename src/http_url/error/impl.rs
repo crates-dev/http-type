@@ -15,6 +15,7 @@ impl Display for HttpUrlError {
     /// # Returns
     ///
     /// A `fmt::Result` indicating success or failure of the formatting operation.
+    #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             HttpUrlError::InvalidUrl => write!(f, "Invalid URL"),

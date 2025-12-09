@@ -71,6 +71,7 @@ impl Protocol {
 }
 
 impl Display for Protocol {
+    #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::HTTP => HTTP_LOWERCASE,
@@ -84,6 +85,7 @@ impl Display for Protocol {
 impl FromStr for Protocol {
     type Err = &'static str;
 
+    #[inline(always)]
     fn from_str(data: &str) -> Result<Self, Self::Err> {
         match data.to_ascii_lowercase().as_str() {
             HTTP_LOWERCASE => Ok(Self::HTTP),

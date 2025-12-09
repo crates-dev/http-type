@@ -16,6 +16,7 @@ impl Display for ResponseError {
     /// # Returns
     ///
     /// A `fmt::Result` indicating whether the formatting was successful.
+    #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NotFoundStream => {
