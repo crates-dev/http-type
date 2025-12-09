@@ -4,6 +4,7 @@ use crate::*;
 ///
 /// The default `Protocol` is `Protocol::Unknown` with an empty string.
 impl Default for Protocol {
+    #[inline(always)]
     fn default() -> Self {
         Self::Unknown(String::new())
     }
@@ -16,7 +17,7 @@ impl Protocol {
     /// # Returns
     ///
     /// A new `Protocol` instance, defaulting to `Protocol::HTTP`.
-    #[inline]
+    #[inline(always)]
     pub fn new() -> Self {
         Self::default()
     }
@@ -30,7 +31,7 @@ impl Protocol {
     /// # Returns
     ///
     /// `true` if the protocol is `HTTP`, otherwise returns `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_http(&self) -> bool {
         *self == Self::HTTP
     }
@@ -44,7 +45,7 @@ impl Protocol {
     /// # Returns
     ///
     /// `true` if the protocol is `HTTPS`, otherwise returns `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_https(&self) -> bool {
         *self == Self::HTTPS
     }
@@ -59,7 +60,7 @@ impl Protocol {
     ///
     /// The default port number for the protocol. Returns `80` for `HTTP` and unknown protocols,
     /// and `443` for `HTTPS`.
-    #[inline]
+    #[inline(always)]
     pub fn get_port(&self) -> u16 {
         match self {
             Self::HTTP => 80,

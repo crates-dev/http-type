@@ -9,7 +9,7 @@ use crate::*;
 /// # Returns
 ///
 /// An `ArcMutex<T>` containing the provided data.
-#[inline]
+#[inline(always)]
 pub fn arc_mutex<T>(data: T) -> ArcMutex<T> {
     Arc::new(Mutex::new(data))
 }

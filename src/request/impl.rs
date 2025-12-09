@@ -4,6 +4,7 @@ use crate::*;
 ///
 /// Returns a new `Request` instance with all fields initialized to their default values.
 impl Default for Request {
+    #[inline(always)]
     fn default() -> Self {
         Self {
             method: Method::default(),
@@ -23,7 +24,7 @@ impl Request {
     /// # Returns
     ///
     /// - `Request` - A new request instance with default values.
-    #[inline]
+    #[inline(always)]
     pub fn new() -> Self {
         Self::default()
     }
@@ -268,7 +269,7 @@ impl Request {
     /// # Returns
     ///
     /// - `Option<String>` - The parameter value if exists.
-    #[inline]
+    #[inline(always)]
     pub fn try_get_query<K>(&self, key: K) -> OptionRequestQuerysValue
     where
         K: AsRef<str>,
@@ -285,7 +286,7 @@ impl Request {
     /// # Returns
     ///
     /// - `OptionRequestHeadersValue` - The optional header values.
-    #[inline]
+    #[inline(always)]
     pub fn try_get_header<K>(&self, key: K) -> OptionRequestHeadersValue
     where
         K: AsRef<str>,
@@ -302,7 +303,7 @@ impl Request {
     /// # Returns
     ///
     /// - `OptionRequestHeadersValueItem` - The first header value if exists.
-    #[inline]
+    #[inline(always)]
     pub fn try_get_header_front<K>(&self, key: K) -> OptionRequestHeadersValueItem
     where
         K: AsRef<str>,
@@ -321,7 +322,7 @@ impl Request {
     /// # Returns
     ///
     /// - `OptionRequestHeadersValueItem` - The last header value if exists.
-    #[inline]
+    #[inline(always)]
     pub fn try_get_header_back<K>(&self, key: K) -> OptionRequestHeadersValueItem
     where
         K: AsRef<str>,
@@ -340,7 +341,7 @@ impl Request {
     /// # Returns
     ///
     /// - `usize` - The count of values for the header.
-    #[inline]
+    #[inline(always)]
     pub fn get_header_length<K>(&self, key: K) -> usize
     where
         K: AsRef<str>,
@@ -356,7 +357,7 @@ impl Request {
     /// # Returns
     ///
     /// - `usize` - The total count of all header values.
-    #[inline]
+    #[inline(always)]
     pub fn get_headers_values_length(&self) -> usize {
         self.headers.values().map(|values| values.len()).sum()
     }
@@ -366,7 +367,7 @@ impl Request {
     /// # Returns
     ///
     /// - `usize` - The count of unique header keys.
-    #[inline]
+    #[inline(always)]
     pub fn get_headers_length(&self) -> usize {
         self.headers.len()
     }
@@ -380,7 +381,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the header exists.
-    #[inline]
+    #[inline(always)]
     pub fn has_header<K>(&self, key: K) -> bool
     where
         K: AsRef<str>,
@@ -398,7 +399,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the header contains the value.
-    #[inline]
+    #[inline(always)]
     pub fn has_header_value<K, V>(&self, key: K, value: V) -> bool
     where
         K: AsRef<str>,
@@ -419,7 +420,7 @@ impl Request {
     /// # Returns
     ///
     /// - `String` - The body content as a string.
-    #[inline]
+    #[inline(always)]
     pub fn get_body_string(&self) -> String {
         String::from_utf8_lossy(self.get_body()).into_owned()
     }
@@ -451,7 +452,7 @@ impl Request {
     /// # Returns
     ///
     /// - `String` - The formatted request details.
-    #[inline]
+    #[inline(always)]
     pub fn get_string(&self) -> String {
         let body: &Vec<u8> = self.get_body();
         let body_type: &'static str = if std::str::from_utf8(body).is_ok() {
@@ -481,7 +482,7 @@ impl Request {
     /// # Returns
     ///
     /// - `UpgradeType` - The parsed upgrade type.
-    #[inline]
+    #[inline(always)]
     pub fn get_upgrade_type(&self) -> UpgradeType {
         let upgrade_type: UpgradeType = self
             .try_get_header_back(UPGRADE)
@@ -497,7 +498,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether WebSocket upgrade is enabled.
-    #[inline]
+    #[inline(always)]
     pub fn is_ws(&self) -> bool {
         self.get_upgrade_type().is_ws()
     }
@@ -507,7 +508,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the upgrade type is h2c.
-    #[inline]
+    #[inline(always)]
     pub fn is_h2c(&self) -> bool {
         self.get_upgrade_type().is_h2c()
     }
@@ -517,7 +518,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the upgrade type is TLS.
-    #[inline]
+    #[inline(always)]
     pub fn is_tls(&self) -> bool {
         self.get_upgrade_type().is_tls()
     }
@@ -527,7 +528,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the upgrade type is unknown.
-    #[inline]
+    #[inline(always)]
     pub fn is_unknown_upgrade(&self) -> bool {
         self.get_upgrade_type().is_unknown()
     }
@@ -537,7 +538,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the version is HTTP/1.1 or higher.
-    #[inline]
+    #[inline(always)]
     pub fn is_http1_1_or_higher(&self) -> bool {
         self.get_version().is_http1_1_or_higher()
     }
@@ -547,7 +548,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the version is HTTP/0.9.
-    #[inline]
+    #[inline(always)]
     pub fn is_http0_9(&self) -> bool {
         self.get_version().is_http0_9()
     }
@@ -557,7 +558,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the version is HTTP/1.0.
-    #[inline]
+    #[inline(always)]
     pub fn is_http1_0(&self) -> bool {
         self.get_version().is_http1_0()
     }
@@ -567,7 +568,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the version is HTTP/1.1.
-    #[inline]
+    #[inline(always)]
     pub fn is_http1_1(&self) -> bool {
         self.get_version().is_http1_1()
     }
@@ -577,7 +578,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the version is HTTP/2.
-    #[inline]
+    #[inline(always)]
     pub fn is_http2(&self) -> bool {
         self.get_version().is_http2()
     }
@@ -587,7 +588,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the version is HTTP/3.
-    #[inline]
+    #[inline(always)]
     pub fn is_http3(&self) -> bool {
         self.get_version().is_http3()
     }
@@ -597,7 +598,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the version is unknown.
-    #[inline]
+    #[inline(always)]
     pub fn is_unknown_version(&self) -> bool {
         self.get_version().is_unknown()
     }
@@ -607,7 +608,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the version is HTTP.
-    #[inline]
+    #[inline(always)]
     pub fn is_http(&self) -> bool {
         self.get_version().is_http()
     }
@@ -617,7 +618,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is GET.
-    #[inline]
+    #[inline(always)]
     pub fn is_get(&self) -> bool {
         self.get_method().is_get()
     }
@@ -627,7 +628,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is POST.
-    #[inline]
+    #[inline(always)]
     pub fn is_post(&self) -> bool {
         self.get_method().is_post()
     }
@@ -637,7 +638,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is PUT.
-    #[inline]
+    #[inline(always)]
     pub fn is_put(&self) -> bool {
         self.get_method().is_put()
     }
@@ -647,7 +648,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is DELETE.
-    #[inline]
+    #[inline(always)]
     pub fn is_delete(&self) -> bool {
         self.get_method().is_delete()
     }
@@ -657,7 +658,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is PATCH.
-    #[inline]
+    #[inline(always)]
     pub fn is_patch(&self) -> bool {
         self.get_method().is_patch()
     }
@@ -667,7 +668,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is HEAD.
-    #[inline]
+    #[inline(always)]
     pub fn is_head(&self) -> bool {
         self.get_method().is_head()
     }
@@ -677,7 +678,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is OPTIONS.
-    #[inline]
+    #[inline(always)]
     pub fn is_options(&self) -> bool {
         self.get_method().is_options()
     }
@@ -687,7 +688,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is CONNECT.
-    #[inline]
+    #[inline(always)]
     pub fn is_connect(&self) -> bool {
         self.get_method().is_connect()
     }
@@ -697,7 +698,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is TRACE.
-    #[inline]
+    #[inline(always)]
     pub fn is_trace(&self) -> bool {
         self.get_method().is_trace()
     }
@@ -707,7 +708,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether the method is UNKNOWN.
-    #[inline]
+    #[inline(always)]
     pub fn is_unknown_method(&self) -> bool {
         self.get_method().is_unknown()
     }
@@ -727,7 +728,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether keep-alive should be enabled.
-    #[inline]
+    #[inline(always)]
     pub fn is_enable_keep_alive(&self) -> bool {
         if let Some(connection_value) = self.try_get_header_back(CONNECTION) {
             if connection_value.eq_ignore_ascii_case(KEEP_ALIVE) {
@@ -744,7 +745,7 @@ impl Request {
     /// # Returns
     ///
     /// - `bool` - Whether keep-alive should be disabled.
-    #[inline]
+    #[inline(always)]
     pub fn is_disable_keep_alive(&self) -> bool {
         !self.is_enable_keep_alive()
     }

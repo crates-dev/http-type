@@ -10,6 +10,7 @@ impl Default for WebSocketFrame {
     /// # Returns
     ///
     /// A default `WebSocketFrame` instance.
+    #[inline(always)]
     fn default() -> Self {
         Self {
             fin: false,
@@ -30,7 +31,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// A `WebSocketOpcode` enum variant corresponding to the raw value.
-    #[inline]
+    #[inline(always)]
     pub fn from_u8(opcode: u8) -> Self {
         match opcode {
             0x0 => Self::Continuation,
@@ -48,7 +49,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// The raw u8 value of the opcode.
-    #[inline]
+    #[inline(always)]
     pub fn to_u8(&self) -> u8 {
         match self {
             Self::Continuation => 0x0,
@@ -66,7 +67,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode represents a control frame (Close, Ping, Pong), otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_control(&self) -> bool {
         matches!(self, Self::Close | Self::Ping | Self::Pong)
     }
@@ -76,7 +77,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode represents a data frame (Text, Binary, Continuation), otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_data(&self) -> bool {
         matches!(self, Self::Text | Self::Binary | Self::Continuation)
     }
@@ -86,7 +87,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode is `Continuation`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_continuation(&self) -> bool {
         matches!(self, Self::Continuation)
     }
@@ -96,7 +97,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode is `Text`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_text(&self) -> bool {
         matches!(self, Self::Text)
     }
@@ -106,7 +107,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode is `Binary`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_binary(&self) -> bool {
         matches!(self, Self::Binary)
     }
@@ -116,7 +117,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode is `Close`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_close(&self) -> bool {
         matches!(self, Self::Close)
     }
@@ -126,7 +127,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode is `Ping`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_ping(&self) -> bool {
         matches!(self, Self::Ping)
     }
@@ -136,7 +137,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode is `Pong`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_pong(&self) -> bool {
         matches!(self, Self::Pong)
     }
@@ -146,7 +147,7 @@ impl WebSocketOpcode {
     /// # Returns
     ///
     /// `true` if the opcode is `Reserved(_)`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_reserved(&self) -> bool {
         matches!(self, Self::Reserved(_))
     }
@@ -435,7 +436,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// `true` if the opcode is `Continuation`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_continuation_opcode(&self) -> bool {
         self.opcode.is_continuation()
     }
@@ -445,7 +446,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// `true` if the opcode is `Text`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_text_opcode(&self) -> bool {
         self.opcode.is_text()
     }
@@ -455,7 +456,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// `true` if the opcode is `Binary`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_binary_opcode(&self) -> bool {
         self.opcode.is_binary()
     }
@@ -465,7 +466,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// `true` if the opcode is `Close`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_close_opcode(&self) -> bool {
         self.opcode.is_close()
     }
@@ -475,7 +476,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// `true` if the opcode is `Ping`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_ping_opcode(&self) -> bool {
         self.opcode.is_ping()
     }
@@ -485,7 +486,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// `true` if the opcode is `Pong`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_pong_opcode(&self) -> bool {
         self.opcode.is_pong()
     }
@@ -495,7 +496,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// `true` if the opcode is `Reserved(_)`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_reserved_opcode(&self) -> bool {
         self.opcode.is_reserved()
     }

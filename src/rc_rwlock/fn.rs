@@ -11,7 +11,7 @@ use crate::*;
 /// # Returns
 ///
 /// A new `RcRwLock<T>` instance.
-#[inline]
+#[inline(always)]
 pub fn rc_rwlock<T>(data: T) -> RcRwLock<T> {
     Rc::new(RwLock::new(data))
 }

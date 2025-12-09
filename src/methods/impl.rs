@@ -7,6 +7,7 @@ impl Default for Method {
     /// # Returns
     ///
     /// The default `Method` variant.
+    #[inline(always)]
     fn default() -> Self {
         Self::UNKNOWN(String::new())
     }
@@ -23,6 +24,7 @@ impl Display for Method {
     /// # Returns
     ///
     /// A `fmt::Result` indicating success or failure of the formatting operation.
+    #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::GET => GET,
@@ -58,6 +60,7 @@ impl FromStr for Method {
     /// # Returns
     ///
     /// A `Result` containing the `Method` variant if successful, or `Self::Err` on failure.
+    #[inline(always)]
     fn from_str(methods_str: &str) -> Result<Self, Self::Err> {
         match methods_str {
             GET => Ok(Self::GET),
@@ -82,7 +85,7 @@ impl Method {
     /// # Returns
     ///
     /// A new `Method` instance.
-    #[inline]
+    #[inline(always)]
     pub fn new() -> Self {
         Self::default()
     }
@@ -92,7 +95,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `GET`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_get(&self) -> bool {
         matches!(self, Self::GET)
     }
@@ -102,7 +105,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `POST`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_post(&self) -> bool {
         matches!(self, Self::POST)
     }
@@ -112,7 +115,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `PUT`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_put(&self) -> bool {
         matches!(self, Self::PUT)
     }
@@ -122,7 +125,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `DELETE`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_delete(&self) -> bool {
         matches!(self, Self::DELETE)
     }
@@ -132,7 +135,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `PATCH`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_patch(&self) -> bool {
         matches!(self, Self::PATCH)
     }
@@ -142,7 +145,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `HEAD`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_head(&self) -> bool {
         matches!(self, Self::HEAD)
     }
@@ -152,7 +155,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `OPTIONS`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_options(&self) -> bool {
         matches!(self, Self::OPTIONS)
     }
@@ -162,7 +165,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `CONNECT`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_connect(&self) -> bool {
         matches!(self, Self::CONNECT)
     }
@@ -172,7 +175,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `TRACE`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_trace(&self) -> bool {
         matches!(self, Self::TRACE)
     }
@@ -182,7 +185,7 @@ impl Method {
     /// # Returns
     ///
     /// `true` if the method is `UNKNOWN`, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_unknown(&self) -> bool {
         matches!(self, Self::UNKNOWN(_))
     }

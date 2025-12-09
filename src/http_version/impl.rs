@@ -60,7 +60,7 @@ impl HttpVersion {
     /// # Returns
     ///
     /// `true` if the version is HTTP/0.9, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_http0_9(&self) -> bool {
         matches!(self, Self::HTTP0_9)
     }
@@ -70,7 +70,7 @@ impl HttpVersion {
     /// # Returns
     ///
     /// `true` if the version is HTTP/1.0, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_http1_0(&self) -> bool {
         matches!(self, Self::HTTP1_0)
     }
@@ -80,7 +80,7 @@ impl HttpVersion {
     /// # Returns
     ///
     /// `true` if the version is HTTP/1.1, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_http1_1(&self) -> bool {
         matches!(self, Self::HTTP1_1)
     }
@@ -90,7 +90,7 @@ impl HttpVersion {
     /// # Returns
     ///
     /// `true` if the version is HTTP/2, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_http2(&self) -> bool {
         matches!(self, Self::HTTP2)
     }
@@ -100,7 +100,7 @@ impl HttpVersion {
     /// # Returns
     ///
     /// `true` if the version is HTTP/3, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_http3(&self) -> bool {
         matches!(self, Self::HTTP3)
     }
@@ -110,7 +110,7 @@ impl HttpVersion {
     /// # Returns
     ///
     /// `true` if the version is unknown, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_unknown(&self) -> bool {
         matches!(self, Self::Unknown(_))
     }
@@ -120,7 +120,7 @@ impl HttpVersion {
     /// # Returns
     ///
     /// `true` if the version is HTTP/1.1, HTTP/2, or HTTP/3, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_http1_1_or_higher(&self) -> bool {
         matches!(self, Self::HTTP1_1 | Self::HTTP2 | Self::HTTP3)
     }
@@ -130,7 +130,7 @@ impl HttpVersion {
     /// # Returns
     ///
     /// `true` if the version is a known HTTP version, `false` otherwise.
-    #[inline]
+    #[inline(always)]
     pub fn is_http(&self) -> bool {
         !self.is_unknown()
     }

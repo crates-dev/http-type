@@ -9,6 +9,7 @@ impl Default for UpgradeType {
     /// # Returns
     ///
     /// The default `UpgradeType` instance.
+    #[inline(always)]
     fn default() -> Self {
         Self::Unknown(String::new())
     }
@@ -16,7 +17,7 @@ impl Default for UpgradeType {
 
 /// Implements the `Display` trait for `UpgradeType`.
 /// This allows `UpgradeType` variants to be formatted into human-readable strings.
-impl fmt::Display for UpgradeType {
+impl Display for UpgradeType {
     /// Formats the `UpgradeType` variant into a human-readable string.
     ///
     /// # Arguments
@@ -26,6 +27,7 @@ impl fmt::Display for UpgradeType {
     /// # Returns
     ///
     /// A `fmt::Result` indicating whether the formatting was successful.
+    #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::WebSocket => write!(f, "{WEBSOCKET}"),
@@ -55,6 +57,7 @@ impl FromStr for UpgradeType {
     ///
     /// - `Ok(UpgradeType)`: The parsed `UpgradeType` variant.
     /// - `Err(())`: If parsing fails (though this implementation always returns `Ok`).
+    #[inline(always)]
     fn from_str(from_str: &str) -> Result<Self, Self::Err> {
         match from_str.to_ascii_lowercase().as_str() {
             WEBSOCKET => Ok(Self::WebSocket),
@@ -71,7 +74,7 @@ impl UpgradeType {
     /// # Returns
     ///
     /// `true` if `self` is `Self::WebSocket`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_ws(&self) -> bool {
         matches!(self, &Self::WebSocket)
     }
@@ -81,7 +84,7 @@ impl UpgradeType {
     /// # Returns
     ///
     /// `true` if `self` is `Self::H2c`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_h2c(&self) -> bool {
         matches!(self, &Self::H2c)
     }
@@ -91,7 +94,7 @@ impl UpgradeType {
     /// # Returns
     ///
     /// `true` if `self` matches `Self::Tls(_)`, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_tls(&self) -> bool {
         matches!(self, Self::Tls(_))
     }
@@ -101,7 +104,7 @@ impl UpgradeType {
     /// # Returns
     ///
     /// `true` if `self` is none of the known upgrade types, otherwise `false`.
-    #[inline]
+    #[inline(always)]
     pub fn is_unknown(&self) -> bool {
         !self.is_ws() && !self.is_h2c() && !self.is_tls()
     }

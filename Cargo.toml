@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "5.11.1"
+version = "5.11.2"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -18,15 +18,15 @@ exclude = [
 
 [dependencies]
 hex = "0.4.3"
-http-constant = "1.73.0"
-lombok-macros = "1.13.13"
+http-constant = "1.73.1"
+lombok-macros = "1.13.15"
 serde = "1.0.228"
 serde_json = "1.0.145"
 serde-xml-rs = "0.8.2"
 serde_urlencoded = "0.7.1"
 url = "2.5.7"
 tokio = { version = "1.48.0", features = ["full"] }
-http-compress = "3.0.3"
+http-compress = "3.0.4"
 
 [profile.dev]
 incremental = false

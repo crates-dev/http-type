@@ -10,7 +10,7 @@ impl ArcRwLockStream {
     /// # Returns
     ///
     /// - `ArcRwLockStream` - The new stream wrapper.
-    #[inline]
+    #[inline(always)]
     pub fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
         Self(arc_rw_lock_stream)
     }
@@ -26,7 +26,7 @@ impl ArcRwLockStream {
     /// # Returns
     ///
     /// - `ArcRwLockStream` - The new thread-safe stream wrapper.
-    #[inline]
+    #[inline(always)]
     pub fn from_stream(stream: TcpStream) -> Self {
         Self(arc_rwlock(stream))
     }

@@ -12,7 +12,7 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// - `CookieBuilder` - A new builder instance.
-    #[inline]
+    #[inline(always)]
     pub fn new<N, V>(name: N, value: V) -> Self
     where
         N: AsRef<str>,
@@ -115,7 +115,7 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    #[inline]
+    #[inline(always)]
     pub fn expires<E>(&mut self, expires: E) -> &mut Self
     where
         E: AsRef<str>,
@@ -133,7 +133,7 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    #[inline]
+    #[inline(always)]
     pub fn max_age(&mut self, max_age: i64) -> &mut Self {
         self.max_age = Some(max_age);
         self
@@ -148,7 +148,7 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    #[inline]
+    #[inline(always)]
     pub fn domain<D>(&mut self, domain: D) -> &mut Self
     where
         D: AsRef<str>,
@@ -166,7 +166,7 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    #[inline]
+    #[inline(always)]
     pub fn path<T>(&mut self, path: T) -> &mut Self
     where
         T: AsRef<str>,
@@ -182,7 +182,7 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    #[inline]
+    #[inline(always)]
     pub fn secure(&mut self) -> &mut Self {
         self.secure = true;
         self
@@ -195,7 +195,7 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    #[inline]
+    #[inline(always)]
     pub fn http_only(&mut self) -> &mut Self {
         self.http_only = true;
         self
@@ -210,7 +210,7 @@ impl CookieBuilder {
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
-    #[inline]
+    #[inline(always)]
     pub fn same_site<T>(&mut self, same_site: T) -> &mut Self
     where
         T: AsRef<str>,
