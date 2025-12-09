@@ -51,21 +51,22 @@ impl Request {
         if parts_len < 3 {
             return Err(RequestError::InvalidHttpRequestPartsLength(parts_len));
         }
-        let method: RequestMethod = parts[0].parse::<RequestMethod>().unwrap_or_default();
+        let method: RequestMethod = parts[0]
+            .parse::<RequestMethod>()
+            .unwrap_or(Method::UNKNOWN(parts[0].to_string()));
         let full_path: RequestPath = parts[1].to_string();
-        let version: RequestVersion = parts[2].parse::<RequestVersion>().unwrap_or_default();
+        let version: RequestVersion = parts[2]
+            .parse::<RequestVersion>()
+            .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
         let hash_index: OptionUsize = full_path.find(HASH);
         let query_index: OptionUsize = full_path.find(QUERY);
-        let query_string: String = query_index.map_or_else(
-            || String::new(),
-            |i| {
-                let temp: &str = &full_path[i + 1..];
-                if hash_index.is_none() || hash_index.unwrap() <= i {
-                    return temp.to_owned();
-                }
-                temp.split(HASH).next().unwrap_or_default().to_owned()
-            },
-        );
+        let query_string: String = query_index.map_or_else(String::new, |i| {
+            let temp: &str = &full_path[i + 1..];
+            if hash_index.is_none() || hash_index.unwrap() <= i {
+                return temp.to_owned();
+            }
+            temp.split(HASH).next().unwrap_or_default().to_owned()
+        });
         let querys: RequestQuerys = Self::parse_querys(&query_string);
         let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
             full_path[..i].to_owned()

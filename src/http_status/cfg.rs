@@ -179,7 +179,7 @@ fn test_http_status_from_str() {
 #[test]
 fn test_http_status_default() {
     use super::*;
-    assert_eq!(HttpStatus::default(), HttpStatus::Unknown);
+    assert_eq!(HttpStatus::default(), HttpStatus::Ok);
 }
 
 #[test]

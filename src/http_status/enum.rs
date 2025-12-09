@@ -12,6 +12,7 @@ pub enum HttpStatus {
     /// HTTP 103 Early Hints
     EarlyHints,
     /// HTTP 200 OK
+    #[default]
     Ok,
     /// HTTP 201 Created
     Created,
@@ -128,6 +129,5 @@ pub enum HttpStatus {
     /// HTTP 511 Network Authentication Required
     NetworkAuthenticationRequired,
     /// HTTP Unknown status code
-    #[default]
     Unknown,
 }
