@@ -15,7 +15,7 @@ pub type CookieValue = String;
 /// Represents an optional cookie value.
 ///
 /// Used when a cookie value may or may not be present.
-pub type OptionCookiesValue = Option<CookieValue>;
+pub type OptionCookieValue = Option<CookieValue>;
 /// Represents an optional cookie expiration date.
 ///
 /// Stores the RFC 1123 formatted date string when present.
