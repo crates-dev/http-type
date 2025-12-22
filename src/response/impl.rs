@@ -28,7 +28,7 @@ impl Response {
         Self::default()
     }
 
-    /// Retrieves the value of a response header by its key.
+    /// Tries to retrieve the value of a response header by its key.
     ///
     /// # Arguments
     ///
@@ -45,7 +45,24 @@ impl Response {
         self.headers.get(key.as_ref()).cloned()
     }
 
-    /// Retrieves the first value of a response header by its key.
+    /// Retrieves the value of a response header by its key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseHeadersValue` - The optional header values.
+    #[inline(always)]
+    pub fn get_header<K>(&self, key: K) -> ResponseHeadersValue
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_header(key).unwrap()
+    }
+
+    /// Tries to retrieve the first value of a response header by its key.
     ///
     /// # Arguments
     ///
@@ -64,7 +81,24 @@ impl Response {
             .and_then(|values| values.front().cloned())
     }
 
-    /// Retrieves the last value of a response header by its key.
+    /// Retrieves the first value of a response header by its key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseHeadersValueItem` - The first header value if exists.
+    #[inline(always)]
+    pub fn get_header_front<K>(&self, key: K) -> ResponseHeadersValueItem
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_header_front(key).unwrap()
+    }
+
+    /// Tries to retrieve the last value of a response header by its key.
     ///
     /// # Arguments
     ///
@@ -81,6 +115,23 @@ impl Response {
         self.headers
             .get(key.as_ref())
             .and_then(|values| values.back().cloned())
+    }
+
+    /// Retrieves the last value of a response header by its key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseHeadersValueItem` - The last header value if exists.
+    #[inline(always)]
+    pub fn get_header_back<K>(&self, key: K) -> ResponseHeadersValueItem
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_header_back(key).unwrap()
     }
 
     /// Checks if a header exists in the response.

@@ -258,6 +258,25 @@ impl Request {
         query_map
     }
 
+    /// Tries to get a query parameter value by key.
+    ///
+    /// The key type must implement AsRef<str> conversion.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The query parameter key (implements AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `OptionRequestQuerysValue` - The parameter value if exists.
+    #[inline(always)]
+    pub fn try_get_query<K>(&self, key: K) -> OptionRequestQuerysValue
+    where
+        K: AsRef<str>,
+    {
+        self.querys.get(key.as_ref()).cloned()
+    }
+
     /// Gets a query parameter value by key.
     ///
     /// The key type must implement AsRef<str> conversion.
@@ -268,16 +287,16 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `Option<String>` - The parameter value if exists.
+    /// - `RequestQuerysValue` - The parameter value if exists.
     #[inline(always)]
-    pub fn try_get_query<K>(&self, key: K) -> OptionRequestQuerysValue
+    pub fn get_query<K>(&self, key: K) -> RequestQuerysValue
     where
         K: AsRef<str>,
     {
-        self.querys.get(key.as_ref()).cloned()
+        self.try_get_query(key).unwrap()
     }
 
-    /// Retrieves the value of a request header by its key.
+    /// Tries to retrieve the value of a request header by its key.
     ///
     /// # Arguments
     ///
@@ -294,7 +313,24 @@ impl Request {
         self.headers.get(key.as_ref()).cloned()
     }
 
-    /// Retrieves the first value of a request header by its key.
+    /// Retrieves the value of a request header by its key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `RequestHeadersValue` - The optional header values.
+    #[inline(always)]
+    pub fn get_header<K>(&self, key: K) -> RequestHeadersValue
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_header(key).unwrap()
+    }
+
+    /// Tries to retrieve the first value of a request header by its key.
     ///
     /// # Arguments
     ///
@@ -313,7 +349,24 @@ impl Request {
             .and_then(|values| values.front().cloned())
     }
 
-    /// Retrieves the last value of a request header by its key.
+    /// Retrieves the first value of a request header by its key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `RequestHeadersValueItem` - The first header value if exists.
+    #[inline(always)]
+    pub fn get_header_front<K>(&self, key: K) -> RequestHeadersValueItem
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_header_front(key).unwrap()
+    }
+
+    /// Tries to retrieve the last value of a request header by its key.
     ///
     /// # Arguments
     ///
@@ -330,6 +383,23 @@ impl Request {
         self.headers
             .get(key.as_ref())
             .and_then(|values| values.back().cloned())
+    }
+
+    /// Retrieves the last value of a request header by its key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `RequestHeadersValueItem` - The last header value if exists.
+    #[inline(always)]
+    pub fn get_header_back<K>(&self, key: K) -> RequestHeadersValueItem
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_header_back(key).unwrap()
     }
 
     /// Retrieves the number of values for a specific header.
