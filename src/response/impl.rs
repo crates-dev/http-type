@@ -148,8 +148,7 @@ impl Response {
     where
         K: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
-        self.headers.contains_key(&key)
+        self.headers.contains_key(key.as_ref())
     }
 
     /// Checks if a header contains a specific value.
@@ -185,6 +184,23 @@ impl Response {
         self.headers.len()
     }
 
+    /// Tries to get the number of values for a specific header key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header key to count (must implement AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `OptionUsize` - The count of values for the header.
+    #[inline(always)]
+    pub fn try_get_header_length<K>(&self, key: K) -> OptionUsize
+    where
+        K: AsRef<str>,
+    {
+        self.headers.get(key.as_ref()).map(|values| values.len())
+    }
+
     /// Gets the number of values for a specific header key.
     ///
     /// # Arguments
@@ -199,9 +215,7 @@ impl Response {
     where
         K: AsRef<str>,
     {
-        self.headers
-            .get(&key.as_ref().to_lowercase())
-            .map_or(0, |values| values.len())
+        self.try_get_header_length(key).unwrap()
     }
 
     /// Gets the total number of header values in the response.
@@ -276,10 +290,9 @@ impl Response {
         K: AsRef<str>,
         V: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
         let mut deque: VecDeque<String> = VecDeque::with_capacity(1);
         deque.push_back(value.as_ref().to_owned());
-        self.headers.insert(key, deque);
+        self.headers.insert(key.as_ref().to_owned(), deque);
         self
     }
 
@@ -301,7 +314,7 @@ impl Response {
         K: AsRef<str>,
         V: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
+        let key: ResponseHeadersKey = key.as_ref().to_owned();
         if self.should_skip_header(&key) {
             return self;
         }
@@ -330,7 +343,7 @@ impl Response {
         K: AsRef<str>,
         V: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
+        let key: ResponseHeadersKey = key.as_ref().to_owned();
         if self.should_skip_header(&key) {
             return self;
         }
@@ -357,7 +370,7 @@ impl Response {
     where
         K: AsRef<str>,
     {
-        let _ = self.headers.remove(&key.as_ref().to_lowercase()).is_some();
+        let _ = self.headers.remove(key.as_ref()).is_some();
         self
     }
 
@@ -381,7 +394,7 @@ impl Response {
         K: AsRef<str>,
         V: AsRef<str>,
     {
-        let key: ResponseHeadersKey = key.as_ref().to_lowercase();
+        let key: ResponseHeadersKey = key.as_ref().to_owned();
         if let Some(values) = self.headers.get_mut(&key) {
             values.retain(|v| v != &value.as_ref().to_owned());
             if values.is_empty() {
