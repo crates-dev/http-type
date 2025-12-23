@@ -410,9 +410,9 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `Option<usize>` - The count of values for the header if exists.
+    /// - `OptionUsize` - The count of values for the header if exists.
     #[inline(always)]
-    pub fn try_get_header_length<K>(&self, key: K) -> Option<usize>
+    pub fn try_get_header_length<K>(&self, key: K) -> OptionUsize
     where
         K: AsRef<str>,
     {
