@@ -402,6 +402,23 @@ impl Request {
         self.try_get_header_back(key).unwrap()
     }
 
+    /// Tries to retrieve the number of values for a specific header.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The header's key (must implement AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `Option<usize>` - The count of values for the header if exists.
+    #[inline(always)]
+    pub fn try_get_header_length<K>(&self, key: K) -> Option<usize>
+    where
+        K: AsRef<str>,
+    {
+        self.headers.get(key.as_ref()).map(|values| values.len())
+    }
+
     /// Retrieves the number of values for a specific header.
     ///
     /// # Arguments
@@ -416,10 +433,7 @@ impl Request {
     where
         K: AsRef<str>,
     {
-        self.headers
-            .get(key.as_ref())
-            .map(|values| values.len())
-            .unwrap_or(0)
+        self.try_get_header_length(key).unwrap()
     }
 
     /// Retrieves the total number of header values across all headers.
