@@ -288,6 +288,10 @@ impl Request {
     /// # Returns
     ///
     /// - `RequestQuerysValue` - The parameter value if exists.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the query parameter key is not found.
     #[inline(always)]
     pub fn get_query<K>(&self, key: K) -> RequestQuerysValue
     where
@@ -322,6 +326,10 @@ impl Request {
     /// # Returns
     ///
     /// - `RequestHeadersValue` - The optional header values.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the header key is not found.
     #[inline(always)]
     pub fn get_header<K>(&self, key: K) -> RequestHeadersValue
     where
@@ -358,6 +366,10 @@ impl Request {
     /// # Returns
     ///
     /// - `RequestHeadersValueItem` - The first header value if exists.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the header key is not found.
     #[inline(always)]
     pub fn get_header_front<K>(&self, key: K) -> RequestHeadersValueItem
     where
@@ -394,6 +406,10 @@ impl Request {
     /// # Returns
     ///
     /// - `RequestHeadersValueItem` - The last header value if exists.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the header key is not found.
     #[inline(always)]
     pub fn get_header_back<K>(&self, key: K) -> RequestHeadersValueItem
     where
@@ -428,6 +444,10 @@ impl Request {
     /// # Returns
     ///
     /// - `usize` - The count of values for the header.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the header key is not found.
     #[inline(always)]
     pub fn get_header_length<K>(&self, key: K) -> usize
     where
@@ -521,11 +541,34 @@ impl Request {
     /// # Returns
     ///
     /// - `ResultJsonError<T>` - The deserialization result.
-    pub fn get_body_json<T>(&self) -> ResultJsonError<T>
+    pub fn try_get_body_json<T>(&self) -> ResultJsonError<T>
     where
         T: DeserializeOwned,
     {
         json_from_slice(self.get_body())
+    }
+
+    /// Deserializes the body content of the request as_ref a specified type `T`.
+    ///
+    /// This method first retrieves the body content as a byte slice using `self.get_body()`.
+    /// It then attempts to deserialize the byte slice as_ref the specified type `T` using `json_from_slice`.
+    ///
+    /// # Arguments
+    ///
+    /// - `DeserializeOwned` - The target type to deserialize as_ref (must implement DeserializeOwned).
+    ///
+    /// # Returns
+    ///
+    /// - `T` - The deserialized body content.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the deserialization fails.
+    pub fn get_body_json<T>(&self) -> T
+    where
+        T: DeserializeOwned,
+    {
+        self.try_get_body_json().unwrap()
     }
 
     /// Converts the request to a formatted string representation.

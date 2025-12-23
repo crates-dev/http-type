@@ -368,6 +368,27 @@ impl WebSocketFrame {
         result
     }
 
+    /// Generates a WebSocket accept key from the client-provided key, returning an `OptionString`.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The client-provided key (typically from the `Sec-WebSocket-Key` header).
+    ///
+    /// # Returns
+    ///
+    /// - `OptionString` - An optional string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
+    pub fn try_generate_accept_key<K>(key: K) -> OptionString
+    where
+        K: AsRef<str>,
+    {
+        let key_ref: &str = key.as_ref();
+        let mut data: [u8; 60] = [0u8; 60];
+        data[..24].copy_from_slice(&key_ref.as_bytes()[..24.min(key_ref.len())]);
+        data[24..].copy_from_slice(GUID);
+        let hash: [u8; 20] = Self::sha1(data);
+        Self::try_base64_encode(hash)
+    }
+
     /// Generates a WebSocket accept key from the client-provided key.
     ///
     /// This function is used during the WebSocket handshake to validate the client's request.
@@ -380,7 +401,11 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - A string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
+    /// - `OptionString` - An optional string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the input key cannot be converted to a UTF-8 string.
     pub fn generate_accept_key<K>(key: K) -> String
     where
         K: AsRef<str>,
@@ -393,11 +418,7 @@ impl WebSocketFrame {
         Self::base64_encode(hash)
     }
 
-    /// Encodes the input data as a base64 string.
-    ///
-    /// This function implements the Base64 encoding scheme, converting binary data into an ASCII string format.
-    /// It processes the input data in chunks of 3 bytes and encodes them into 4 base64 characters.
-    /// Padding with '=' characters is applied if necessary.
+    /// Encodes the input data as a base64 string, returning an `OptionString`.
     ///
     /// # Arguments
     ///
@@ -405,8 +426,8 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - A string with the base64 encoded representation of the input data.
-    pub fn base64_encode<D>(data: D) -> String
+    /// - `OptionString` - An optional string with the base64 encoded representation of the input data.
+    pub fn try_base64_encode<D>(data: D) -> OptionString
     where
         D: AsRef<[u8]>,
     {
@@ -428,7 +449,27 @@ impl WebSocketFrame {
                 encoded_data.push(EQUAL_BYTES[0]);
             }
         }
-        String::from_utf8(encoded_data).unwrap()
+        String::from_utf8(encoded_data).ok()
+    }
+
+    /// Encodes the input data as a base64 string.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<[u8]>` - The data to encode in base64.
+    ///
+    /// # Returns
+    ///
+    /// - A string with the base64 encoded representation of the input data.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the input data cannot be converted to a UTF-8 string.
+    pub fn base64_encode<D>(data: D) -> String
+    where
+        D: AsRef<[u8]>,
+    {
+        Self::try_base64_encode(data).unwrap()
     }
 
     /// Checks if the opcode is a continuation frame.
