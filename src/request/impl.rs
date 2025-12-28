@@ -479,8 +479,10 @@ impl Request {
         let mut full_frame: Vec<u8> = Vec::with_capacity(config.max_ws_frame_size);
         let mut frame_count: usize = 0;
         let mut is_client_response: bool = false;
+        let ws_read_timeout_ms: u64 =
+            (config.ws_read_timeout_ms >> 1) + (config.ws_read_timeout_ms & 1);
         loop {
-            let timeout_duration: Duration = Duration::from_millis(config.ws_read_timeout_ms);
+            let timeout_duration: Duration = Duration::from_millis(ws_read_timeout_ms);
             let len: usize = match timeout(
                 timeout_duration,
                 stream.write().await.read(&mut temp_buffer),
@@ -503,8 +505,7 @@ impl Request {
                         return Err(RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout));
                     }
                     is_client_response = false;
-                    let ping_frame: Vec<u8> = WebSocketFrame::create_ping_frame();
-                    stream.send_body(&ping_frame).await.map_err(|_| {
+                    stream.send_body(&PING_FRAME).await.map_err(|_| {
                         RequestError::WriteTimeoutNotSet(HttpStatus::InternalServerError)
                     })?;
                     stream.flush().await;

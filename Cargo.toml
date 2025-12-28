@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "5.25.1"
+version = "5.26.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -13,7 +13,7 @@ exclude = ["target", "Cargo.lock", "sh", ".github"]
 
 [dependencies]
 hex = "0.4.3"
-http-constant = "1.82.1"
+http-constant = "1.83.0"
 lombok-macros = "1.13.18"
 serde = "1.0.228"
 serde_json = "1.0.148"
