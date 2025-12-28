@@ -293,6 +293,19 @@ impl WebSocketFrame {
         frames_list
     }
 
+    /// Creates a ping frame for WebSocket heartbeat/ping mechanism.
+    ///
+    /// # Returns
+    ///
+    /// - A byte vector representing a WebSocket ping frame.
+    #[inline(always)]
+    pub fn create_ping_frame() -> Vec<u8> {
+        let mut frame: Vec<u8> = Vec::with_capacity(2);
+        frame.push(0x89);
+        frame.push(0x00);
+        frame
+    }
+
     /// Calculates the SHA-1 hash of the input data.
     ///
     /// This function implements the SHA-1 cryptographic hash algorithm according to RFC 3174.
@@ -540,5 +553,29 @@ impl WebSocketFrame {
     #[inline(always)]
     pub fn is_reserved_opcode(&self) -> bool {
         self.opcode.is_reserved()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create_ping_frame() {
+        let ping_frame: Vec<u8> = WebSocketFrame::create_ping_frame();
+        assert_eq!(ping_frame.len(), 2);
+        assert_eq!(ping_frame[0], 0x89);
+        assert_eq!(ping_frame[1], 0x00);
+    }
+
+    #[test]
+    fn test_ping_frame_decode() {
+        let ping_frame: Vec<u8> = WebSocketFrame::create_ping_frame();
+        let decoded: Option<(WebSocketFrame, usize)> = WebSocketFrame::decode_ws_frame(&ping_frame);
+        assert!(decoded.is_some());
+        let (frame, consumed): (WebSocketFrame, usize) = decoded.unwrap();
+        assert_eq!(consumed, 2);
+        assert!(frame.is_ping_opcode());
+        assert!(frame.get_payload_data().is_empty());
     }
 }

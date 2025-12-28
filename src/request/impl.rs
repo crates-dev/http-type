@@ -472,38 +472,21 @@ impl Request {
         stream: &ArcRwLockStream,
         config: &RequestConfig,
     ) -> Result<Request, RequestError> {
-        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
-        let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        self.ws_from_reader(&mut reader, config).await
-    }
-
-    /// Parses a WebSocket request from a buffered TCP stream.
-    ///
-    /// Handles WebSocket frames including text, binary, ping, pong and close frames.
-    /// Assembles the request body from frame payload data.
-    ///
-    /// # Arguments
-    ///
-    /// - `&mut BufReader<&mut TcpStream>` - The buffered TCP stream reader.
-    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
-    pub async fn ws_from_reader(
-        &mut self,
-        reader: &mut BufReader<&mut TcpStream>,
-        config: &RequestConfig,
-    ) -> Result<Request, RequestError> {
         let buffer_size: usize = *config.get_buffer_size();
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let temp_buffer_size: usize = buffer_size;
         let mut temp_buffer: Vec<u8> = vec![0; temp_buffer_size];
         let mut full_frame: Vec<u8> = Vec::with_capacity(config.max_ws_frame_size);
         let mut frame_count: usize = 0;
+        let mut is_client_response: bool = false;
         loop {
             let timeout_duration: Duration = Duration::from_millis(config.ws_read_timeout_ms);
-            let len: usize = match timeout(timeout_duration, reader.read(&mut temp_buffer)).await {
+            let len: usize = match timeout(
+                timeout_duration,
+                stream.write().await.read(&mut temp_buffer),
+            )
+            .await
+            {
                 Ok(result) => match result {
                     Ok(len) => len,
                     Err(err) => {
@@ -516,7 +499,16 @@ impl Request {
                     }
                 },
                 Err(_) => {
-                    return Err(RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout));
+                    if !is_client_response {
+                        return Err(RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout));
+                    }
+                    is_client_response = false;
+                    let ping_frame: Vec<u8> = WebSocketFrame::create_ping_frame();
+                    stream.send_body(&ping_frame).await.map_err(|_| {
+                        RequestError::WriteTimeoutNotSet(HttpStatus::InternalServerError)
+                    })?;
+                    stream.flush().await;
+                    continue;
                 }
             };
             if len == 0 {
@@ -526,6 +518,7 @@ impl Request {
             }
             dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
             while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&dynamic_buffer) {
+                is_client_response = true;
                 dynamic_buffer.drain(0..consumed);
                 frame_count += 1;
                 if frame_count > config.max_ws_frames {
