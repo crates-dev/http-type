@@ -94,7 +94,7 @@ fn test_http_version_pattern_matching() {
     match version {
         HttpVersion::Http0_9 => panic!("Should not match HTTP0_9"),
         HttpVersion::Http1_0 => panic!("Should not match HTTP1_0"),
-        HttpVersion::Http1_1 => assert!(true),
+        HttpVersion::Http1_1 => {}
         HttpVersion::Http2 => panic!("Should not match HTTP2"),
         HttpVersion::Http3 => panic!("Should not match HTTP3"),
         HttpVersion::Unknown(_) => panic!("Should not match Unknown"),

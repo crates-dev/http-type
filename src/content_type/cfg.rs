@@ -155,7 +155,7 @@ fn test_content_type_pattern_matching() {
     use super::*;
     let content_type: ContentType = ContentType::ApplicationJson;
     match content_type {
-        ContentType::ApplicationJson => assert!(true),
+        ContentType::ApplicationJson => {}
         ContentType::ApplicationXml => panic!("Should not match ApplicationXml"),
         ContentType::TextPlain => panic!("Should not match TextPlain"),
         ContentType::TextHtml => panic!("Should not match TextHtml"),

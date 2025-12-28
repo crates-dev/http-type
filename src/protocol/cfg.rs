@@ -169,7 +169,7 @@ fn test_protocol_pattern_matching() {
     use super::*;
     let protocol: Protocol = Protocol::Http;
     match protocol {
-        Protocol::Http => assert!(true),
+        Protocol::Http => {}
         Protocol::Https => panic!("Should not match HTTPS"),
         Protocol::Unknown(_) => panic!("Should not match Unknown"),
     }
