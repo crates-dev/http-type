@@ -196,18 +196,18 @@ impl Default for RequestConfig {
     fn default() -> Self {
         Self {
             buffer_size: DEFAULT_BUFFER_SIZE,
-            max_request_line_length: KB_16,
-            max_path_length: KB_8,
-            max_query_length: KB_16,
-            max_header_line_length: KB_16,
-            max_header_count: 200,
-            max_header_key_length: KB_512,
-            max_header_value_length: KB_16,
-            max_body_size: MB_100,
-            max_ws_frame_size: MB_10,
-            max_ws_frames: 5000,
-            http_read_timeout_ms: 20000,
-            ws_read_timeout_ms: 20000,
+            max_request_line_length: DEFAULT_MAX_REQUEST_LINE_LENGTH,
+            max_path_length: DEFAULT_MAX_PATH_LENGTH,
+            max_query_length: DEFAULT_MAX_QUERY_LENGTH,
+            max_header_line_length: DEFAULT_MAX_HEADER_LINE_LENGTH,
+            max_header_count: DEFAULT_MAX_HEADER_COUNT,
+            max_header_key_length: DEFAULT_MAX_HEADER_KEY_LENGTH,
+            max_header_value_length: DEFAULT_MAX_HEADER_VALUE_LENGTH,
+            max_body_size: DEFAULT_MAX_BODY_SIZE,
+            max_ws_frame_size: DEFAULT_MAX_WS_FRAME_SIZE,
+            max_ws_frames: DEFAULT_MAX_WS_FRAMES,
+            http_read_timeout_ms: DEFAULT_HTTP_READ_TIMEOUT_MS,
+            ws_read_timeout_ms: DEFAULT_WS_READ_TIMEOUT_MS,
         }
     }
 }
@@ -232,19 +232,19 @@ impl RequestConfig {
     /// - `RequestConfig` - A new config with high-security settings.
     pub fn high_security() -> Self {
         Self {
-            buffer_size: KB_4,
-            max_request_line_length: KB_2,
-            max_path_length: KB_1,
-            max_query_length: KB_2,
-            max_header_line_length: KB_2,
-            max_header_count: 50,
-            max_header_key_length: KB_128,
-            max_header_value_length: KB_2,
-            max_body_size: MB_1,
-            max_ws_frame_size: KB_256,
-            max_ws_frames: 100,
-            http_read_timeout_ms: 10000,
-            ws_read_timeout_ms: 10000,
+            buffer_size: DEFAULT_HIGH_SECURITY_BUFFER_SIZE,
+            max_request_line_length: DEFAULT_HIGH_SECURITY_MAX_REQUEST_LINE_LENGTH,
+            max_path_length: DEFAULT_HIGH_SECURITY_MAX_PATH_LENGTH,
+            max_query_length: DEFAULT_HIGH_SECURITY_MAX_QUERY_LENGTH,
+            max_header_line_length: DEFAULT_HIGH_SECURITY_MAX_HEADER_LINE_LENGTH,
+            max_header_count: DEFAULT_HIGH_SECURITY_MAX_HEADER_COUNT,
+            max_header_key_length: DEFAULT_HIGH_SECURITY_MAX_HEADER_KEY_LENGTH,
+            max_header_value_length: DEFAULT_HIGH_SECURITY_MAX_HEADER_VALUE_LENGTH,
+            max_body_size: DEFAULT_HIGH_SECURITY_MAX_BODY_SIZE,
+            max_ws_frame_size: DEFAULT_HIGH_SECURITY_MAX_WS_FRAME_SIZE,
+            max_ws_frames: DEFAULT_HIGH_SECURITY_MAX_WS_FRAMES,
+            http_read_timeout_ms: DEFAULT_HIGH_SECURITY_HTTP_READ_TIMEOUT_MS,
+            ws_read_timeout_ms: DEFAULT_HIGH_SECURITY_WS_READ_TIMEOUT_MS,
         }
     }
 }
