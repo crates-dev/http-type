@@ -32,7 +32,7 @@ fn test_http_version_debug() {
     use super::*;
     let version: HttpVersion = HttpVersion::Http1_1;
     let debug_str: String = format!("{version:?}");
-    assert_eq!(debug_str, "Http_1_1");
+    assert_eq!(debug_str, "Http1_1");
 }
 
 #[test]
