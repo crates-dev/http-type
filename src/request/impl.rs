@@ -122,6 +122,7 @@ impl RequestError {
     /// # Returns
     ///
     /// - `HttpStatus` - The HTTP status associated with this error.
+    #[inline(always)]
     pub fn get_http_status(&self) -> HttpStatus {
         match self {
             Self::HttpRead(status) => *status,
@@ -218,6 +219,7 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `RequestConfig` - A new config instance with default values.
+    #[inline(always)]
     pub fn new() -> Self {
         Self::default()
     }
@@ -230,6 +232,7 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `RequestConfig` - A new config with high-security settings.
+    #[inline(always)]
     pub fn high_security() -> Self {
         Self {
             buffer_size: DEFAULT_HIGH_SECURITY_BUFFER_SIZE,
