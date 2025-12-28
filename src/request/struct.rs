@@ -7,9 +7,6 @@ use crate::*;
 /// when parsing HTTP requests.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Data, DisplayDebug, Deserialize, Serialize)]
 pub struct RequestConfig {
-    /// Minimum buffer size for reading operations.
-    pub(super) min_buffer_size: usize,
-
     /// Buffer size for reading operations.
     pub(super) buffer_size: usize,
 

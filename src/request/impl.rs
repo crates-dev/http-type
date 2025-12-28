@@ -195,7 +195,6 @@ impl Default for RequestConfig {
     #[inline(always)]
     fn default() -> Self {
         Self {
-            min_buffer_size: KB_2,
             buffer_size: DEFAULT_BUFFER_SIZE,
             max_request_line_length: KB_16,
             max_path_length: KB_8,
@@ -233,7 +232,6 @@ impl RequestConfig {
     /// - `RequestConfig` - A new config with high-security settings.
     pub fn high_security() -> Self {
         Self {
-            min_buffer_size: KB_512,
             buffer_size: KB_4,
             max_request_line_length: KB_2,
             max_path_length: KB_1,
@@ -296,7 +294,7 @@ impl Request {
         reader: &mut BufReader<&mut TcpStream>,
         config: &RequestConfig,
     ) -> Result<Request, RequestError> {
-        let buffer_size: usize = config.buffer_size.max(config.min_buffer_size);
+        let buffer_size: usize = *config.get_buffer_size();
         let mut request_line: String = String::with_capacity(buffer_size);
         let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
         let bytes_read: usize = timeout(
@@ -494,7 +492,7 @@ impl Request {
         reader: &mut BufReader<&mut TcpStream>,
         config: &RequestConfig,
     ) -> Result<Request, RequestError> {
-        let buffer_size: usize = config.buffer_size.max(config.min_buffer_size);
+        let buffer_size: usize = *config.get_buffer_size();
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let temp_buffer_size: usize = buffer_size;
         let mut temp_buffer: Vec<u8> = vec![0; temp_buffer_size];
