@@ -206,8 +206,8 @@ impl Default for RequestConfig {
             max_body_size: MB_100,
             max_ws_frame_size: MB_10,
             max_ws_frames: 5000,
-            http_read_timeout_ms: 60000,
-            ws_read_timeout_ms: 60000,
+            http_read_timeout_ms: 20000,
+            ws_read_timeout_ms: 20000,
         }
     }
 }
