@@ -15,7 +15,7 @@ impl ContentType {
     where
         T: Serialize + Display,
     {
-        json_to_string(data).unwrap_or_else(|_| "{}".to_string())
+        serde_json::to_string(data).unwrap_or_else(|_| "{}".to_string())
     }
 
     /// Serializes data into XML format.

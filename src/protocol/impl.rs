@@ -33,7 +33,7 @@ impl Protocol {
     /// `true` if the protocol is `HTTP`, otherwise returns `false`.
     #[inline(always)]
     pub fn is_http(&self) -> bool {
-        *self == Self::HTTP
+        *self == Self::Http
     }
 
     /// Checks if the current protocol is `HTTPS`.
@@ -47,7 +47,7 @@ impl Protocol {
     /// `true` if the protocol is `HTTPS`, otherwise returns `false`.
     #[inline(always)]
     pub fn is_https(&self) -> bool {
-        *self == Self::HTTPS
+        *self == Self::Https
     }
 
     /// Returns the default port associated with the protocol.
@@ -63,8 +63,8 @@ impl Protocol {
     #[inline(always)]
     pub fn get_port(&self) -> u16 {
         match self {
-            Self::HTTP => 80,
-            Self::HTTPS => 443,
+            Self::Http => 80,
+            Self::Https => 443,
             Self::Unknown(_) => 80,
         }
     }
@@ -74,8 +74,8 @@ impl Display for Protocol {
     #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
-            Self::HTTP => HTTP_LOWERCASE,
-            Self::HTTPS => HTTPS_LOWERCASE,
+            Self::Http => HTTP_LOWERCASE,
+            Self::Https => HTTPS_LOWERCASE,
             Self::Unknown(protocol) => protocol,
         };
         write!(f, "{res}")
@@ -88,8 +88,8 @@ impl FromStr for Protocol {
     #[inline(always)]
     fn from_str(data: &str) -> Result<Self, Self::Err> {
         match data.to_ascii_lowercase().as_str() {
-            HTTP_LOWERCASE => Ok(Self::HTTP),
-            HTTPS_LOWERCASE => Ok(Self::HTTPS),
+            HTTP_LOWERCASE => Ok(Self::Http),
+            HTTPS_LOWERCASE => Ok(Self::Https),
             _ => Ok(Self::Unknown(data.to_string())),
         }
     }

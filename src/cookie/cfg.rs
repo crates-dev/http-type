@@ -8,8 +8,8 @@ fn test_cookie_builder_new() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -23,8 +23,8 @@ fn test_cookie_builder_default() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -38,8 +38,8 @@ fn test_cookie_builder_parse_basic() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -57,8 +57,8 @@ fn test_cookie_builder_parse_with_expires() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -72,8 +72,8 @@ fn test_cookie_builder_parse_with_max_age() {
     assert_eq!(cookie.max_age, Some(3600));
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -87,8 +87,8 @@ fn test_cookie_builder_parse_with_domain() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, Some("example.com".to_string()));
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -102,8 +102,8 @@ fn test_cookie_builder_parse_with_path() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, Some("/admin".to_string()));
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -117,8 +117,8 @@ fn test_cookie_builder_parse_with_secure() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, true);
-    assert_eq!(cookie.http_only, false);
+    assert!(cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -132,8 +132,8 @@ fn test_cookie_builder_parse_with_httponly() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, true);
+    assert!(!cookie.secure);
+    assert!(cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -147,8 +147,8 @@ fn test_cookie_builder_parse_with_samesite() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, Some("Strict".to_string()));
 }
 
@@ -167,8 +167,8 @@ fn test_cookie_builder_parse_complex() {
     assert_eq!(cookie.max_age, Some(3600));
     assert_eq!(cookie.domain, Some("example.com".to_string()));
     assert_eq!(cookie.path, Some("/admin".to_string()));
-    assert_eq!(cookie.secure, true);
-    assert_eq!(cookie.http_only, true);
+    assert!(cookie.secure);
+    assert!(cookie.http_only);
     assert_eq!(cookie.same_site, Some("Strict".to_string()));
 }
 
@@ -182,8 +182,8 @@ fn test_cookie_builder_parse_empty_string() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -197,8 +197,8 @@ fn test_cookie_builder_parse_name_only() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -213,8 +213,8 @@ fn test_cookie_builder_parse_with_spaces() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, Some("example.com".to_string()));
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, true);
-    assert_eq!(cookie.http_only, false);
+    assert!(cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -228,8 +228,8 @@ fn test_cookie_builder_parse_invalid_max_age() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -245,8 +245,8 @@ fn test_cookie_builder_parse_case_insensitive() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, Some("example.com".to_string()));
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, true);
-    assert_eq!(cookie.http_only, true);
+    assert!(cookie.secure);
+    assert!(cookie.http_only);
     assert_eq!(cookie.same_site, Some("Strict".to_string()));
 }
 
@@ -290,7 +290,7 @@ fn test_cookie_builder_secure() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.secure();
-    assert_eq!(cookie.secure, true);
+    assert!(cookie.secure);
 }
 
 #[test]
@@ -298,7 +298,7 @@ fn test_cookie_builder_http_only() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.http_only();
-    assert_eq!(cookie.http_only, true);
+    assert!(cookie.http_only);
 }
 
 #[test]
@@ -330,8 +330,8 @@ fn test_cookie_builder_chaining() {
     assert_eq!(cookie.max_age, Some(3600));
     assert_eq!(cookie.domain, Some("example.com".to_string()));
     assert_eq!(cookie.path, Some("/admin".to_string()));
-    assert_eq!(cookie.secure, true);
-    assert_eq!(cookie.http_only, true);
+    assert!(cookie.secure);
+    assert!(cookie.http_only);
     assert_eq!(cookie.same_site, Some("Strict".to_string()));
 }
 
@@ -446,8 +446,8 @@ fn test_cookie_builder_parse_with_semicolon_only() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -461,8 +461,8 @@ fn test_cookie_builder_parse_with_multiple_semicolons() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, Some("example.com".to_string()));
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -477,8 +477,8 @@ fn test_cookie_builder_parse_with_unknown_attributes() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, Some("example.com".to_string()));
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -492,8 +492,8 @@ fn test_cookie_builder_parse_negative_max_age() {
     assert_eq!(cookie.max_age, Some(-1));
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -507,8 +507,8 @@ fn test_cookie_builder_parse_zero_max_age() {
     assert_eq!(cookie.max_age, Some(0));
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -523,8 +523,8 @@ fn test_cookie_builder_parse_large_max_age() {
     assert_eq!(cookie.max_age, Some(9223372036854775807));
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -538,8 +538,8 @@ fn test_cookie_builder_parse_empty_value() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, None);
     assert_eq!(cookie.path, None);
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -553,8 +553,8 @@ fn test_cookie_builder_parse_empty_attribute_value() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, Some("".to_string()));
     assert_eq!(cookie.path, Some("".to_string()));
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 
@@ -570,8 +570,8 @@ fn test_cookie_builder_parse_special_characters() {
     assert_eq!(cookie.max_age, None);
     assert_eq!(cookie.domain, Some("sub.example.com".to_string()));
     assert_eq!(cookie.path, Some("/admin/users".to_string()));
-    assert_eq!(cookie.secure, false);
-    assert_eq!(cookie.http_only, false);
+    assert!(!cookie.secure);
+    assert!(!cookie.http_only);
     assert_eq!(cookie.same_site, None);
 }
 

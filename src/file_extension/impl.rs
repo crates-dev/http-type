@@ -1122,7 +1122,7 @@ impl FileExtension {
             Self::FileExtensionZir => APPLICATION_VND_ZUL,
             Self::FileExtensionZirz => APPLICATION_VND_ZUL,
             Self::FileExtensionZmm => APPLICATION_VND_HANDHELD_ENTERTAINMENT_XML,
-            Self::FileExtensionEmpty => EMPTY_STR,
+            Self::Unknown => EMPTY_STR,
         }
     }
 }
@@ -3277,7 +3277,7 @@ impl Display for FileExtension {
             Self::FileExtensionZir => FILE_EXTENSION_ZIR,
             Self::FileExtensionZirz => FILE_EXTENSION_ZIRZ,
             Self::FileExtensionZmm => FILE_EXTENSION_ZMM,
-            Self::FileExtensionEmpty => EMPTY_STR,
+            Self::Unknown => EMPTY_STR,
         };
         write!(f, "{version_str}")
     }

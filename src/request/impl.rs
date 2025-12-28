@@ -1,5 +1,256 @@
 use crate::*;
 
+/// Implements the `std::error::Error` trait for `RequestError`.
+impl std::error::Error for RequestError {}
+
+/// Implements the `Display` trait for `RequestError`, allowing it to be formatted as a string.
+impl Display for RequestError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::HttpRead(status) => write!(f, "Http read error [{}]", status.code()),
+            Self::GetTcpStream(status) => write!(f, "Failed to get tcp stream [{}]", status.code()),
+            Self::GetTlsStream(status) => write!(f, "Failed to get tls stream [{}]", status.code()),
+            Self::ReadConnection(status) => write!(f, "Connection read error [{}]", status.code()),
+            Self::RequestAborted(status) => write!(f, "Request aborted [{}]", status.code()),
+            Self::TlsStreamConnect(status) => {
+                write!(f, "Tls stream connection error [{}]", status.code())
+            }
+            Self::NeedOpenRedirect(status) => {
+                write!(f, "Open redirect required [{}]", status.code())
+            }
+            Self::MaxRedirectTimes(status) => {
+                write!(f, "Exceeded maximum redirect attempts [{}]", status.code())
+            }
+            Self::MethodsNotSupport(status) => {
+                write!(f, "Http method not supported [{}]", status.code())
+            }
+            Self::RedirectInvalidUrl(status) => {
+                write!(f, "Invalid redirect url [{}]", status.code())
+            }
+            Self::ClientDisconnected(status) => {
+                write!(f, "Client disconnected [{}]", status.code())
+            }
+            Self::RedirectUrlDeadLoop(status) => {
+                write!(f, "Redirect url dead loop detected [{}]", status.code())
+            }
+            Self::ClientClosedConnection(status) => {
+                write!(f, "Client closed connection [{}]", status.code())
+            }
+            Self::IncompleteWebSocketFrame(status) => write!(
+                f,
+                "WebSocket connection closed before a complete frame was received [{}]",
+                status.code()
+            ),
+            Self::RequestTooLong(status) => write!(f, "Request line too long [{}]", status.code()),
+            Self::PathTooLong(status) => write!(f, "Path too long [{}]", status.code()),
+            Self::QueryTooLong(status) => write!(f, "Query string too long [{}]", status.code()),
+            Self::HeaderLineTooLong(status) => {
+                write!(f, "Header line too long [{}]", status.code())
+            }
+            Self::TooManyHeaders(status) => write!(f, "Too many headers [{}]", status.code()),
+            Self::HeaderKeyTooLong(status) => write!(f, "Header key too long [{}]", status.code()),
+            Self::HeaderValueTooLong(status) => {
+                write!(f, "Header value too long [{}]", status.code())
+            }
+            Self::ContentLengthTooLarge(status) => {
+                write!(f, "Content length too large [{}]", status.code())
+            }
+            Self::InvalidContentLength(status) => {
+                write!(f, "Invalid content length [{}]", status.code())
+            }
+            Self::Unknown(status) => write!(f, "Unknown error occurred [{}]", status.code()),
+            Self::InvalidUrlScheme(status) => write!(f, "Invalid URL scheme [{}]", status.code()),
+            Self::InvalidUrlHost(status) => write!(f, "Invalid URL host [{}]", status.code()),
+            Self::InvalidUrlPort(status) => write!(f, "Invalid URL port [{}]", status.code()),
+            Self::InvalidUrlPath(status) => write!(f, "Invalid URL path [{}]", status.code()),
+            Self::InvalidUrlQuery(status) => write!(f, "Invalid URL query [{}]", status.code()),
+            Self::InvalidUrlFragment(status) => {
+                write!(f, "Invalid URL fragment [{}]", status.code())
+            }
+            Self::ReadTimeoutNotSet(status) => {
+                write!(f, "Failed to set read timeout [{}]", status.code())
+            }
+            Self::WriteTimeoutNotSet(status) => {
+                write!(f, "Failed to set write timeout [{}]", status.code())
+            }
+            Self::TcpConnectionFailed(status) => {
+                write!(f, "Tcp connection failed [{}]", status.code())
+            }
+            Self::TlsHandshakeFailed(status) => {
+                write!(f, "Tls handshake failed [{}]", status.code())
+            }
+            Self::TlsCertificateInvalid(status) => {
+                write!(f, "Tls certificate invalid [{}]", status.code())
+            }
+            Self::WebSocketFrameTooLarge(status) => {
+                write!(f, "WebSocket frame too large [{}]", status.code())
+            }
+            Self::WebSocketOpcodeUnsupported(status) => {
+                write!(f, "WebSocket opcode unsupported [{}]", status.code())
+            }
+            Self::WebSocketMaskMissing(status) => {
+                write!(f, "WebSocket mask missing [{}]", status.code())
+            }
+            Self::WebSocketPayloadCorrupted(status) => {
+                write!(f, "WebSocket payload corrupted [{}]", status.code())
+            }
+            Self::WebSocketInvalidUtf8(status) => {
+                write!(f, "WebSocket invalid UTF-8 [{}]", status.code())
+            }
+            Self::WebSocketInvalidCloseCode(status) => {
+                write!(f, "WebSocket invalid close code [{}]", status.code())
+            }
+            Self::WebSocketInvalidExtension(status) => {
+                write!(f, "WebSocket invalid extension [{}]", status.code())
+            }
+            Self::HttpRequestPartsInsufficient(status) => {
+                write!(f, "HTTP request parts insufficient [{}]", status.code())
+            }
+        }
+    }
+}
+
+impl RequestError {
+    /// Gets the HTTP status associated with this error.
+    ///
+    /// Returns the HttpStatus enum variant that corresponds to this error.
+    ///
+    /// # Arguments
+    ///
+    /// - `&self` - The RequestError instance.
+    ///
+    /// # Returns
+    ///
+    /// - `HttpStatus` - The HTTP status associated with this error.
+    pub fn get_http_status(&self) -> HttpStatus {
+        match self {
+            Self::HttpRead(status) => *status,
+            Self::GetTcpStream(status) => *status,
+            Self::GetTlsStream(status) => *status,
+            Self::ReadConnection(status) => *status,
+            Self::RequestAborted(status) => *status,
+            Self::TlsStreamConnect(status) => *status,
+            Self::NeedOpenRedirect(status) => *status,
+            Self::MaxRedirectTimes(status) => *status,
+            Self::MethodsNotSupport(status) => *status,
+            Self::RedirectInvalidUrl(status) => *status,
+            Self::ClientDisconnected(status) => *status,
+            Self::RedirectUrlDeadLoop(status) => *status,
+            Self::ClientClosedConnection(status) => *status,
+            Self::IncompleteWebSocketFrame(status) => *status,
+            Self::RequestTooLong(status) => *status,
+            Self::PathTooLong(status) => *status,
+            Self::QueryTooLong(status) => *status,
+            Self::HeaderLineTooLong(status) => *status,
+            Self::TooManyHeaders(status) => *status,
+            Self::HeaderKeyTooLong(status) => *status,
+            Self::HeaderValueTooLong(status) => *status,
+            Self::ContentLengthTooLarge(status) => *status,
+            Self::InvalidContentLength(status) => *status,
+            Self::Unknown(status) => *status,
+            Self::InvalidUrlScheme(status) => *status,
+            Self::InvalidUrlHost(status) => *status,
+            Self::InvalidUrlPort(status) => *status,
+            Self::InvalidUrlPath(status) => *status,
+            Self::InvalidUrlQuery(status) => *status,
+            Self::InvalidUrlFragment(status) => *status,
+            Self::ReadTimeoutNotSet(status) => *status,
+            Self::WriteTimeoutNotSet(status) => *status,
+            Self::TcpConnectionFailed(status) => *status,
+            Self::TlsHandshakeFailed(status) => *status,
+            Self::TlsCertificateInvalid(status) => *status,
+            Self::WebSocketFrameTooLarge(status) => *status,
+            Self::WebSocketOpcodeUnsupported(status) => *status,
+            Self::WebSocketMaskMissing(status) => *status,
+            Self::WebSocketPayloadCorrupted(status) => *status,
+            Self::WebSocketInvalidUtf8(status) => *status,
+            Self::WebSocketInvalidCloseCode(status) => *status,
+            Self::WebSocketInvalidExtension(status) => *status,
+            Self::HttpRequestPartsInsufficient(status) => *status,
+        }
+    }
+
+    /// Gets the numeric HTTP status code associated with this error.
+    ///
+    /// Returns the numeric status code (e.g., 400, 404, 500) that corresponds to this error.
+    ///
+    /// # Arguments
+    ///
+    /// - `&self` - The RequestError instance.
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseStatusCode` - The numeric HTTP status code.
+    pub fn get_http_status_code(&self) -> ResponseStatusCode {
+        self.get_http_status().code()
+    }
+}
+
+impl Default for RequestConfig {
+    /// Creates a `RequestConfig` with secure default values.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestConfig` - A new config instance with secure defaults.
+    #[inline(always)]
+    fn default() -> Self {
+        Self {
+            min_buffer_size: KB_2,
+            buffer_size: DEFAULT_BUFFER_SIZE,
+            max_request_line_length: KB_16,
+            max_path_length: KB_8,
+            max_query_length: KB_16,
+            max_header_line_length: KB_16,
+            max_header_count: 200,
+            max_header_key_length: KB_512,
+            max_header_value_length: KB_16,
+            max_body_size: MB_100,
+            max_ws_frame_size: MB_10,
+            max_ws_frames: 5000,
+            http_read_timeout_ms: 60000,
+            ws_read_timeout_ms: 60000,
+        }
+    }
+}
+
+impl RequestConfig {
+    /// Creates a new `RequestConfig` with default values.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestConfig` - A new config instance with default values.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Creates a config optimized for high-security environments.
+    ///
+    /// This configuration uses more restrictive limits to provide
+    /// maximum protection against various attacks.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestConfig` - A new config with high-security settings.
+    pub fn high_security() -> Self {
+        Self {
+            min_buffer_size: KB_512,
+            buffer_size: KB_4,
+            max_request_line_length: KB_2,
+            max_path_length: KB_1,
+            max_query_length: KB_2,
+            max_header_line_length: KB_2,
+            max_header_count: 50,
+            max_header_key_length: KB_128,
+            max_header_value_length: KB_2,
+            max_body_size: MB_1,
+            max_ws_frame_size: KB_256,
+            max_ws_frames: 100,
+            http_read_timeout_ms: 10000,
+            ws_read_timeout_ms: 10000,
+        }
+    }
+}
+
 /// Provides a default value for `Request`.
 ///
 /// Returns a new `Request` instance with all fields initialized to their default values.
@@ -36,31 +287,48 @@ impl Request {
     /// # Arguments
     ///
     /// - `&mut BufReader<&mut TcpStream>` - The buffered TCP stream reader.
-    /// - `usize` - The buffer size for reading.
+    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
     /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn http_from_reader(
         reader: &mut BufReader<&mut TcpStream>,
-        buffer: usize,
-    ) -> RequestReaderHandleResult {
-        let mut request_line: String = String::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
-        let _ = AsyncBufReadExt::read_line(reader, &mut request_line).await;
+        config: &RequestConfig,
+    ) -> Result<Request, RequestError> {
+        let buffer_size: usize = config.buffer_size.max(config.min_buffer_size);
+        let mut request_line: String = String::with_capacity(buffer_size);
+        let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
+        let bytes_read: usize = timeout(
+            timeout_duration,
+            AsyncBufReadExt::read_line(reader, &mut request_line),
+        )
+        .await
+        .map_err(|_| RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout))?
+        .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
+        if bytes_read > config.max_request_line_length {
+            return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
+        }
         let parts: Vec<&str> = request_line.split_whitespace().collect();
         let parts_len: usize = parts.len();
         if parts_len < 3 {
-            return Err(RequestError::InvalidHttpRequestPartsLength(parts_len));
+            return Err(RequestError::HttpRequestPartsInsufficient(
+                HttpStatus::BadRequest,
+            ));
+        }
+        let full_path: &str = parts[1];
+        if full_path.len() > config.max_path_length {
+            return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
         }
         let method: RequestMethod = parts[0]
             .parse::<RequestMethod>()
-            .unwrap_or(Method::UNKNOWN(parts[0].to_string()));
-        let full_path: RequestPath = parts[1].to_string();
+            .unwrap_or(Method::Unknown(parts[0].to_string()));
+        let full_path: RequestPath = full_path.to_string();
         let version: RequestVersion = parts[2]
             .parse::<RequestVersion>()
             .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
-        let hash_index: OptionUsize = full_path.find(HASH);
-        let query_index: OptionUsize = full_path.find(QUERY);
+        let hash_index: Option<usize> = full_path.find(HASH);
+        let query_index: Option<usize> = full_path.find(QUERY);
         let query_string: String = query_index.map_or_else(String::new, |i| {
             let temp: &str = &full_path[i + 1..];
             if hash_index.is_none() || hash_index.unwrap() <= i {
@@ -68,6 +336,9 @@ impl Request {
             }
             temp.split(HASH).next().unwrap_or_default().to_owned()
         });
+        if query_string.len() > config.max_query_length {
+            return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
+        }
         let querys: RequestQuerys = Self::parse_querys(&query_string);
         let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
             full_path[..i].to_owned()
@@ -77,30 +348,79 @@ impl Request {
         let mut headers: RequestHeaders = hash_map_xx_hash3_64();
         let mut host: RequestHost = String::new();
         let mut content_length: usize = 0;
+        let mut header_count: usize = 0;
         loop {
-            let mut header_line: String = String::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
-            let _ = AsyncBufReadExt::read_line(reader, &mut header_line).await;
+            let mut header_line: String = String::with_capacity(buffer_size);
+            let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
+            let bytes_read: usize = timeout(
+                timeout_duration,
+                AsyncBufReadExt::read_line(reader, &mut header_line),
+            )
+            .await
+            .map_err(|_| RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout))?
+            .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
+            if bytes_read > config.max_header_line_length {
+                return Err(RequestError::HeaderLineTooLong(
+                    HttpStatus::RequestHeaderFieldsTooLarge,
+                ));
+            }
             let header_line: &str = header_line.trim();
             if header_line.is_empty() {
                 break;
+            }
+            header_count += 1;
+            if header_count > config.max_header_count {
+                return Err(RequestError::TooManyHeaders(
+                    HttpStatus::RequestHeaderFieldsTooLarge,
+                ));
             }
             if let Some((key_part, value_part)) = header_line.split_once(COLON) {
                 let key: String = key_part.trim().to_ascii_lowercase();
                 if key.is_empty() {
                     continue;
                 }
+                if key.len() > config.max_header_key_length {
+                    return Err(RequestError::HeaderKeyTooLong(
+                        HttpStatus::RequestHeaderFieldsTooLarge,
+                    ));
+                }
                 let value: String = value_part.trim().to_string();
+                if value.len() > config.max_header_value_length {
+                    return Err(RequestError::HeaderValueTooLong(
+                        HttpStatus::RequestHeaderFieldsTooLarge,
+                    ));
+                }
                 if key == HOST {
                     host = value.clone();
                 } else if key == CONTENT_LENGTH {
-                    content_length = value.parse().unwrap_or(0);
+                    match value.parse::<usize>() {
+                        Ok(length) => {
+                            if length > config.max_body_size {
+                                return Err(RequestError::ContentLengthTooLarge(
+                                    HttpStatus::PayloadTooLarge,
+                                ));
+                            }
+                            content_length = length;
+                        }
+                        Err(_) => {
+                            return Err(RequestError::InvalidContentLength(HttpStatus::BadRequest));
+                        }
+                    }
                 }
                 headers.entry(key).or_default().push_back(value);
             }
         }
-        let mut body: RequestBody = vec![0; content_length];
+        let mut body: RequestBody = Vec::with_capacity(content_length);
         if content_length > 0 {
-            let _ = AsyncReadExt::read_exact(reader, &mut body).await;
+            body.resize(content_length, 0);
+            let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
+            timeout(
+                timeout_duration,
+                AsyncReadExt::read_exact(reader, &mut body),
+            )
+            .await
+            .map_err(|_| RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout))?
+            .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
         }
         Ok(Request {
             method,
@@ -120,18 +440,18 @@ impl Request {
     /// # Arguments
     ///
     /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `usize` - The buffer size for reading.
+    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
     /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn http_from_stream(
         stream: &ArcRwLockStream,
-        buffer: usize,
-    ) -> RequestReaderHandleResult {
+        config: &RequestConfig,
+    ) -> Result<Request, RequestError> {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::http_from_reader(&mut reader, buffer).await
+        Self::http_from_reader(&mut reader, config).await
     }
 
     /// Parses a WebSocket request from a TCP stream.
@@ -141,20 +461,19 @@ impl Request {
     /// # Arguments
     ///
     /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `usize` - The buffer size for reading.
-    /// - `&mut Request` - The request template to populate.
+    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
     /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
     pub async fn ws_from_stream(
+        &mut self,
         stream: &ArcRwLockStream,
-        buffer: usize,
-        request: &mut Self,
-    ) -> RequestReaderHandleResult {
+        config: &RequestConfig,
+    ) -> Result<Request, RequestError> {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::ws_from_reader(&mut reader, buffer, request).await
+        self.ws_from_reader(&mut reader, config).await
     }
 
     /// Parses a WebSocket request from a buffered TCP stream.
@@ -165,64 +484,83 @@ impl Request {
     /// # Arguments
     ///
     /// - `&mut BufReader<&mut TcpStream>` - The buffered TCP stream reader.
-    /// - `usize` - The buffer size for reading frames.
-    /// - `&mut Request` - The request template to populate.
+    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
     /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
     pub async fn ws_from_reader(
+        &mut self,
         reader: &mut BufReader<&mut TcpStream>,
-        buffer: usize,
-        request: &mut Self,
-    ) -> RequestReaderHandleResult {
-        let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer.min(DEFAULT_BUFFER_SIZE));
-        let temp_buffer_size: usize = buffer.min(DEFAULT_BUFFER_SIZE);
+        config: &RequestConfig,
+    ) -> Result<Request, RequestError> {
+        let buffer_size: usize = config.buffer_size.max(config.min_buffer_size);
+        let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
+        let temp_buffer_size: usize = buffer_size;
         let mut temp_buffer: Vec<u8> = vec![0; temp_buffer_size];
-        let mut full_frame: Vec<u8> = Vec::with_capacity(buffer.min(MAX_FRAME_SIZE));
-        let mut error_handle = || {
-            request.body.clear();
-        };
+        let mut full_frame: Vec<u8> = Vec::with_capacity(config.max_ws_frame_size);
+        let mut frame_count: usize = 0;
         loop {
-            let len: usize = match reader.read(&mut temp_buffer).await {
-                Ok(len) => len,
-                Err(err) => {
-                    error_handle();
-                    if err.kind() == ErrorKind::ConnectionReset
-                        || err.kind() == ErrorKind::ConnectionAborted
-                    {
-                        return Err(RequestError::ClientDisconnected);
+            let timeout_duration: Duration = Duration::from_millis(config.ws_read_timeout_ms);
+            let len: usize = match timeout(timeout_duration, reader.read(&mut temp_buffer)).await {
+                Ok(result) => match result {
+                    Ok(len) => len,
+                    Err(err) => {
+                        if err.kind() == ErrorKind::ConnectionReset
+                            || err.kind() == ErrorKind::ConnectionAborted
+                        {
+                            return Err(RequestError::ClientDisconnected(HttpStatus::BadRequest));
+                        }
+                        return Err(RequestError::Unknown(HttpStatus::InternalServerError));
                     }
-                    return Err(RequestError::InvalidWebSocketRequest(err.to_string()));
+                },
+                Err(_) => {
+                    return Err(RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout));
                 }
             };
             if len == 0 {
-                error_handle();
-                return Err(RequestError::IncompleteWebSocketFrame);
+                return Err(RequestError::IncompleteWebSocketFrame(
+                    HttpStatus::BadRequest,
+                ));
             }
             dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
             while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&dynamic_buffer) {
                 dynamic_buffer.drain(0..consumed);
+                frame_count += 1;
+                if frame_count > config.max_ws_frames {
+                    return Err(RequestError::TooManyHeaders(
+                        HttpStatus::RequestHeaderFieldsTooLarge,
+                    ));
+                }
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
-                        error_handle();
-                        return Err(RequestError::ClientClosedConnection);
+                        return Err(RequestError::ClientClosedConnection(HttpStatus::BadRequest));
                     }
                     WebSocketOpcode::Ping | WebSocketOpcode::Pong => {
                         continue;
                     }
                     WebSocketOpcode::Text | WebSocketOpcode::Binary => {
-                        full_frame.extend_from_slice(frame.get_payload_data());
+                        let payload_data: &[u8] = frame.get_payload_data();
+                        if payload_data.len() > config.max_ws_frame_size {
+                            return Err(RequestError::WebSocketFrameTooLarge(
+                                HttpStatus::PayloadTooLarge,
+                            ));
+                        }
+                        if full_frame.len() + payload_data.len() > config.max_ws_frame_size {
+                            return Err(RequestError::WebSocketFrameTooLarge(
+                                HttpStatus::PayloadTooLarge,
+                            ));
+                        }
+                        full_frame.extend_from_slice(payload_data);
                         if *frame.get_fin() {
-                            let mut request: Request = request.clone();
+                            let mut request: Request = self.clone();
                             request.body = full_frame;
                             return Ok(request);
                         }
                     }
                     _ => {
-                        error_handle();
-                        return Err(RequestError::InvalidWebSocketFrame(
-                            "Unsupported opcode".to_owned(),
+                        return Err(RequestError::WebSocketOpcodeUnsupported(
+                            HttpStatus::NotImplemented,
                         ));
                     }
                 }
@@ -268,9 +606,9 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `OptionRequestQuerysValue` - The parameter value if exists.
+    /// - `Option<RequestQuerysValue>` - The parameter value if exists.
     #[inline(always)]
-    pub fn try_get_query<K>(&self, key: K) -> OptionRequestQuerysValue
+    pub fn try_get_query<K>(&self, key: K) -> Option<RequestQuerysValue>
     where
         K: AsRef<str>,
     {
@@ -308,9 +646,9 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `OptionRequestHeadersValue` - The optional header values.
+    /// - `Option<RequestHeadersValue>` - The optional header values.
     #[inline(always)]
-    pub fn try_get_header<K>(&self, key: K) -> OptionRequestHeadersValue
+    pub fn try_get_header<K>(&self, key: K) -> Option<RequestHeadersValue>
     where
         K: AsRef<str>,
     {
@@ -346,9 +684,9 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `OptionRequestHeadersValueItem` - The first header value if exists.
+    /// - `Option<RequestHeadersValueItem>` - The first header value if exists.
     #[inline(always)]
-    pub fn try_get_header_front<K>(&self, key: K) -> OptionRequestHeadersValueItem
+    pub fn try_get_header_front<K>(&self, key: K) -> Option<RequestHeadersValueItem>
     where
         K: AsRef<str>,
     {
@@ -386,9 +724,9 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `OptionRequestHeadersValueItem` - The last header value if exists.
+    /// - `Option<RequestHeadersValueItem>` - The last header value if exists.
     #[inline(always)]
-    pub fn try_get_header_back<K>(&self, key: K) -> OptionRequestHeadersValueItem
+    pub fn try_get_header_back<K>(&self, key: K) -> Option<RequestHeadersValueItem>
     where
         K: AsRef<str>,
     {
@@ -426,9 +764,9 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `OptionUsize` - The count of values for the header if exists.
+    /// - `Option<usize>` - The count of values for the header if exists.
     #[inline(always)]
-    pub fn try_get_header_length<K>(&self, key: K) -> OptionUsize
+    pub fn try_get_header_length<K>(&self, key: K) -> Option<usize>
     where
         K: AsRef<str>,
     {
@@ -540,12 +878,12 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `ResultJsonError<T>` - The deserialization result.
-    pub fn try_get_body_json<T>(&self) -> ResultJsonError<T>
+    /// - `Result<T, serde_json::Error>` - The deserialization result.
+    pub fn try_get_body_json<T>(&self) -> Result<T, serde_json::Error>
     where
         T: DeserializeOwned,
     {
-        json_from_slice(self.get_body())
+        serde_json::from_slice(self.get_body())
     }
 
     /// Deserializes the body content of the request as_ref a specified type `T`.

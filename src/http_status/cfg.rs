@@ -186,7 +186,7 @@ fn test_http_status_default() {
 fn test_http_status_clone() {
     use super::*;
     let status: HttpStatus = HttpStatus::Ok;
-    let cloned_status: HttpStatus = status.clone();
+    let cloned_status: HttpStatus = status;
     assert_eq!(status, cloned_status);
 }
 
@@ -194,7 +194,7 @@ fn test_http_status_clone() {
 fn test_http_status_debug() {
     use super::*;
     let status: HttpStatus = HttpStatus::Ok;
-    let debug_str: String = format!("{:?}", status);
+    let debug_str: String = format!("{status:?}");
     assert_eq!(debug_str, "Ok");
 }
 

@@ -64,7 +64,7 @@ fn test_content_type_default() {
 fn test_content_type_clone() {
     use super::*;
     let content_type: ContentType = ContentType::ApplicationJson;
-    let cloned_content_type: ContentType = content_type.clone();
+    let cloned_content_type: ContentType = content_type;
     assert_eq!(content_type, cloned_content_type);
 }
 
@@ -72,7 +72,7 @@ fn test_content_type_clone() {
 fn test_content_type_debug() {
     use super::*;
     let content_type: ContentType = ContentType::ApplicationJson;
-    let debug_str: String = format!("{:?}", content_type);
+    let debug_str: String = format!("{content_type:?}");
     assert_eq!(debug_str, "ApplicationJson");
 }
 
@@ -145,7 +145,7 @@ fn test_content_type_all_variants() {
         ContentType::Unknown,
     ];
     for content_type in content_types {
-        let debug_str: String = format!("{:?}", content_type);
+        let debug_str: String = format!("{content_type:?}");
         assert!(!debug_str.is_empty());
     }
 }

@@ -1,5 +1,28 @@
 use crate::*;
 
+/// Implements the `std::error::Error` trait for `HttpUrlError`.
+impl std::error::Error for HttpUrlError {}
+
+/// Implements the `Display` trait for `HttpUrlError`, allowing it to be formatted as a string.
+impl Display for HttpUrlError {
+    /// Formats the `HttpUrlError` variant into a human-readable string.
+    ///
+    /// # Arguments
+    ///
+    /// - `f` - The formatter to write the string into.
+    ///
+    /// # Returns
+    ///
+    /// A `fmt::Result` indicating success or failure of the formatting operation.
+    #[inline(always)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            HttpUrlError::InvalidUrl => write!(f, "Invalid URL"),
+            HttpUrlError::Unknown => write!(f, "Unknown error"),
+        }
+    }
+}
+
 impl HttpUrlComponents {
     /// Parses a URL string into its components.
     ///
@@ -12,12 +35,12 @@ impl HttpUrlComponents {
     /// # Returns
     ///
     /// - `Result<HttpUrlComponents, HttpUrlError>` - Either the parsed components or an error.
+    #[inline]
     pub fn parse<U>(url_str: U) -> Result<Self, HttpUrlError>
     where
         U: AsRef<str>,
     {
-        let parsed_url: UrlParser =
-            UrlParser::parse(url_str.as_ref()).map_err(|_| HttpUrlError::InvalidUrl)?;
+        let parsed_url: Url = Url::parse(url_str.as_ref()).map_err(|_| HttpUrlError::InvalidUrl)?;
         let res: Self = Self {
             protocol: parsed_url
                 .scheme()

@@ -61,8 +61,8 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     ///
-    /// - `ResponseResult` - Result indicating success or failure.
-    pub async fn send<D>(&self, data: D) -> ResponseResult
+    /// - `Result<(), ResponseError>` - Result indicating success or failure.
+    pub async fn send<D>(&self, data: D) -> Result<(), ResponseError>
     where
         D: AsRef<[u8]>,
     {
@@ -82,8 +82,8 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     ///
-    /// - `ResponseResult` - Result indicating success or failure.
-    pub async fn send_body<D>(&self, data: D) -> ResponseResult
+    /// - `Result<(), ResponseError>` - Result indicating success or failure.
+    pub async fn send_body<D>(&self, data: D) -> Result<(), ResponseError>
     where
         D: AsRef<[u8]>,
     {
@@ -103,8 +103,8 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     ///
-    /// - `ResponseResult` - Result indicating success or failure.
-    pub async fn send_body_list<I, D>(&self, data_iter: I) -> ResponseResult
+    /// - `Result<(), ResponseError>` - Result indicating success or failure.
+    pub async fn send_body_list<I, D>(&self, data_iter: I) -> Result<(), ResponseError>
     where
         I: IntoIterator<Item = D>,
         D: AsRef<[u8]>,

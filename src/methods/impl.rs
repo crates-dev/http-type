@@ -9,7 +9,7 @@ impl Default for Method {
     /// The default `Method` variant.
     #[inline(always)]
     fn default() -> Self {
-        Self::UNKNOWN(String::new())
+        Self::Unknown(String::new())
     }
 }
 
@@ -27,16 +27,16 @@ impl Display for Method {
     #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
-            Self::GET => GET,
-            Self::POST => POST,
-            Self::CONNECT => CONNECT,
-            Self::DELETE => DELETE,
-            Self::HEAD => HEAD,
-            Self::PATCH => PATCH,
-            Self::TRACE => TRACE,
-            Self::PUT => PUT,
-            Self::OPTIONS => OPTIONS,
-            Self::UNKNOWN(methods) => methods,
+            Self::Get => GET,
+            Self::Post => POST,
+            Self::Connect => CONNECT,
+            Self::Delete => DELETE,
+            Self::Head => HEAD,
+            Self::Patch => PATCH,
+            Self::Trace => TRACE,
+            Self::Put => PUT,
+            Self::Options => OPTIONS,
+            Self::Unknown(methods) => methods,
         };
         write!(f, "{res}")
     }
@@ -63,16 +63,16 @@ impl FromStr for Method {
     #[inline(always)]
     fn from_str(methods_str: &str) -> Result<Self, Self::Err> {
         match methods_str {
-            GET => Ok(Self::GET),
-            POST => Ok(Self::POST),
-            PUT => Ok(Self::PUT),
-            DELETE => Ok(Self::DELETE),
-            PATCH => Ok(Self::PATCH),
-            HEAD => Ok(Self::HEAD),
-            OPTIONS => Ok(Self::OPTIONS),
-            CONNECT => Ok(Self::CONNECT),
-            TRACE => Ok(Self::TRACE),
-            _ => Ok(Self::UNKNOWN(methods_str.to_string())),
+            GET => Ok(Self::Get),
+            POST => Ok(Self::Post),
+            PUT => Ok(Self::Put),
+            DELETE => Ok(Self::Delete),
+            PATCH => Ok(Self::Patch),
+            HEAD => Ok(Self::Head),
+            OPTIONS => Ok(Self::Options),
+            CONNECT => Ok(Self::Connect),
+            TRACE => Ok(Self::Trace),
+            _ => Ok(Self::Unknown(methods_str.to_string())),
         }
     }
 }
@@ -97,7 +97,7 @@ impl Method {
     /// `true` if the method is `GET`, `false` otherwise.
     #[inline(always)]
     pub fn is_get(&self) -> bool {
-        matches!(self, Self::GET)
+        matches!(self, Self::Get)
     }
 
     /// Checks if the current method is `POST`.
@@ -107,7 +107,7 @@ impl Method {
     /// `true` if the method is `POST`, `false` otherwise.
     #[inline(always)]
     pub fn is_post(&self) -> bool {
-        matches!(self, Self::POST)
+        matches!(self, Self::Post)
     }
 
     /// Checks if the current method is `PUT`.
@@ -117,7 +117,7 @@ impl Method {
     /// `true` if the method is `PUT`, `false` otherwise.
     #[inline(always)]
     pub fn is_put(&self) -> bool {
-        matches!(self, Self::PUT)
+        matches!(self, Self::Put)
     }
 
     /// Checks if the current method is `DELETE`.
@@ -127,7 +127,7 @@ impl Method {
     /// `true` if the method is `DELETE`, `false` otherwise.
     #[inline(always)]
     pub fn is_delete(&self) -> bool {
-        matches!(self, Self::DELETE)
+        matches!(self, Self::Delete)
     }
 
     /// Checks if the current method is `PATCH`.
@@ -137,7 +137,7 @@ impl Method {
     /// `true` if the method is `PATCH`, `false` otherwise.
     #[inline(always)]
     pub fn is_patch(&self) -> bool {
-        matches!(self, Self::PATCH)
+        matches!(self, Self::Patch)
     }
 
     /// Checks if the current method is `HEAD`.
@@ -147,7 +147,7 @@ impl Method {
     /// `true` if the method is `HEAD`, `false` otherwise.
     #[inline(always)]
     pub fn is_head(&self) -> bool {
-        matches!(self, Self::HEAD)
+        matches!(self, Self::Head)
     }
 
     /// Checks if the current method is `OPTIONS`.
@@ -157,7 +157,7 @@ impl Method {
     /// `true` if the method is `OPTIONS`, `false` otherwise.
     #[inline(always)]
     pub fn is_options(&self) -> bool {
-        matches!(self, Self::OPTIONS)
+        matches!(self, Self::Options)
     }
 
     /// Checks if the current method is `CONNECT`.
@@ -167,7 +167,7 @@ impl Method {
     /// `true` if the method is `CONNECT`, `false` otherwise.
     #[inline(always)]
     pub fn is_connect(&self) -> bool {
-        matches!(self, Self::CONNECT)
+        matches!(self, Self::Connect)
     }
 
     /// Checks if the current method is `TRACE`.
@@ -177,7 +177,7 @@ impl Method {
     /// `true` if the method is `TRACE`, `false` otherwise.
     #[inline(always)]
     pub fn is_trace(&self) -> bool {
-        matches!(self, Self::TRACE)
+        matches!(self, Self::Trace)
     }
 
     /// Checks if the current method is `UNKNOWN`.
@@ -187,6 +187,6 @@ impl Method {
     /// `true` if the method is `UNKNOWN`, `false` otherwise.
     #[inline(always)]
     pub fn is_unknown(&self) -> bool {
-        matches!(self, Self::UNKNOWN(_))
+        matches!(self, Self::Unknown(_))
     }
 }

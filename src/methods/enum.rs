@@ -1,28 +1,30 @@
+use crate::*;
+
 /// Defines the `Method` enum, representing HTTP request methods.
 ///
 /// This enum provides a comprehensive list of standard HTTP methods,
 /// such as GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, CONNECT, and TRACE.
 /// It also includes an `UNKNOWN` variant for unrecognized methods.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Method {
     /// Represents the HTTP `GET` method.
-    GET,
+    Get,
     /// Represents the HTTP `POST` method.
-    POST,
+    Post,
     /// Represents the HTTP `PUT` method.
-    PUT,
+    Put,
     /// Represents the HTTP `DELETE` method.
-    DELETE,
+    Delete,
     /// Represents the HTTP `PATCH` method.
-    PATCH,
+    Patch,
     /// Represents the HTTP `HEAD` method.
-    HEAD,
+    Head,
     /// Represents the HTTP `OPTIONS` method.
-    OPTIONS,
+    Options,
     /// Represents the HTTP `CONNECT` method.
-    CONNECT,
+    Connect,
     /// Represents the HTTP `TRACE` method.
-    TRACE,
+    Trace,
     /// Unknown
-    UNKNOWN(String),
+    Unknown(String),
 }

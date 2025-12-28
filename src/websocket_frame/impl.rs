@@ -169,7 +169,7 @@ impl WebSocketFrame {
     /// - `Some((WebSocketFrame, usize))`: If the frame is successfully decoded, returns the decoded frame
     ///   and the number of bytes consumed from the input slice.
     /// - `None`: If the frame is incomplete or malformed.
-    pub fn decode_ws_frame<D>(data: D) -> WebsocketFrameWithLengthOption
+    pub fn decode_ws_frame<D>(data: D) -> Option<(WebSocketFrame, usize)>
     where
         D: AsRef<[u8]>,
     {
@@ -368,7 +368,7 @@ impl WebSocketFrame {
         result
     }
 
-    /// Generates a WebSocket accept key from the client-provided key, returning an `OptionString`.
+    /// Generates a WebSocket accept key from the client-provided key, returning an `Option<String>`.
     ///
     /// # Arguments
     ///
@@ -376,8 +376,8 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - `OptionString` - An optional string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
-    pub fn try_generate_accept_key<K>(key: K) -> OptionString
+    /// - `Option<String>` - An optional string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
+    pub fn try_generate_accept_key<K>(key: K) -> Option<String>
     where
         K: AsRef<str>,
     {
@@ -401,7 +401,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - `OptionString` - An optional string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
+    /// - `Option<String>` - An optional string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
     ///
     /// # Panics
     ///
@@ -418,7 +418,7 @@ impl WebSocketFrame {
         Self::base64_encode(hash)
     }
 
-    /// Encodes the input data as a base64 string, returning an `OptionString`.
+    /// Encodes the input data as a base64 string, returning an `Option<String>`.
     ///
     /// # Arguments
     ///
@@ -426,8 +426,8 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - `OptionString` - An optional string with the base64 encoded representation of the input data.
-    pub fn try_base64_encode<D>(data: D) -> OptionString
+    /// - `Option<String>` - An optional string with the base64 encoded representation of the input data.
+    pub fn try_base64_encode<D>(data: D) -> Option<String>
     where
         D: AsRef<[u8]>,
     {

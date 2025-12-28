@@ -1,8 +1,10 @@
+use crate::*;
+
 /// Enumeration of supported file extensions.
 ///
 /// Contains all known file extensions with their corresponding MIME types.
 /// Used for content type detection and file handling.
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum FileExtension {
     /// The `123` file extension.
     FileExtension123,
@@ -2126,5 +2128,5 @@ pub enum FileExtension {
     FileExtensionZmm,
     /// An empty or unknown file extension.
     #[default]
-    FileExtensionEmpty,
+    Unknown,
 }

@@ -9,13 +9,13 @@ pub struct HttpUrlComponents {
     /// The URL scheme, such as "http" or "https".
     pub protocol: Protocol,
     /// The host part of the URL.
-    pub host: OptionString,
+    pub host: Option<String>,
     /// The port number in the URL, if specified.
-    pub port: OptionU16,
+    pub port: Option<u16>,
     /// The path in the URL.
-    pub path: OptionString,
+    pub path: Option<String>,
     /// The query string in the URL.
-    pub query: OptionString,
+    pub query: Option<String>,
     /// The fragment identifier.
-    pub fragment: OptionString,
+    pub fragment: Option<String>,
 }

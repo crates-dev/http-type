@@ -1,5 +1,39 @@
 use crate::*;
 
+/// Implements the `std::error::Error` trait for `ResponseError`.
+/// This allows `ResponseError` to be treated as a standard Rust error type.
+impl std::error::Error for ResponseError {}
+
+/// Implements the `Display` trait for `ResponseError`.
+/// This allows `ResponseError` variants to be formatted into human-readable strings.
+impl Display for ResponseError {
+    /// Formats the `ResponseError` variant into a human-readable string.
+    ///
+    /// # Arguments
+    ///
+    /// - `f`: A mutable reference to a `fmt::Formatter` used for writing the formatted string.
+    ///
+    /// # Returns
+    ///
+    /// A `fmt::Result` indicating whether the formatting was successful.
+    #[inline(always)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NotFoundStream => {
+                write!(f, "Not found stream")
+            }
+            Self::ConnectionClosed => {
+                write!(f, "Connection has been closed")
+            }
+            Self::Terminated => {
+                write!(f, "Current processing has been terminated")
+            }
+            Self::Response(err) => write!(f, "Response error{COLON_SPACE}{err}"),
+            Self::Unknown => write!(f, "Unknown error"),
+        }
+    }
+}
+
 /// Provides a default value for `Response`.
 ///
 /// Returns a new `Response` instance with all fields initialized to their default values.
@@ -8,7 +42,7 @@ impl Default for Response {
     fn default() -> Self {
         let http_status: HttpStatus = HttpStatus::default();
         Self {
-            version: HttpVersion::HTTP1_1,
+            version: HttpVersion::Http1_1,
             status_code: http_status.code(),
             reason_phrase: http_status.to_string(),
             headers: hash_map_xx_hash3_64(),
@@ -36,9 +70,9 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - `OptionResponseHeadersValue` - The optional header values.
+    /// - `Option<ResponseHeadersValue>` - The optional header values.
     #[inline(always)]
-    pub fn try_get_header<K>(&self, key: K) -> OptionResponseHeadersValue
+    pub fn try_get_header<K>(&self, key: K) -> Option<ResponseHeadersValue>
     where
         K: AsRef<str>,
     {
@@ -74,9 +108,9 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - `OptionResponseHeadersValueItem` - The first header value if exists.
+    /// - `Option<ResponseHeadersValueItem>` - The first header value if exists.
     #[inline(always)]
-    pub fn try_get_header_front<K>(&self, key: K) -> OptionResponseHeadersValueItem
+    pub fn try_get_header_front<K>(&self, key: K) -> Option<ResponseHeadersValueItem>
     where
         K: AsRef<str>,
     {
@@ -114,9 +148,9 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - `OptionResponseHeadersValueItem` - The last header value if exists.
+    /// - `Option<ResponseHeadersValueItem>` - The last header value if exists.
     #[inline(always)]
-    pub fn try_get_header_back<K>(&self, key: K) -> OptionResponseHeadersValueItem
+    pub fn try_get_header_back<K>(&self, key: K) -> Option<ResponseHeadersValueItem>
     where
         K: AsRef<str>,
     {
@@ -204,9 +238,9 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - `OptionUsize` - The count of values for the header.
+    /// - `Option<usize>` - The count of values for the header.
     #[inline(always)]
-    pub fn try_get_header_length<K>(&self, key: K) -> OptionUsize
+    pub fn try_get_header_length<K>(&self, key: K) -> Option<usize>
     where
         K: AsRef<str>,
     {
@@ -271,12 +305,12 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - `ResultJsonError<T>` - The deserialization result.
-    pub fn try_get_body_json<T>(&self) -> ResultJsonError<T>
+    /// - `Result<T, serde_json::Error>` - The deserialization result.
+    pub fn try_get_body_json<T>(&self) -> Result<T, serde_json::Error>
     where
         T: DeserializeOwned,
     {
-        json_from_slice(self.get_body())
+        serde_json::from_slice(self.get_body())
     }
 
     /// Deserializes the body content of the response as_ref a specified type `T`.
@@ -545,7 +579,7 @@ impl Response {
         }
         let mut response_string: String = String::with_capacity(DEFAULT_BUFFER_SIZE);
         self.push_http_first_line(&mut response_string);
-        let compress_type_opt: OptionCompress = self
+        let compress_type_opt: Option<Compress> = self
             .try_get_header_back(CONTENT_ENCODING)
             .map(|value| value.parse::<Compress>().unwrap_or_default());
         if self.try_get_header_back(CONNECTION).is_none() {
