@@ -281,23 +281,26 @@ impl Request {
         Self::default()
     }
 
-    /// Parses an HTTP request from a buffered TCP stream reader.
+    /// Parses an HTTP request from a TCP stream.
     ///
-    /// Reads request line, headers and body from the stream and constructs a Request object.
+    /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
     ///
     /// # Arguments
     ///
-    /// - `&mut BufReader<&mut TcpStream>` - The buffered TCP stream reader.
+    /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
     /// - `&RequestConfig` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
     /// - `Result<Request, RequestError>` - The parsed request or an error.
-    pub async fn http_from_reader(
-        reader: &mut BufReader<&mut TcpStream>,
+    pub async fn http_from_stream(
+        stream: &ArcRwLockStream,
         config: &RequestConfig,
     ) -> Result<Request, RequestError> {
+        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let buffer_size: usize = *config.get_buffer_size();
+        let reader: &mut BufReader<&mut TcpStream> =
+            &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
         let mut request_line: String = String::with_capacity(buffer_size);
         let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
         let bytes_read: usize = timeout(
@@ -351,11 +354,11 @@ impl Request {
         let mut content_length: usize = 0;
         let mut header_count: usize = 0;
         loop {
-            let mut header_line: String = String::with_capacity(buffer_size);
+            let header_line: &mut String = &mut String::with_capacity(buffer_size);
             let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
             let bytes_read: usize = timeout(
                 timeout_duration,
-                AsyncBufReadExt::read_line(reader, &mut header_line),
+                AsyncBufReadExt::read_line(reader, header_line),
             )
             .await
             .map_err(|_| RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout))?
@@ -432,27 +435,6 @@ impl Request {
             headers,
             body,
         })
-    }
-
-    /// Parses an HTTP request from a TCP stream.
-    ///
-    /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
-    ///
-    /// # Arguments
-    ///
-    /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<Request, RequestError>` - The parsed request or an error.
-    pub async fn http_from_stream(
-        stream: &ArcRwLockStream,
-        config: &RequestConfig,
-    ) -> Result<Request, RequestError> {
-        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
-        let mut reader: BufReader<&mut TcpStream> = BufReader::new(&mut buf_stream);
-        Self::http_from_reader(&mut reader, config).await
     }
 
     /// Parses a WebSocket request from a TCP stream.
