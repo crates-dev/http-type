@@ -487,10 +487,10 @@ impl Request {
                         return Err(RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout));
                     }
                     is_client_response = false;
-                    stream.send_body(&PING_FRAME).await.map_err(|_| {
+                    stream.try_send_body(&PING_FRAME).await.map_err(|_| {
                         RequestError::WriteTimeoutNotSet(HttpStatus::InternalServerError)
                     })?;
-                    stream.flush().await;
+                    let _ = stream.try_flush().await;
                     continue;
                 }
             };
