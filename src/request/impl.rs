@@ -58,7 +58,6 @@ impl Display for RequestError {
             Self::InvalidContentLength(status) => {
                 write!(f, "Invalid content length [{}]", status.code())
             }
-            Self::Unknown(status) => write!(f, "Unknown error occurred [{}]", status.code()),
             Self::InvalidUrlScheme(status) => write!(f, "Invalid URL scheme [{}]", status.code()),
             Self::InvalidUrlHost(status) => write!(f, "Invalid URL host [{}]", status.code()),
             Self::InvalidUrlPort(status) => write!(f, "Invalid URL port [{}]", status.code()),
@@ -106,6 +105,37 @@ impl Display for RequestError {
             Self::HttpRequestPartsInsufficient(status) => {
                 write!(f, "HTTP request parts insufficient [{}]", status.code())
             }
+            Self::TcpStreamConnect(status) => {
+                write!(f, "TCP stream connection error [{}]", status.code())
+            }
+            Self::TlsConnectorBuild(status) => {
+                write!(f, "TLS connector build error [{}]", status.code())
+            }
+            Self::InvalidUrl(status) => {
+                write!(f, "Invalid URL error [{}]", status.code())
+            }
+            Self::SetReadTimeout(status) => {
+                write!(f, "Set read timeout error [{}]", status.code())
+            }
+            Self::SetWriteTimeout(status) => {
+                write!(f, "Set write timeout error [{}]", status.code())
+            }
+            Self::ConfigReadError(status) => {
+                write!(f, "Configuration read error [{}]", status.code())
+            }
+            Self::TcpStreamConnectString(status) => {
+                write!(f, "TCP stream connection error [{}]", status.code())
+            }
+            Self::TlsConnectorBuildString(status) => {
+                write!(f, "TLS connector build error [{}]", status.code())
+            }
+            Self::SetReadTimeoutString(status) => {
+                write!(f, "Set read timeout error [{}]", status.code())
+            }
+            Self::SetWriteTimeoutString(status) => {
+                write!(f, "Set write timeout error [{}]", status.code())
+            }
+            Self::Unknown(status) => write!(f, "Unknown error occurred [{}]", status.code()),
         }
     }
 }
@@ -148,7 +178,6 @@ impl RequestError {
             Self::HeaderValueTooLong(status) => *status,
             Self::ContentLengthTooLarge(status) => *status,
             Self::InvalidContentLength(status) => *status,
-            Self::Unknown(status) => *status,
             Self::InvalidUrlScheme(status) => *status,
             Self::InvalidUrlHost(status) => *status,
             Self::InvalidUrlPort(status) => *status,
@@ -168,6 +197,17 @@ impl RequestError {
             Self::WebSocketInvalidCloseCode(status) => *status,
             Self::WebSocketInvalidExtension(status) => *status,
             Self::HttpRequestPartsInsufficient(status) => *status,
+            Self::TcpStreamConnect(status) => *status,
+            Self::TlsConnectorBuild(status) => *status,
+            Self::InvalidUrl(status) => *status,
+            Self::SetReadTimeout(status) => *status,
+            Self::SetWriteTimeout(status) => *status,
+            Self::ConfigReadError(status) => *status,
+            Self::TcpStreamConnectString(status) => *status,
+            Self::TlsConnectorBuildString(status) => *status,
+            Self::SetReadTimeoutString(status) => *status,
+            Self::SetWriteTimeoutString(status) => *status,
+            Self::Unknown(status) => *status,
         }
     }
 
