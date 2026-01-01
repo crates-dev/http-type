@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RequestError {
     /// HTTP read error with HTTP status
     HttpRead(HttpStatus),
@@ -106,6 +106,8 @@ pub enum RequestError {
     SetReadTimeoutString(HttpStatus),
     /// Set write timeout error with HTTP status
     SetWriteTimeoutString(HttpStatus),
+    /// Request error with custom message
+    Request(String),
     /// Unknown error with HTTP status
     Unknown(HttpStatus),
 }

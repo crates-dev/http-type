@@ -135,6 +135,7 @@ impl Display for RequestError {
             Self::SetWriteTimeoutString(status) => {
                 write!(f, "Set write timeout error [{}]", status.code())
             }
+            Self::Request(message) => write!(f, "Request error: {message}"),
             Self::Unknown(status) => write!(f, "Unknown error occurred [{}]", status.code()),
         }
     }
@@ -207,6 +208,7 @@ impl RequestError {
             Self::TlsConnectorBuildString(status) => *status,
             Self::SetReadTimeoutString(status) => *status,
             Self::SetWriteTimeoutString(status) => *status,
+            Self::Request(_) => HttpStatus::BadRequest,
             Self::Unknown(status) => *status,
         }
     }
