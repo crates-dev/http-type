@@ -14,4 +14,6 @@ pub enum ResponseError {
     Terminated,
     /// Represents an error with a message string.
     Response(String),
+    /// Represents a flush operation error with a message string.
+    FlushError(String),
 }

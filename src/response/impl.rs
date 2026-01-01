@@ -28,7 +28,8 @@ impl Display for ResponseError {
             Self::Terminated => {
                 write!(f, "Current processing has been terminated")
             }
-            Self::Response(err) => write!(f, "Response error{COLON_SPACE}{err}"),
+            Self::Response(error) => write!(f, "Response error{COLON_SPACE}{error}"),
+            Self::FlushError(error) => write!(f, "Flush error{COLON_SPACE}{error}"),
             Self::Unknown => write!(f, "Unknown error"),
         }
     }

@@ -70,7 +70,7 @@ impl ArcRwLockStream {
             .await
             .write_all(data.as_ref())
             .await
-            .map_err(|err| ResponseError::Response(err.to_string()))?;
+            .map_err(|error| ResponseError::Response(error.to_string()))?;
         Ok(())
     }
 
@@ -107,7 +107,7 @@ impl ArcRwLockStream {
             .await
             .write_all(data.as_ref())
             .await
-            .map_err(|err| ResponseError::Response(err.to_string()))?;
+            .map_err(|error| ResponseError::Response(error.to_string()))?;
         Ok(())
     }
 
@@ -146,7 +146,7 @@ impl ArcRwLockStream {
             stream
                 .write_all(data.as_ref())
                 .await
-                .map_err(|err| ResponseError::Response(err.to_string()))?;
+                .map_err(|error| ResponseError::Response(error.to_string()))?;
         }
         Ok(())
     }
@@ -165,19 +165,20 @@ impl ArcRwLockStream {
         I: IntoIterator<Item = D>,
         D: AsRef<[u8]>,
     {
-        let mut stream: RwLockWriteGuardTcpStream = self.write().await;
-        for data in data_iter {
-            stream.write_all(data.as_ref()).await.unwrap();
-        }
+        self.try_send_body_list(data_iter).await.unwrap();
     }
 
     /// Flushes all buffered data to the stream.
     ///
     /// # Returns
     ///
-    /// - `Result<(), std::io::Error>` - Result indicating success or failure.
-    pub async fn try_flush(&self) -> Result<(), std::io::Error> {
-        self.write().await.flush().await
+    /// - `Result<(), ResponseError>` - Result indicating success or failure.
+    pub async fn try_flush(&self) -> Result<(), ResponseError> {
+        self.write()
+            .await
+            .flush()
+            .await
+            .map_err(|error| ResponseError::FlushError(error.to_string()))
     }
 
     /// Flushes all buffered data to the stream.

@@ -513,9 +513,9 @@ impl Request {
             {
                 Ok(result) => match result {
                     Ok(len) => len,
-                    Err(err) => {
-                        if err.kind() == ErrorKind::ConnectionReset
-                            || err.kind() == ErrorKind::ConnectionAborted
+                    Err(error) => {
+                        if error.kind() == ErrorKind::ConnectionReset
+                            || error.kind() == ErrorKind::ConnectionAborted
                         {
                             return Err(RequestError::ClientDisconnected(HttpStatus::BadRequest));
                         }
