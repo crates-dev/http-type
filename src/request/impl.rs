@@ -3,6 +3,16 @@ use crate::*;
 /// Implements the `std::error::Error` trait for `RequestError`.
 impl std::error::Error for RequestError {}
 
+/// Provides a default value for `RequestError`.
+impl Default for RequestError {
+    /// Provides a default value for `RequestError`.
+    ///
+    /// Returns a `RequestError::Unknown` with `HttpStatus::InternalServerError`.
+    fn default() -> Self {
+        RequestError::Unknown(HttpStatus::InternalServerError)
+    }
+}
+
 /// Implements the `Display` trait for `RequestError`, allowing it to be formatted as a string.
 impl Display for RequestError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
