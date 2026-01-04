@@ -207,144 +207,139 @@ impl Request {
         stream: &ArcRwLockStream,
         config: &RequestConfig,
     ) -> Result<Request, RequestError> {
-        let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
-        let buffer_size: usize = *config.get_buffer_size();
-        let reader: &mut BufReader<&mut TcpStream> =
-            &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
-        let mut request_line: String = String::with_capacity(buffer_size);
-        let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
-        let bytes_read: usize = timeout(
-            timeout_duration,
-            AsyncBufReadExt::read_line(reader, &mut request_line),
+        timeout(
+            Duration::from_millis(config.http_read_timeout_ms),
+            async move {
+                let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
+                let buffer_size: usize = *config.get_buffer_size();
+                let reader: &mut BufReader<&mut TcpStream> =
+                    &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
+                let mut request_line: String = String::with_capacity(buffer_size);
+                let bytes_read: usize = AsyncBufReadExt::read_line(reader, &mut request_line)
+                    .await
+                    .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
+                if bytes_read > config.max_request_line_length {
+                    return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
+                }
+                let parts: Vec<&str> = request_line.split_whitespace().collect();
+                let parts_len: usize = parts.len();
+                if parts_len < 3 {
+                    return Err(RequestError::HttpRequestPartsInsufficient(
+                        HttpStatus::BadRequest,
+                    ));
+                }
+                let full_path: &str = parts[1];
+                if full_path.len() > config.max_path_length {
+                    return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
+                }
+                let method: RequestMethod = parts[0]
+                    .parse::<RequestMethod>()
+                    .unwrap_or(Method::Unknown(parts[0].to_string()));
+                let full_path: RequestPath = full_path.to_string();
+                let version: RequestVersion = parts[2]
+                    .parse::<RequestVersion>()
+                    .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
+                let hash_index: Option<usize> = full_path.find(HASH);
+                let query_index: Option<usize> = full_path.find(QUERY);
+                let query_string: String = query_index.map_or_else(String::new, |i| {
+                    let temp: &str = &full_path[i + 1..];
+                    if hash_index.is_none() || hash_index.unwrap() <= i {
+                        return temp.to_owned();
+                    }
+                    temp.split(HASH).next().unwrap_or_default().to_owned()
+                });
+                if query_string.len() > config.max_query_length {
+                    return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
+                }
+                let querys: RequestQuerys = Self::parse_querys(&query_string);
+                let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
+                    full_path[..i].to_owned()
+                } else {
+                    full_path.to_owned()
+                };
+                let mut headers: RequestHeaders = hash_map_xx_hash3_64();
+                let mut host: RequestHost = String::new();
+                let mut content_length: usize = 0;
+                let mut header_count: usize = 0;
+                loop {
+                    let header_line: &mut String = &mut String::with_capacity(buffer_size);
+                    let bytes_read: usize =
+                        AsyncBufReadExt::read_line(reader, header_line)
+                            .await
+                            .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
+                    if bytes_read > config.max_header_line_length {
+                        return Err(RequestError::HeaderLineTooLong(
+                            HttpStatus::RequestHeaderFieldsTooLarge,
+                        ));
+                    }
+                    let header_line: &str = header_line.trim();
+                    if header_line.is_empty() {
+                        break;
+                    }
+                    header_count += 1;
+                    if header_count > config.max_header_count {
+                        return Err(RequestError::TooManyHeaders(
+                            HttpStatus::RequestHeaderFieldsTooLarge,
+                        ));
+                    }
+                    if let Some((key_part, value_part)) = header_line.split_once(COLON) {
+                        let key: String = key_part.trim().to_ascii_lowercase();
+                        if key.is_empty() {
+                            continue;
+                        }
+                        if key.len() > config.max_header_key_length {
+                            return Err(RequestError::HeaderKeyTooLong(
+                                HttpStatus::RequestHeaderFieldsTooLarge,
+                            ));
+                        }
+                        let value: String = value_part.trim().to_string();
+                        if value.len() > config.max_header_value_length {
+                            return Err(RequestError::HeaderValueTooLong(
+                                HttpStatus::RequestHeaderFieldsTooLarge,
+                            ));
+                        }
+                        if key == HOST {
+                            host = value.clone();
+                        } else if key == CONTENT_LENGTH {
+                            match value.parse::<usize>() {
+                                Ok(length) => {
+                                    if length > config.max_body_size {
+                                        return Err(RequestError::ContentLengthTooLarge(
+                                            HttpStatus::PayloadTooLarge,
+                                        ));
+                                    }
+                                    content_length = length;
+                                }
+                                Err(_) => {
+                                    return Err(RequestError::InvalidContentLength(
+                                        HttpStatus::BadRequest,
+                                    ));
+                                }
+                            }
+                        }
+                        headers.entry(key).or_default().push_back(value);
+                    }
+                }
+                let mut body: RequestBody = Vec::with_capacity(content_length);
+                if content_length > 0 {
+                    body.resize(content_length, 0);
+                    AsyncReadExt::read_exact(reader, &mut body)
+                        .await
+                        .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
+                }
+                Ok(Request {
+                    method,
+                    host,
+                    version,
+                    path,
+                    querys,
+                    headers,
+                    body,
+                })
+            },
         )
         .await
         .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
-        .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-        if bytes_read > config.max_request_line_length {
-            return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
-        }
-        let parts: Vec<&str> = request_line.split_whitespace().collect();
-        let parts_len: usize = parts.len();
-        if parts_len < 3 {
-            return Err(RequestError::HttpRequestPartsInsufficient(
-                HttpStatus::BadRequest,
-            ));
-        }
-        let full_path: &str = parts[1];
-        if full_path.len() > config.max_path_length {
-            return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
-        }
-        let method: RequestMethod = parts[0]
-            .parse::<RequestMethod>()
-            .unwrap_or(Method::Unknown(parts[0].to_string()));
-        let full_path: RequestPath = full_path.to_string();
-        let version: RequestVersion = parts[2]
-            .parse::<RequestVersion>()
-            .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
-        let hash_index: Option<usize> = full_path.find(HASH);
-        let query_index: Option<usize> = full_path.find(QUERY);
-        let query_string: String = query_index.map_or_else(String::new, |i| {
-            let temp: &str = &full_path[i + 1..];
-            if hash_index.is_none() || hash_index.unwrap() <= i {
-                return temp.to_owned();
-            }
-            temp.split(HASH).next().unwrap_or_default().to_owned()
-        });
-        if query_string.len() > config.max_query_length {
-            return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
-        }
-        let querys: RequestQuerys = Self::parse_querys(&query_string);
-        let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
-            full_path[..i].to_owned()
-        } else {
-            full_path.to_owned()
-        };
-        let mut headers: RequestHeaders = hash_map_xx_hash3_64();
-        let mut host: RequestHost = String::new();
-        let mut content_length: usize = 0;
-        let mut header_count: usize = 0;
-        loop {
-            let header_line: &mut String = &mut String::with_capacity(buffer_size);
-            let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
-            let bytes_read: usize = timeout(
-                timeout_duration,
-                AsyncBufReadExt::read_line(reader, header_line),
-            )
-            .await
-            .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
-            .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-            if bytes_read > config.max_header_line_length {
-                return Err(RequestError::HeaderLineTooLong(
-                    HttpStatus::RequestHeaderFieldsTooLarge,
-                ));
-            }
-            let header_line: &str = header_line.trim();
-            if header_line.is_empty() {
-                break;
-            }
-            header_count += 1;
-            if header_count > config.max_header_count {
-                return Err(RequestError::TooManyHeaders(
-                    HttpStatus::RequestHeaderFieldsTooLarge,
-                ));
-            }
-            if let Some((key_part, value_part)) = header_line.split_once(COLON) {
-                let key: String = key_part.trim().to_ascii_lowercase();
-                if key.is_empty() {
-                    continue;
-                }
-                if key.len() > config.max_header_key_length {
-                    return Err(RequestError::HeaderKeyTooLong(
-                        HttpStatus::RequestHeaderFieldsTooLarge,
-                    ));
-                }
-                let value: String = value_part.trim().to_string();
-                if value.len() > config.max_header_value_length {
-                    return Err(RequestError::HeaderValueTooLong(
-                        HttpStatus::RequestHeaderFieldsTooLarge,
-                    ));
-                }
-                if key == HOST {
-                    host = value.clone();
-                } else if key == CONTENT_LENGTH {
-                    match value.parse::<usize>() {
-                        Ok(length) => {
-                            if length > config.max_body_size {
-                                return Err(RequestError::ContentLengthTooLarge(
-                                    HttpStatus::PayloadTooLarge,
-                                ));
-                            }
-                            content_length = length;
-                        }
-                        Err(_) => {
-                            return Err(RequestError::InvalidContentLength(HttpStatus::BadRequest));
-                        }
-                    }
-                }
-                headers.entry(key).or_default().push_back(value);
-            }
-        }
-        let mut body: RequestBody = Vec::with_capacity(content_length);
-        if content_length > 0 {
-            body.resize(content_length, 0);
-            let timeout_duration: Duration = Duration::from_millis(config.http_read_timeout_ms);
-            timeout(
-                timeout_duration,
-                AsyncReadExt::read_exact(reader, &mut body),
-            )
-            .await
-            .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
-            .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
-        }
-        Ok(Request {
-            method,
-            host,
-            version,
-            path,
-            querys,
-            headers,
-            body,
-        })
     }
 
     /// Parses a WebSocket request from a TCP stream.
@@ -373,8 +368,8 @@ impl Request {
         let mut is_client_response: bool = false;
         let ws_read_timeout_ms: u64 =
             (config.ws_read_timeout_ms >> 1) + (config.ws_read_timeout_ms & 1);
+        let timeout_duration: Duration = Duration::from_millis(ws_read_timeout_ms);
         loop {
-            let timeout_duration: Duration = Duration::from_millis(ws_read_timeout_ms);
             let len: usize = match timeout(
                 timeout_duration,
                 stream.write().await.read(&mut temp_buffer),
