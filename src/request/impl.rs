@@ -191,94 +191,32 @@ impl Request {
         Self::default()
     }
 
-    /// Parses an HTTP request from a TCP stream.
+    /// Parses a query string as_ref key-value pairs.
     ///
-    /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
+    /// Expects format "key1=value1&key2=value2". Empty values are allowed.
     ///
     /// # Arguments
     ///
-    /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
+    /// - `&str` - The query string to parse.
     ///
     /// # Returns
     ///
-    /// - `Result<Request, RequestError>` - The parsed request or an error.
-    pub async fn http_from_stream(
-        stream: &ArcRwLockStream,
-        config: &RequestConfig,
-    ) -> Result<Request, RequestError> {
-        timeout(
-            Duration::from_millis(config.http_read_timeout_ms),
-            async move {
-                let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
-                let buffer_size: usize = *config.get_buffer_size();
-                let reader: &mut BufReader<&mut TcpStream> =
-                    &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
-                let mut request_line: String = String::with_capacity(buffer_size);
-                let bytes_read: usize = AsyncBufReadExt::read_line(reader, &mut request_line)
-                    .await
-                    .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-                if bytes_read > config.max_request_line_length {
-                    return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
+    /// - `HashMap<String, String>` - The parsed query parameters.
+    fn parse_querys<Q>(query: Q) -> RequestQuerys
+    where
+        Q: AsRef<str>,
+    {
+        let mut query_map: RequestQuerys = hash_map_xx_hash3_64();
+        for pair in query.as_ref().split(AND) {
+            if let Some((key, value)) = pair.split_once(EQUAL) {
+                if !key.is_empty() {
+                    query_map.insert(key.to_string(), value.to_string());
                 }
-                let parts: Vec<&str> = request_line.split_whitespace().collect();
-                let parts_len: usize = parts.len();
-                if parts_len < 3 {
-                    return Err(RequestError::HttpRequestPartsInsufficient(
-                        HttpStatus::BadRequest,
-                    ));
-                }
-                let full_path: &str = parts[1];
-                if full_path.len() > config.max_path_length {
-                    return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
-                }
-                let method: RequestMethod = parts[0]
-                    .parse::<RequestMethod>()
-                    .unwrap_or(Method::Unknown(parts[0].to_string()));
-                let full_path: RequestPath = full_path.to_string();
-                let version: RequestVersion = parts[2]
-                    .parse::<RequestVersion>()
-                    .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
-                let hash_index: Option<usize> = full_path.find(HASH);
-                let query_index: Option<usize> = full_path.find(QUERY);
-                let query_string: String = query_index.map_or_else(String::new, |i| {
-                    let temp: &str = &full_path[i + 1..];
-                    if hash_index.is_none() || hash_index.unwrap() <= i {
-                        return temp.to_owned();
-                    }
-                    temp.split(HASH).next().unwrap_or_default().to_owned()
-                });
-                if query_string.len() > config.max_query_length {
-                    return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
-                }
-                let querys: RequestQuerys = Self::parse_querys(&query_string);
-                let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
-                    full_path[..i].to_owned()
-                } else {
-                    full_path.to_owned()
-                };
-                let (headers, host, content_length): (RequestHeaders, RequestHost, usize) =
-                    Self::parse_headers(reader, config).await?;
-                let mut body: RequestBody = Vec::with_capacity(content_length);
-                if content_length > 0 {
-                    body.resize(content_length, 0);
-                    AsyncReadExt::read_exact(reader, &mut body)
-                        .await
-                        .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
-                }
-                Ok(Request {
-                    method,
-                    host,
-                    version,
-                    path,
-                    querys,
-                    headers,
-                    body,
-                })
-            },
-        )
-        .await
-        .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
+            } else if !pair.is_empty() {
+                query_map.insert(pair.to_string(), String::new());
+            }
+        }
+        query_map
     }
 
     /// Parses HTTP headers from a buffered reader.
@@ -368,6 +306,96 @@ impl Request {
             }
         }
         Ok((headers, host, content_length))
+    }
+
+    /// Parses an HTTP request from a TCP stream.
+    ///
+    /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
+    ///
+    /// # Arguments
+    ///
+    /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
+    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Request, RequestError>` - The parsed request or an error.
+    pub async fn http_from_stream(
+        stream: &ArcRwLockStream,
+        config: &RequestConfig,
+    ) -> Result<Request, RequestError> {
+        timeout(
+            Duration::from_millis(config.http_read_timeout_ms),
+            async move {
+                let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
+                let buffer_size: usize = *config.get_buffer_size();
+                let reader: &mut BufReader<&mut TcpStream> =
+                    &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
+                let mut request_line: String = String::with_capacity(buffer_size);
+                let bytes_read: usize = AsyncBufReadExt::read_line(reader, &mut request_line)
+                    .await
+                    .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
+                if bytes_read > config.max_request_line_length {
+                    return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
+                }
+                let parts: Vec<&str> = request_line.split_whitespace().collect();
+                let parts_len: usize = parts.len();
+                if parts_len < 3 {
+                    return Err(RequestError::HttpRequestPartsInsufficient(
+                        HttpStatus::BadRequest,
+                    ));
+                }
+                let method: RequestMethod = parts[0]
+                    .parse::<RequestMethod>()
+                    .unwrap_or(Method::Unknown(parts[0].to_string()));
+                let full_path: &str = parts[1];
+                if full_path.len() > config.max_path_length {
+                    return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
+                }
+                let full_path: RequestPath = full_path.to_string();
+                let version: RequestVersion = parts[2]
+                    .parse::<RequestVersion>()
+                    .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
+                let hash_index: Option<usize> = full_path.find(HASH);
+                let query_index: Option<usize> = full_path.find(QUERY);
+                let query_string: String = query_index.map_or_else(String::new, |i| {
+                    let temp: &str = &full_path[i + 1..];
+                    if hash_index.is_none() || hash_index.unwrap() <= i {
+                        return temp.to_owned();
+                    }
+                    temp.split(HASH).next().unwrap_or_default().to_owned()
+                });
+                if query_string.len() > config.max_query_length {
+                    return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
+                }
+                let querys: RequestQuerys = Self::parse_querys(&query_string);
+                let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
+                    full_path[..i].to_owned()
+                } else {
+                    full_path.to_owned()
+                };
+                let (headers, host, content_length): (RequestHeaders, RequestHost, usize) =
+                    Self::parse_headers(reader, config).await?;
+                let mut body: RequestBody = Vec::with_capacity(content_length);
+                if content_length > 0 {
+                    body.resize(content_length, 0);
+                    AsyncReadExt::read_exact(reader, &mut body)
+                        .await
+                        .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
+                }
+                Ok(Request {
+                    method,
+                    host,
+                    version,
+                    path,
+                    querys,
+                    headers,
+                    body,
+                })
+            },
+        )
+        .await
+        .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
     }
 
     /// Parses a WebSocket request from a TCP stream.
@@ -477,34 +505,6 @@ impl Request {
                 }
             }
         }
-    }
-
-    /// Parses a query string as_ref key-value pairs.
-    ///
-    /// Expects format "key1=value1&key2=value2". Empty values are allowed.
-    ///
-    /// # Arguments
-    ///
-    /// - `&str` - The query string to parse.
-    ///
-    /// # Returns
-    ///
-    /// - `HashMap<String, String>` - The parsed query parameters.
-    fn parse_querys<Q>(query: Q) -> RequestQuerys
-    where
-        Q: AsRef<str>,
-    {
-        let mut query_map: RequestQuerys = hash_map_xx_hash3_64();
-        for pair in query.as_ref().split(AND) {
-            if let Some((key, value)) = pair.split_once(EQUAL) {
-                if !key.is_empty() {
-                    query_map.insert(key.to_string(), value.to_string());
-                }
-            } else if !pair.is_empty() {
-                query_map.insert(pair.to_string(), String::new());
-            }
-        }
-        query_map
     }
 
     /// Tries to get a query parameter value by key.
