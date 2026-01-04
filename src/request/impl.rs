@@ -257,69 +257,8 @@ impl Request {
                 } else {
                     full_path.to_owned()
                 };
-                let mut headers: RequestHeaders = hash_map_xx_hash3_64();
-                let mut host: RequestHost = String::new();
-                let mut content_length: usize = 0;
-                let mut header_count: usize = 0;
-                loop {
-                    let header_line: &mut String = &mut String::with_capacity(buffer_size);
-                    let bytes_read: usize =
-                        AsyncBufReadExt::read_line(reader, header_line)
-                            .await
-                            .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-                    if bytes_read > config.max_header_line_length {
-                        return Err(RequestError::HeaderLineTooLong(
-                            HttpStatus::RequestHeaderFieldsTooLarge,
-                        ));
-                    }
-                    let header_line: &str = header_line.trim();
-                    if header_line.is_empty() {
-                        break;
-                    }
-                    header_count += 1;
-                    if header_count > config.max_header_count {
-                        return Err(RequestError::TooManyHeaders(
-                            HttpStatus::RequestHeaderFieldsTooLarge,
-                        ));
-                    }
-                    if let Some((key_part, value_part)) = header_line.split_once(COLON) {
-                        let key: String = key_part.trim().to_ascii_lowercase();
-                        if key.is_empty() {
-                            continue;
-                        }
-                        if key.len() > config.max_header_key_length {
-                            return Err(RequestError::HeaderKeyTooLong(
-                                HttpStatus::RequestHeaderFieldsTooLarge,
-                            ));
-                        }
-                        let value: String = value_part.trim().to_string();
-                        if value.len() > config.max_header_value_length {
-                            return Err(RequestError::HeaderValueTooLong(
-                                HttpStatus::RequestHeaderFieldsTooLarge,
-                            ));
-                        }
-                        if key == HOST {
-                            host = value.clone();
-                        } else if key == CONTENT_LENGTH {
-                            match value.parse::<usize>() {
-                                Ok(length) => {
-                                    if length > config.max_body_size {
-                                        return Err(RequestError::ContentLengthTooLarge(
-                                            HttpStatus::PayloadTooLarge,
-                                        ));
-                                    }
-                                    content_length = length;
-                                }
-                                Err(_) => {
-                                    return Err(RequestError::InvalidContentLength(
-                                        HttpStatus::BadRequest,
-                                    ));
-                                }
-                            }
-                        }
-                        headers.entry(key).or_default().push_back(value);
-                    }
-                }
+                let (headers, host, content_length): (RequestHeaders, RequestHost, usize) =
+                    Self::parse_headers(reader, config).await?;
                 let mut body: RequestBody = Vec::with_capacity(content_length);
                 if content_length > 0 {
                     body.resize(content_length, 0);
@@ -340,6 +279,95 @@ impl Request {
         )
         .await
         .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
+    }
+
+    /// Parses HTTP headers from a buffered reader.
+    ///
+    /// This method reads header lines from the provided buffered reader until an empty line
+    /// is encountered, which indicates the end of headers. It validates header count, length,
+    /// and content according to the provided configuration.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut R` - A mutable reference to a buffered reader implementing `AsyncBufReadExt`.
+    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(RequestHeaders, RequestHost, usize), RequestError>` - A tuple containing:
+    ///   - The parsed headers as a hash map
+    ///   - The host value extracted from the Host header
+    ///   - The content length extracted from the Content-Length header
+    ///   - Or an error if parsing fails
+    async fn parse_headers<R>(
+        reader: &mut R,
+        config: &RequestConfig,
+    ) -> Result<(RequestHeaders, RequestHost, usize), RequestError>
+    where
+        R: AsyncBufReadExt + Unpin,
+    {
+        let buffer_size: usize = *config.get_buffer_size();
+        let mut headers: RequestHeaders = hash_map_xx_hash3_64();
+        let mut host: RequestHost = String::new();
+        let mut content_length: usize = 0;
+        let mut header_count: usize = 0;
+        loop {
+            let header_line: &mut String = &mut String::with_capacity(buffer_size);
+            let bytes_read: usize = AsyncBufReadExt::read_line(reader, header_line)
+                .await
+                .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
+            if bytes_read > config.max_header_line_length {
+                return Err(RequestError::HeaderLineTooLong(
+                    HttpStatus::RequestHeaderFieldsTooLarge,
+                ));
+            }
+            let header_line: &str = header_line.trim();
+            if header_line.is_empty() {
+                break;
+            }
+            header_count += 1;
+            if header_count > config.max_header_count {
+                return Err(RequestError::TooManyHeaders(
+                    HttpStatus::RequestHeaderFieldsTooLarge,
+                ));
+            }
+            if let Some((key_part, value_part)) = header_line.split_once(COLON) {
+                let key: String = key_part.trim().to_ascii_lowercase();
+                if key.is_empty() {
+                    continue;
+                }
+                if key.len() > config.max_header_key_length {
+                    return Err(RequestError::HeaderKeyTooLong(
+                        HttpStatus::RequestHeaderFieldsTooLarge,
+                    ));
+                }
+                let value: String = value_part.trim().to_string();
+                if value.len() > config.max_header_value_length {
+                    return Err(RequestError::HeaderValueTooLong(
+                        HttpStatus::RequestHeaderFieldsTooLarge,
+                    ));
+                }
+                if key == HOST {
+                    host = value.clone();
+                } else if key == CONTENT_LENGTH {
+                    match value.parse::<usize>() {
+                        Ok(length) => {
+                            if length > config.max_body_size {
+                                return Err(RequestError::ContentLengthTooLarge(
+                                    HttpStatus::PayloadTooLarge,
+                                ));
+                            }
+                            content_length = length;
+                        }
+                        Err(_) => {
+                            return Err(RequestError::InvalidContentLength(HttpStatus::BadRequest));
+                        }
+                    }
+                }
+                headers.entry(key).or_default().push_back(value);
+            }
+        }
+        Ok((headers, host, content_length))
     }
 
     /// Parses a WebSocket request from a TCP stream.
