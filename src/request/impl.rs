@@ -57,8 +57,8 @@ impl RequestError {
             Self::InvalidUrlPath(status) => *status,
             Self::InvalidUrlQuery(status) => *status,
             Self::InvalidUrlFragment(status) => *status,
-            Self::ReadTimeoutNotSet(status) => *status,
-            Self::WriteTimeoutNotSet(status) => *status,
+            Self::ReadTimeout(status) => *status,
+            Self::WriteTimeout(status) => *status,
             Self::TcpConnectionFailed(status) => *status,
             Self::TlsHandshakeFailed(status) => *status,
             Self::TlsCertificateInvalid(status) => *status,
@@ -73,13 +73,9 @@ impl RequestError {
             Self::TcpStreamConnect(status) => *status,
             Self::TlsConnectorBuild(status) => *status,
             Self::InvalidUrl(status) => *status,
-            Self::SetReadTimeout(status) => *status,
-            Self::SetWriteTimeout(status) => *status,
             Self::ConfigReadError(status) => *status,
             Self::TcpStreamConnectString(status) => *status,
             Self::TlsConnectorBuildString(status) => *status,
-            Self::SetReadTimeoutString(status) => *status,
-            Self::SetWriteTimeoutString(status) => *status,
             Self::Request(_) => HttpStatus::BadRequest,
             Self::Unknown(status) => *status,
         }
@@ -222,7 +218,7 @@ impl Request {
             AsyncBufReadExt::read_line(reader, &mut request_line),
         )
         .await
-        .map_err(|_| RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout))?
+        .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
         .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
         if bytes_read > config.max_request_line_length {
             return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
@@ -275,7 +271,7 @@ impl Request {
                 AsyncBufReadExt::read_line(reader, header_line),
             )
             .await
-            .map_err(|_| RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout))?
+            .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
             .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
             if bytes_read > config.max_header_line_length {
                 return Err(RequestError::HeaderLineTooLong(
@@ -337,7 +333,7 @@ impl Request {
                 AsyncReadExt::read_exact(reader, &mut body),
             )
             .await
-            .map_err(|_| RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout))?
+            .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
             .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
         }
         Ok(Request {
@@ -398,12 +394,13 @@ impl Request {
                 },
                 Err(_) => {
                     if !is_client_response {
-                        return Err(RequestError::ReadTimeoutNotSet(HttpStatus::RequestTimeout));
+                        return Err(RequestError::ReadTimeout(HttpStatus::RequestTimeout));
                     }
                     is_client_response = false;
-                    stream.try_send_body(&PING_FRAME).await.map_err(|_| {
-                        RequestError::WriteTimeoutNotSet(HttpStatus::InternalServerError)
-                    })?;
+                    stream
+                        .try_send_body(&PING_FRAME)
+                        .await
+                        .map_err(|_| RequestError::WriteTimeout(HttpStatus::InternalServerError))?;
                     let _ = stream.try_flush().await;
                     continue;
                 }

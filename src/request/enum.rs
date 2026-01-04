@@ -60,10 +60,10 @@ pub enum RequestError {
     InvalidUrlQuery(HttpStatus),
     /// Invalid URL fragment with HTTP status
     InvalidUrlFragment(HttpStatus),
-    /// Read timeout not set with HTTP status
-    ReadTimeoutNotSet(HttpStatus),
-    /// Write timeout not set with HTTP status
-    WriteTimeoutNotSet(HttpStatus),
+    /// Read timeout with HTTP status
+    ReadTimeout(HttpStatus),
+    /// Write timeout with HTTP status
+    WriteTimeout(HttpStatus),
     /// TCP connection failed with HTTP status
     TcpConnectionFailed(HttpStatus),
     /// TLS handshake failed with HTTP status
@@ -92,20 +92,12 @@ pub enum RequestError {
     TlsConnectorBuild(HttpStatus),
     /// Invalid URL error with HTTP status
     InvalidUrl(HttpStatus),
-    /// Set read timeout error with HTTP status
-    SetReadTimeout(HttpStatus),
-    /// Set write timeout error with HTTP status
-    SetWriteTimeout(HttpStatus),
     /// Configuration read error with HTTP status
     ConfigReadError(HttpStatus),
     /// TCP stream connection error with HTTP status
     TcpStreamConnectString(HttpStatus),
     /// TLS connector build error with HTTP status
     TlsConnectorBuildString(HttpStatus),
-    /// Set read timeout error with HTTP status
-    SetReadTimeoutString(HttpStatus),
-    /// Set write timeout error with HTTP status
-    SetWriteTimeoutString(HttpStatus),
     /// Request error with custom message
     Request(String),
     /// Unknown error with HTTP status
