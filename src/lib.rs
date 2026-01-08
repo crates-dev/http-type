@@ -50,7 +50,6 @@ pub use websocket_frame::*;
 
 pub use http_compress::*;
 pub use http_constant::*;
-pub use serde;
 pub use serde_json;
 pub use tokio;
 
