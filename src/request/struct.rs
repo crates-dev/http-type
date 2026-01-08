@@ -10,24 +10,33 @@ pub struct RequestConfig {
     /// Buffer size for reading operations.
     pub(super) buffer_size: usize,
     /// Maximum length for HTTP request line in bytes.
+    #[new(skip)]
     pub(super) max_request_line_length: usize,
     /// Maximum length for URL path in bytes.
+    #[new(skip)]
     pub(super) max_path_length: usize,
     /// Maximum length for query string in bytes.
+    #[new(skip)]
     pub(super) max_query_length: usize,
     /// Maximum length for a single header line in bytes.
+    #[new(skip)]
     pub(super) max_header_line_length: usize,
     /// Maximum number of headers allowed in a request.
+    #[new(skip)]
     pub(super) max_header_count: usize,
     /// Maximum length for a header key in bytes.
+    #[new(skip)]
     pub(super) max_header_key_length: usize,
     /// Maximum length for a header value in bytes.
+    #[new(skip)]
     pub(super) max_header_value_length: usize,
     /// Maximum size for request body in bytes.
     pub(super) max_body_size: usize,
     /// Maximum size for WebSocket frame in bytes.
+    #[new(skip)]
     pub(super) max_ws_frame_size: usize,
     /// Maximum number of WebSocket frames to process in a single request.
+    #[new(skip)]
     pub(super) max_ws_frames: usize,
     /// Timeout for reading HTTP request in milliseconds.
     pub(super) http_read_timeout_ms: u64,

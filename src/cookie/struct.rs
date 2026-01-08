@@ -11,18 +11,25 @@ pub struct CookieBuilder {
     /// Cookie value content.
     pub(super) value: CookieValue,
     /// Optional expiration date/time string.
+    #[new(skip)]
     pub(super) expires: Option<String>,
     /// Optional maximum age in seconds.
+    #[new(skip)]
     pub(super) max_age: Option<i64>,
     /// Optional domain scope for the cookie.
+    #[new(skip)]
     pub(super) domain: Option<String>,
     /// Optional path scope for the cookie.
+    #[new(skip)]
     pub(super) path: Option<String>,
     /// Flag indicating secure (HTTPS-only) transmission.
+    #[new(skip)]
     pub(super) secure: bool,
     /// Flag preventing JavaScript access.
+    #[new(skip)]
     pub(super) http_only: bool,
     /// Optional SameSite policy setting.
+    #[new(skip)]
     pub(super) same_site: Option<String>,
 }
 
