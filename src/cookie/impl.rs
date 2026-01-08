@@ -1,30 +1,7 @@
 use crate::*;
 
 /// Implementation for `CookieBuilder`.
-impl CookieBuilder {
-    /// Creates a new cookie builder instance.
-    ///
-    /// # Arguments
-    ///
-    /// - `AsRef<str>` - The cookie name type.
-    /// - `AsRef<str>` - The cookie value type.
-    ///
-    /// # Returns
-    ///
-    /// - `CookieBuilder` - A new builder instance.
-    #[inline(always)]
-    pub fn new<N, V>(name: N, value: V) -> Self
-    where
-        N: AsRef<str>,
-        V: AsRef<str>,
-    {
-        Self {
-            name: name.as_ref().to_owned(),
-            value: value.as_ref().to_owned(),
-            ..Default::default()
-        }
-    }
-
+impl<'a> CookieBuilder<'a> {
     /// Parses a `Set-Cookie` header string into a `CookieBuilder`.
     ///
     /// This method takes a `Set-Cookie` header string and extracts the various
@@ -32,55 +9,60 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `AsRef<str>` - The `Set-Cookie` header string to parse.
+    /// - `&'a str` - The `Set-Cookie` header string to parse.
     ///
     /// # Returns
     ///
-    /// A `CookieBuilder` instance populated with the parsed cookie attributes.
-    pub fn parse<C>(cookie: C) -> Self
-    where
-        C: AsRef<str>,
-    {
-        let mut cookie_builder: Self = Self::default();
-        let parts: Vec<&str> = cookie.as_ref().split(SEMICOLON).collect();
+    /// A `CookieBuilder<'a>` instance populated with the parsed cookie attributes.
+    pub fn parse(cookie: &'a str) -> Self {
+        let parts: Vec<&str> = cookie.split(SEMICOLON).collect();
         if parts.is_empty() {
-            return cookie_builder;
+            return Self::default();
         }
+        let mut name: &str = "";
+        let mut value: &str = "";
         if let Some(name_value_pair) = parts.first() {
             let name_value_pair: &str = name_value_pair.trim();
-            if let Some((name, value)) = name_value_pair.split_once(EQUAL) {
-                cookie_builder.name = name.trim().to_string();
-                cookie_builder.value = value.trim().to_string();
+            if let Some((n, v)) = name_value_pair.split_once(EQUAL) {
+                name = n.trim();
+                value = v.trim();
             } else if !name_value_pair.is_empty() {
-                cookie_builder.name = name_value_pair.to_string();
-                cookie_builder.value = String::new();
+                name = name_value_pair;
+                value = "";
             }
         }
+        let mut expires: &str = "";
+        let mut max_age: i64 = 0i64;
+        let mut domain: &str = "";
+        let mut path: &str = "";
+        let mut secure: bool = false;
+        let mut http_only: bool = false;
+        let mut same_site: &str = "";
         for part in parts.iter().skip(1) {
             let part: &str = part.trim();
             if part.is_empty() {
                 continue;
             }
-            if let Some((key, value)) = part.split_once(EQUAL) {
+            if let Some((key, val)) = part.split_once(EQUAL) {
                 let key_lowercase: String = key.trim().to_lowercase();
-                let value: String = value.trim().to_string();
+                let val: &str = val.trim();
                 match key_lowercase.as_str() {
                     COOKIE_EXPIRES_LOWERCASE => {
-                        cookie_builder.expires = value;
+                        expires = val;
                     }
                     COOKIE_MAX_AGE_LOWERCASE => {
-                        if let Ok(max_age_value) = value.parse::<i64>() {
-                            cookie_builder.max_age = max_age_value;
+                        if let Ok(max_age_value) = val.parse::<i64>() {
+                            max_age = max_age_value;
                         }
                     }
                     COOKIE_DOMAIN_LOWERCASE => {
-                        cookie_builder.domain = value;
+                        domain = val;
                     }
                     COOKIE_PATH_LOWERCASE => {
-                        cookie_builder.path = value;
+                        path = val;
                     }
                     COOKIE_SAME_SITE_LOWERCASE => {
-                        cookie_builder.same_site = value;
+                        same_site = val;
                     }
                     _ => {}
                 }
@@ -88,16 +70,27 @@ impl CookieBuilder {
                 let attribute_lowercase: String = part.to_lowercase();
                 match attribute_lowercase.as_str() {
                     COOKIE_SECURE_LOWERCASE => {
-                        cookie_builder.secure = true;
+                        secure = true;
                     }
                     COOKIE_HTTP_ONLY_LOWERCASE => {
-                        cookie_builder.http_only = true;
+                        http_only = true;
                     }
                     _ => {}
                 }
             }
         }
-        cookie_builder
+
+        Self {
+            name,
+            value,
+            expires,
+            max_age,
+            domain,
+            path,
+            secure,
+            http_only,
+            same_site,
+        }
     }
 
     /// Builds the cookie string according to the `Set-Cookie` header format.
@@ -115,7 +108,7 @@ impl CookieBuilder {
 
         if !self.expires.is_empty() {
             cookie_string.push_str(COOKIE_EXPIRES_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(&self.expires);
+            cookie_string.push_str(self.expires);
         }
         if self.max_age > 0 {
             cookie_string.push_str(COOKIE_MAX_AGE_ATTRIBUTE_LOWERCASE);
@@ -123,11 +116,11 @@ impl CookieBuilder {
         }
         if !self.domain.is_empty() {
             cookie_string.push_str(COOKIE_DOMAIN_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(&self.domain);
+            cookie_string.push_str(self.domain);
         }
         if !self.path.is_empty() {
             cookie_string.push_str(COOKIE_PATH_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(&self.path);
+            cookie_string.push_str(self.path);
         }
         if self.secure {
             cookie_string.push_str(COOKIE_SECURE_ATTRIBUTE_LOWERCASE);
@@ -137,7 +130,7 @@ impl CookieBuilder {
         }
         if !self.same_site.is_empty() {
             cookie_string.push_str(COOKIE_SAME_SITE_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(&self.same_site);
+            cookie_string.push_str(self.same_site);
         }
         cookie_string
     }

@@ -248,7 +248,7 @@ fn test_cookie_builder_parse_case_insensitive() {
 fn test_cookie_builder_expires() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("", "");
-    cookie.set_expires("Wed, 21 Oct 2015 07:28:00 GMT".to_string());
+    cookie.set_expires("Wed, 21 Oct 2015 07:28:00 GMT");
     assert_eq!(cookie.expires, "Wed, 21 Oct 2015 07:28:00 GMT");
 }
 
@@ -264,7 +264,7 @@ fn test_cookie_builder_max_age() {
 fn test_cookie_builder_domain() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("", "");
-    cookie.set_domain("example.com".to_string());
+    cookie.set_domain("example.com");
     assert_eq!(cookie.domain, "example.com");
 }
 
@@ -272,7 +272,7 @@ fn test_cookie_builder_domain() {
 fn test_cookie_builder_path() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("", "");
-    cookie.set_path("/admin".to_string());
+    cookie.set_path("/admin");
     assert_eq!(cookie.path, "/admin");
 }
 
@@ -296,7 +296,7 @@ fn test_cookie_builder_http_only() {
 fn test_cookie_builder_same_site() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("", "");
-    cookie.set_same_site("Strict".to_string());
+    cookie.set_same_site("Strict");
     assert_eq!(cookie.same_site, "Strict");
 }
 
@@ -305,13 +305,13 @@ fn test_cookie_builder_chaining() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "");
     cookie
-        .set_expires("Wed, 21 Oct 2015 07:28:00 GMT".to_string())
+        .set_expires("Wed, 21 Oct 2015 07:28:00 GMT")
         .set_max_age(3600)
-        .set_domain("example.com".to_string())
-        .set_path("/admin".to_string())
+        .set_domain("example.com")
+        .set_path("/admin")
         .set_secure(true)
         .set_http_only(true)
-        .set_same_site("Strict".to_string());
+        .set_same_site("Strict");
     assert_eq!(cookie.name, "session_id");
     assert_eq!(cookie.value, "");
     assert_eq!(cookie.expires, "Wed, 21 Oct 2015 07:28:00 GMT");
@@ -343,7 +343,7 @@ fn test_cookie_builder_build_empty_name() {
 fn test_cookie_builder_build_with_expires() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
-    cookie.set_expires("Wed, 21 Oct 2015 07:28:00 GMT".to_string());
+    cookie.set_expires("Wed, 21 Oct 2015 07:28:00 GMT");
     let result: String = cookie.build();
     assert_eq!(
         result,
@@ -364,7 +364,7 @@ fn test_cookie_builder_build_with_max_age() {
 fn test_cookie_builder_build_with_domain() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
-    cookie.set_domain("example.com".to_string());
+    cookie.set_domain("example.com");
     let result: String = cookie.build();
     assert_eq!(result, "session_id=abc123; domain=example.com");
 }
@@ -373,7 +373,7 @@ fn test_cookie_builder_build_with_domain() {
 fn test_cookie_builder_build_with_path() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
-    cookie.set_path("/admin".to_string());
+    cookie.set_path("/admin");
     let result: String = cookie.build();
     assert_eq!(result, "session_id=abc123; path=/admin");
 }
@@ -400,7 +400,7 @@ fn test_cookie_builder_build_with_http_only() {
 fn test_cookie_builder_build_with_same_site() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
-    cookie.set_same_site("Strict".to_string());
+    cookie.set_same_site("Strict");
     let result: String = cookie.build();
     assert_eq!(result, "session_id=abc123; samesite=Strict");
 }
@@ -410,13 +410,13 @@ fn test_cookie_builder_build_complex() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie
-        .set_expires("Wed, 21 Oct 2015 07:28:00 GMT".to_string())
+        .set_expires("Wed, 21 Oct 2015 07:28:00 GMT")
         .set_max_age(3600)
-        .set_domain("example.com".to_string())
-        .set_path("/admin".to_string())
+        .set_domain("example.com")
+        .set_path("/admin")
         .set_secure(true)
         .set_http_only(true)
-        .set_same_site("Strict".to_string());
+        .set_same_site("Strict");
     let result: String = cookie.build();
     assert_eq!(
         result,
