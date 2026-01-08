@@ -18,4 +18,4 @@ pub type CookieValue<'a> = &'a str;
 /// Represents a collection of HTTP cookies.
 ///
 /// Stores multiple cookies as key-value pairs using a high-performance hash map.
-pub type Cookies = HashMapXxHash3_64<String, String>;
+pub type Cookies<'a> = HashMapXxHash3_64<&'a str, &'a str>;

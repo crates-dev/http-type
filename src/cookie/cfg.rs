@@ -575,7 +575,7 @@ fn test_cookie_parse_single() {
     use super::*;
     let cookies: Cookies = Cookie::parse("session_id=abc123");
     assert_eq!(cookies.len(), 1);
-    assert_eq!(cookies.get("session_id"), Some(&"abc123".to_string()));
+    assert_eq!(cookies.get("session_id"), Some(&"abc123"));
 }
 
 #[test]
@@ -583,9 +583,9 @@ fn test_cookie_parse_multiple() {
     use super::*;
     let cookies: Cookies = Cookie::parse("session_id=abc123; user_id=456; theme=dark");
     assert_eq!(cookies.len(), 3);
-    assert_eq!(cookies.get("session_id"), Some(&"abc123".to_string()));
-    assert_eq!(cookies.get("user_id"), Some(&"456".to_string()));
-    assert_eq!(cookies.get("theme"), Some(&"dark".to_string()));
+    assert_eq!(cookies.get("session_id"), Some(&"abc123"));
+    assert_eq!(cookies.get("user_id"), Some(&"456"));
+    assert_eq!(cookies.get("theme"), Some(&"dark"));
 }
 
 #[test]
@@ -593,8 +593,8 @@ fn test_cookie_parse_with_spaces() {
     use super::*;
     let cookies: Cookies = Cookie::parse("  session_id  =  abc123  ;  user_id  =  456  ");
     assert_eq!(cookies.len(), 2);
-    assert_eq!(cookies.get("session_id"), Some(&"abc123".to_string()));
-    assert_eq!(cookies.get("user_id"), Some(&"456".to_string()));
+    assert_eq!(cookies.get("session_id"), Some(&"abc123"));
+    assert_eq!(cookies.get("user_id"), Some(&"456"));
 }
 
 #[test]
@@ -602,8 +602,8 @@ fn test_cookie_parse_empty_value() {
     use super::*;
     let cookies: Cookies = Cookie::parse("session_id=; user_id=456");
     assert_eq!(cookies.len(), 2);
-    assert_eq!(cookies.get("session_id"), Some(&"".to_string()));
-    assert_eq!(cookies.get("user_id"), Some(&"456".to_string()));
+    assert_eq!(cookies.get("session_id"), Some(&""));
+    assert_eq!(cookies.get("user_id"), Some(&"456"));
 }
 
 #[test]
@@ -611,8 +611,8 @@ fn test_cookie_parse_no_value() {
     use super::*;
     let cookies: Cookies = Cookie::parse("session_id; user_id=456");
     assert_eq!(cookies.len(), 2);
-    assert_eq!(cookies.get("session_id"), Some(&"".to_string()));
-    assert_eq!(cookies.get("user_id"), Some(&"456".to_string()));
+    assert_eq!(cookies.get("session_id"), Some(&""));
+    assert_eq!(cookies.get("user_id"), Some(&"456"));
 }
 
 #[test]
@@ -620,8 +620,8 @@ fn test_cookie_parse_multiple_semicolons() {
     use super::*;
     let cookies: Cookies = Cookie::parse("session_id=abc123;;;user_id=456;;");
     assert_eq!(cookies.len(), 2);
-    assert_eq!(cookies.get("session_id"), Some(&"abc123".to_string()));
-    assert_eq!(cookies.get("user_id"), Some(&"456".to_string()));
+    assert_eq!(cookies.get("session_id"), Some(&"abc123"));
+    assert_eq!(cookies.get("user_id"), Some(&"456"));
 }
 
 #[test]
@@ -629,11 +629,8 @@ fn test_cookie_parse_special_characters() {
     use super::*;
     let cookies: Cookies = Cookie::parse("session_id=abc123!@#$%^&*(); user_id=456");
     assert_eq!(cookies.len(), 2);
-    assert_eq!(
-        cookies.get("session_id"),
-        Some(&"abc123!@#$%^&*()".to_string())
-    );
-    assert_eq!(cookies.get("user_id"), Some(&"456".to_string()));
+    assert_eq!(cookies.get("session_id"), Some(&"abc123!@#$%^&*()"));
+    assert_eq!(cookies.get("user_id"), Some(&"456"));
 }
 
 #[test]

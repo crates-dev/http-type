@@ -145,34 +145,30 @@ impl Cookie {
     ///
     /// # Arguments
     ///
-    /// - `AsRef<str>` - The `Cookie` header string to parse.
+    /// - `&str` - The `Cookie` header string to parse.
     ///
     /// # Returns
     ///
     /// A `Cookies` collection (a hash map) containing all parsed cookie key-value pairs.
-    pub fn parse<C>(cookie: C) -> Cookies
-    where
-        C: AsRef<str>,
-    {
-        let cookie_ref: &str = cookie.as_ref();
-        let mut cookies: Cookies = hash_map_xx_hash3_64();
-        if cookie_ref.trim().is_empty() {
+    pub fn parse(cookie: &str) -> Cookies<'_> {
+        let mut cookies: Cookies<'_> = hash_map_xx_hash3_64();
+        if cookie.trim().is_empty() {
             return cookies;
         }
-        let parts: Vec<&str> = cookie_ref.split(SEMICOLON).collect();
+        let parts: Vec<&str> = cookie.split(SEMICOLON).collect();
         for part in parts {
             let part: &str = part.trim();
             if part.is_empty() {
                 continue;
             }
             if let Some((name, value)) = part.split_once(EQUAL) {
-                let name: String = name.trim().to_string();
-                let value: String = value.trim().to_string();
+                let name: &str = name.trim();
+                let value: &str = value.trim();
                 if !name.is_empty() {
                     cookies.insert(name, value);
                 }
             } else if !part.is_empty() {
-                cookies.insert(part.to_string(), String::new());
+                cookies.insert(part, EMPTY_STR);
             }
         }
         cookies
