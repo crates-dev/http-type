@@ -12,16 +12,6 @@ impl Default for Protocol {
 
 /// Provides utility methods for the `Protocol` type.
 impl Protocol {
-    /// Creates a new instance of `Protocol` with the default value of `Self::HTTP`.
-    ///
-    /// # Returns
-    ///
-    /// A new `Protocol` instance, defaulting to `Protocol::HTTP`.
-    #[inline(always)]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Checks if the current protocol is `HTTP`.
     ///
     /// # Arguments

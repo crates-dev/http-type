@@ -78,18 +78,6 @@ impl FromStr for Method {
 }
 
 impl Method {
-    /// Creates a new instance of `Method` with the default value of `Self::GET`.
-    ///
-    /// This is a shorthand for using the `default` method.
-    ///
-    /// # Returns
-    ///
-    /// A new `Method` instance.
-    #[inline(always)]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Checks if the current method is `GET`.
     ///
     /// # Returns

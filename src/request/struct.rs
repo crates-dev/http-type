@@ -5,7 +5,19 @@ use crate::*;
 /// This struct defines various limits and constraints to prevent
 /// denial-of-service attacks and other security vulnerabilities
 /// when parsing HTTP requests.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Data, DisplayDebug, Deserialize, Serialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Getter,
+    GetterMut,
+    Setter,
+    DisplayDebug,
+    Deserialize,
+    Serialize,
+)]
 pub struct RequestConfig {
     /// Buffer size for reading operations.
     pub(super) buffer_size: usize,

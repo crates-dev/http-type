@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Represents a parsed HTTP response.
-#[derive(Debug, Clone, PartialEq, Eq, Data, DisplayDebug)]
+#[derive(Debug, Clone, PartialEq, Eq, Getter, GetterMut, Setter, DisplayDebug)]
 pub struct Response {
     /// The HTTP version used in the response.
     pub(super) version: ResponseVersion,

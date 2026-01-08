@@ -35,13 +35,6 @@ fn test_protocol_default() {
 }
 
 #[test]
-fn test_protocol_new() {
-    use super::*;
-    assert_eq!(Protocol::new(), Protocol::default());
-    assert_eq!(Protocol::new(), Protocol::default());
-}
-
-#[test]
 fn test_protocol_is_http() {
     use super::*;
     assert!(Protocol::Http.is_http());
