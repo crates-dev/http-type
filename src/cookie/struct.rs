@@ -4,33 +4,26 @@ use crate::*;
 ///
 /// Provides methods to set various cookie attributes like expiration,
 /// domain, path, and security flags before building the final cookie string.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Data)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Setter, Getter, GetterMut)]
 pub struct CookieBuilder {
     /// Cookie name identifier.
     pub(super) name: CookieKey,
     /// Cookie value content.
     pub(super) value: CookieValue,
-    /// Optional expiration date/time string.
-    #[new(skip)]
-    pub(super) expires: Option<String>,
-    /// Optional maximum age in seconds.
-    #[new(skip)]
-    pub(super) max_age: Option<i64>,
-    /// Optional domain scope for the cookie.
-    #[new(skip)]
-    pub(super) domain: Option<String>,
-    /// Optional path scope for the cookie.
-    #[new(skip)]
-    pub(super) path: Option<String>,
+    /// Expiration date/time string.
+    pub(super) expires: String,
+    /// Maximum age in seconds.
+    pub(super) max_age: i64,
+    /// Domain scope for the cookie.
+    pub(super) domain: String,
+    /// Path scope for the cookie.
+    pub(super) path: String,
     /// Flag indicating secure (HTTPS-only) transmission.
-    #[new(skip)]
     pub(super) secure: bool,
     /// Flag preventing JavaScript access.
-    #[new(skip)]
     pub(super) http_only: bool,
-    /// Optional SameSite policy setting.
-    #[new(skip)]
-    pub(super) same_site: Option<String>,
+    /// SameSite policy setting.
+    pub(super) same_site: String,
 }
 
 /// Parser for HTTP Cookie headers.

@@ -2,6 +2,29 @@ use crate::*;
 
 /// Implementation for `CookieBuilder`.
 impl CookieBuilder {
+    /// Creates a new cookie builder instance.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The cookie name type.
+    /// - `AsRef<str>` - The cookie value type.
+    ///
+    /// # Returns
+    ///
+    /// - `CookieBuilder` - A new builder instance.
+    #[inline(always)]
+    pub fn new<N, V>(name: N, value: V) -> Self
+    where
+        N: AsRef<str>,
+        V: AsRef<str>,
+    {
+        Self {
+            name: name.as_ref().to_owned(),
+            value: value.as_ref().to_owned(),
+            ..Default::default()
+        }
+    }
+
     /// Parses a `Set-Cookie` header string into a `CookieBuilder`.
     ///
     /// This method takes a `Set-Cookie` header string and extracts the various
@@ -43,21 +66,21 @@ impl CookieBuilder {
                 let value: String = value.trim().to_string();
                 match key_lowercase.as_str() {
                     COOKIE_EXPIRES_LOWERCASE => {
-                        cookie_builder.expires = Some(value);
+                        cookie_builder.expires = value;
                     }
                     COOKIE_MAX_AGE_LOWERCASE => {
                         if let Ok(max_age_value) = value.parse::<i64>() {
-                            cookie_builder.max_age = Some(max_age_value);
+                            cookie_builder.max_age = max_age_value;
                         }
                     }
                     COOKIE_DOMAIN_LOWERCASE => {
-                        cookie_builder.domain = Some(value);
+                        cookie_builder.domain = value;
                     }
                     COOKIE_PATH_LOWERCASE => {
-                        cookie_builder.path = Some(value);
+                        cookie_builder.path = value;
                     }
                     COOKIE_SAME_SITE_LOWERCASE => {
-                        cookie_builder.same_site = Some(value);
+                        cookie_builder.same_site = value;
                     }
                     _ => {}
                 }
@@ -79,6 +102,8 @@ impl CookieBuilder {
 
     /// Builds the cookie string according to the `Set-Cookie` header format.
     ///
+    /// Only includes attributes that have been set with non-empty values.
+    ///
     /// # Returns
     ///
     /// - `String` - A formatted cookie string ready to be sent in a `Set-Cookie` header.
@@ -87,21 +112,22 @@ impl CookieBuilder {
             return String::new();
         }
         let mut cookie_string: String = format!("{}={}", self.name, self.value);
-        if let Some(ref expires_value) = self.expires {
+
+        if !self.expires.is_empty() {
             cookie_string.push_str(COOKIE_EXPIRES_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(expires_value);
+            cookie_string.push_str(&self.expires);
         }
-        if let Some(max_age_value) = self.max_age {
+        if self.max_age > 0 {
             cookie_string.push_str(COOKIE_MAX_AGE_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(&max_age_value.to_string());
+            cookie_string.push_str(&self.max_age.to_string());
         }
-        if let Some(ref domain_value) = self.domain {
+        if !self.domain.is_empty() {
             cookie_string.push_str(COOKIE_DOMAIN_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(domain_value);
+            cookie_string.push_str(&self.domain);
         }
-        if let Some(ref path_value) = self.path {
+        if !self.path.is_empty() {
             cookie_string.push_str(COOKIE_PATH_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(path_value);
+            cookie_string.push_str(&self.path);
         }
         if self.secure {
             cookie_string.push_str(COOKIE_SECURE_ATTRIBUTE_LOWERCASE);
@@ -109,9 +135,9 @@ impl CookieBuilder {
         if self.http_only {
             cookie_string.push_str(COOKIE_HTTP_ONLY_ATTRIBUTE_LOWERCASE);
         }
-        if let Some(ref same_site_value) = self.same_site {
+        if !self.same_site.is_empty() {
             cookie_string.push_str(COOKIE_SAME_SITE_ATTRIBUTE_LOWERCASE);
-            cookie_string.push_str(same_site_value);
+            cookie_string.push_str(&self.same_site);
         }
         cookie_string
     }
