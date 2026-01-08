@@ -7,5 +7,5 @@ use crate::*;
 /// # Fields
 ///
 /// - `Arc<RwLock<TcpStream>>` - The protected TCP stream.
-#[derive(Clone, Debug, Getter)]
+#[derive(Clone, Debug, Getter, New)]
 pub struct ArcRwLockStream(#[get(pub(super))] pub(super) ArcRwLock<TcpStream>);

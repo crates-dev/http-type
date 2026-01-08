@@ -38,7 +38,7 @@ pub struct RequestConfig {
 /// HTTP request representation.
 ///
 /// Contains all components of an HTTP request.
-#[derive(Debug, Clone, PartialEq, Eq, Getter, DisplayDebug)]
+#[derive(Debug, Clone, PartialEq, Eq, Getter, DisplayDebug, New)]
 pub struct Request {
     /// HTTP request method.
     pub(super) method: RequestMethod,

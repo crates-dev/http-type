@@ -53,16 +53,6 @@ impl Default for Response {
 }
 
 impl Response {
-    /// Creates a new instance of `Response`.
-    ///
-    /// # Returns
-    ///
-    /// - `Response` - A new response instance with default values.
-    #[inline(always)]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Tries to retrieve the value of a response header by its key.
     ///
     /// # Arguments

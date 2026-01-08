@@ -1,7 +1,7 @@
 use crate::*;
 
-impl ArcRwLockStream {
-    /// Creates a new ArcRwLockStream from an Arc<RwLock<TcpStream>>.
+impl From<ArcRwLock<TcpStream>> for ArcRwLockStream {
+    /// Converts an Arc<RwLock<TcpStream>> into an ArcRwLockStream.
     ///
     /// # Arguments
     ///
@@ -11,10 +11,12 @@ impl ArcRwLockStream {
     ///
     /// - `ArcRwLockStream` - The new stream wrapper.
     #[inline(always)]
-    pub fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
+    fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
         Self(arc_rw_lock_stream)
     }
+}
 
+impl ArcRwLockStream {
     /// Creates a new ArcRwLockStream from a TcpStream.
     ///
     /// Wraps the stream in an Arc<RwLock<_>>.

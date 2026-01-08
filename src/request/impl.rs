@@ -124,16 +124,6 @@ impl Default for RequestConfig {
 }
 
 impl RequestConfig {
-    /// Creates a new `RequestConfig` with default values.
-    ///
-    /// # Returns
-    ///
-    /// - `RequestConfig` - A new config instance with default values.
-    #[inline(always)]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Creates a config optimized for high-security environments.
     ///
     /// This configuration uses more restrictive limits to provide
@@ -181,16 +171,6 @@ impl Default for Request {
 }
 
 impl Request {
-    /// Creates a new instance of `Request`.
-    ///
-    /// # Returns
-    ///
-    /// - `Request` - A new request instance with default values.
-    #[inline(always)]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Parses a query string as_ref key-value pairs.
     ///
     /// Expects format "key1=value1&key2=value2". Empty values are allowed.

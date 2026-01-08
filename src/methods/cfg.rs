@@ -44,12 +44,6 @@ fn test_method_default() {
 }
 
 #[test]
-fn test_method_new() {
-    use super::*;
-    assert_eq!(Method::new(), Method::default());
-}
-
-#[test]
 fn test_method_is_get() {
     use super::*;
     assert!(Method::Get.is_get());

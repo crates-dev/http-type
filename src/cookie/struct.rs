@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// Provides methods to set various cookie attributes like expiration,
 /// domain, path, and security flags before building the final cookie string.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Data)]
 pub struct CookieBuilder {
     /// Cookie name identifier.
     pub(super) name: CookieKey,
