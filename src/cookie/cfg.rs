@@ -4,13 +4,13 @@ fn test_cookie_builder_new() {
     let cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -19,13 +19,13 @@ fn test_cookie_builder_default() {
     let cookie: CookieBuilder = CookieBuilder::default();
     assert_eq!(cookie.get_name(), "");
     assert_eq!(cookie.get_value(), "");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -34,13 +34,13 @@ fn test_cookie_builder_parse_basic() {
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -51,15 +51,15 @@ fn test_cookie_builder_parse_with_expires() {
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
     assert_eq!(
-        *cookie.get_expires(),
+        *cookie.try_get_expires(),
         Some("Wed, 21 Oct 2015 07:28:00 GMT".to_string())
     );
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -68,13 +68,13 @@ fn test_cookie_builder_parse_with_max_age() {
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; max-age=3600");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), Some(3600));
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), Some(3600));
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -83,13 +83,13 @@ fn test_cookie_builder_parse_with_domain() {
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; domain=example.com");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), Some("example.com".to_string()));
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), Some("example.com".to_string()));
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -98,13 +98,13 @@ fn test_cookie_builder_parse_with_path() {
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; path=/admin");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), Some("/admin".to_string()));
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), Some("/admin".to_string()));
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -113,13 +113,13 @@ fn test_cookie_builder_parse_with_secure() {
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; secure");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert_eq!(*cookie.get_secure(), Some(true));
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert_eq!(*cookie.try_get_secure(), Some(true));
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -128,13 +128,13 @@ fn test_cookie_builder_parse_with_http_only() {
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; httponly");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert_eq!(*cookie.get_http_only(), Some(true));
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert_eq!(*cookie.try_get_http_only(), Some(true));
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -143,13 +143,13 @@ fn test_cookie_builder_parse_with_same_site() {
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; samesite=strict");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), Some("strict".to_string()));
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), Some("strict".to_string()));
 }
 
 #[test]
@@ -161,15 +161,15 @@ fn test_cookie_builder_parse_complex() {
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
     assert_eq!(
-        *cookie.get_expires(),
+        *cookie.try_get_expires(),
         Some("Wed, 21 Oct 2015 07:28:00 GMT".to_string())
     );
-    assert_eq!(*cookie.get_max_age(), Some(3600));
-    assert_eq!(*cookie.get_domain(), Some("example.com".to_string()));
-    assert_eq!(*cookie.get_path(), Some("/admin".to_string()));
-    assert_eq!(*cookie.get_secure(), Some(true));
-    assert_eq!(*cookie.get_http_only(), Some(true));
-    assert_eq!(*cookie.get_same_site(), Some("lax".to_string()));
+    assert_eq!(*cookie.try_get_max_age(), Some(3600));
+    assert_eq!(*cookie.try_get_domain(), Some("example.com".to_string()));
+    assert_eq!(*cookie.try_get_path(), Some("/admin".to_string()));
+    assert_eq!(*cookie.try_get_secure(), Some(true));
+    assert_eq!(*cookie.try_get_http_only(), Some(true));
+    assert_eq!(*cookie.try_get_same_site(), Some("lax".to_string()));
 }
 
 #[test]
@@ -178,13 +178,13 @@ fn test_cookie_builder_parse_empty_string() {
     let cookie: CookieBuilder = CookieBuilder::parse("");
     assert_eq!(cookie.get_name(), "");
     assert_eq!(cookie.get_value(), "");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), None);
-    assert_eq!(*cookie.get_path(), None);
-    assert!(cookie.get_secure().is_none());
-    assert!(cookie.get_http_only().is_none());
-    assert_eq!(*cookie.get_same_site(), None);
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), None);
+    assert_eq!(*cookie.try_get_path(), None);
+    assert!(cookie.try_get_secure().is_none());
+    assert!(cookie.try_get_http_only().is_none());
+    assert_eq!(*cookie.try_get_same_site(), None);
 }
 
 #[test]
@@ -195,13 +195,13 @@ fn test_cookie_builder_parse_case_insensitive() {
     );
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
-    assert_eq!(*cookie.get_expires(), None);
-    assert_eq!(*cookie.get_max_age(), None);
-    assert_eq!(*cookie.get_domain(), Some("example.com".to_string()));
-    assert_eq!(*cookie.get_path(), None);
-    assert_eq!(*cookie.get_secure(), Some(true));
-    assert_eq!(*cookie.get_http_only(), Some(true));
-    assert_eq!(*cookie.get_same_site(), Some("Strict".to_string()));
+    assert_eq!(*cookie.try_get_expires(), None);
+    assert_eq!(*cookie.try_get_max_age(), None);
+    assert_eq!(*cookie.try_get_domain(), Some("example.com".to_string()));
+    assert_eq!(*cookie.try_get_path(), None);
+    assert_eq!(*cookie.try_get_secure(), Some(true));
+    assert_eq!(*cookie.try_get_http_only(), Some(true));
+    assert_eq!(*cookie.try_get_same_site(), Some("Strict".to_string()));
 }
 
 #[test]
@@ -210,7 +210,7 @@ fn test_cookie_builder_expires() {
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_expires("Wed, 21 Oct 2015 07:28:00 GMT");
     assert_eq!(
-        *cookie.get_expires(),
+        *cookie.try_get_expires(),
         Some("Wed, 21 Oct 2015 07:28:00 GMT".to_string())
     );
 }
@@ -220,7 +220,7 @@ fn test_cookie_builder_max_age() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_max_age(3600);
-    assert_eq!(*cookie.get_max_age(), Some(3600));
+    assert_eq!(*cookie.try_get_max_age(), Some(3600));
 }
 
 #[test]
@@ -228,7 +228,7 @@ fn test_cookie_builder_domain() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_domain("example.com");
-    assert_eq!(*cookie.get_domain(), Some("example.com".to_string()));
+    assert_eq!(*cookie.try_get_domain(), Some("example.com".to_string()));
 }
 
 #[test]
@@ -236,7 +236,7 @@ fn test_cookie_builder_path() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_path("/admin");
-    assert_eq!(*cookie.get_path(), Some("/admin".to_string()));
+    assert_eq!(*cookie.try_get_path(), Some("/admin".to_string()));
 }
 
 #[test]
@@ -244,7 +244,7 @@ fn test_cookie_builder_secure() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.secure();
-    assert_eq!(*cookie.get_secure(), Some(true));
+    assert_eq!(*cookie.try_get_secure(), Some(true));
 }
 
 #[test]
@@ -252,7 +252,7 @@ fn test_cookie_builder_http_only() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.http_only();
-    assert_eq!(*cookie.get_http_only(), Some(true));
+    assert_eq!(*cookie.try_get_http_only(), Some(true));
 }
 
 #[test]
@@ -260,7 +260,7 @@ fn test_cookie_builder_same_site() {
     use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_same_site("Strict");
-    assert_eq!(*cookie.get_same_site(), Some("Strict".to_string()));
+    assert_eq!(*cookie.try_get_same_site(), Some("Strict".to_string()));
 }
 
 #[test]
@@ -278,15 +278,15 @@ fn test_cookie_builder_chaining() {
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
     assert_eq!(
-        *cookie.get_expires(),
+        *cookie.try_get_expires(),
         Some("Wed, 21 Oct 2015 07:28:00 GMT".to_string())
     );
-    assert_eq!(*cookie.get_max_age(), Some(3600));
-    assert_eq!(*cookie.get_domain(), Some("example.com".to_string()));
-    assert_eq!(*cookie.get_path(), Some("/admin".to_string()));
-    assert_eq!(*cookie.get_secure(), Some(true));
-    assert_eq!(*cookie.get_http_only(), Some(true));
-    assert_eq!(*cookie.get_same_site(), Some("Strict".to_string()));
+    assert_eq!(*cookie.try_get_max_age(), Some(3600));
+    assert_eq!(*cookie.try_get_domain(), Some("example.com".to_string()));
+    assert_eq!(*cookie.try_get_path(), Some("/admin".to_string()));
+    assert_eq!(*cookie.try_get_secure(), Some(true));
+    assert_eq!(*cookie.try_get_http_only(), Some(true));
+    assert_eq!(*cookie.try_get_same_site(), Some("Strict".to_string()));
 }
 
 #[test]

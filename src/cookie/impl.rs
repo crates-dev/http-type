@@ -260,29 +260,29 @@ impl CookieBuilder {
             return String::new();
         }
         let mut cookie_string: String = format!("{}={}", self.get_name(), self.get_value());
-        if let Some(expires_value) = self.get_expires() {
+        if let Some(expires_value) = self.try_get_expires() {
             cookie_string.push_str(COOKIE_EXPIRES_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(expires_value);
         }
-        if let Some(max_age_value) = self.get_max_age() {
+        if let Some(max_age_value) = self.try_get_max_age() {
             cookie_string.push_str(COOKIE_MAX_AGE_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(&max_age_value.to_string());
         }
-        if let Some(domain_value) = self.get_domain() {
+        if let Some(domain_value) = self.try_get_domain() {
             cookie_string.push_str(COOKIE_DOMAIN_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(domain_value);
         }
-        if let Some(path_value) = self.get_path() {
+        if let Some(path_value) = self.try_get_path() {
             cookie_string.push_str(COOKIE_PATH_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(path_value);
         }
-        if let Some(true) = self.get_secure() {
+        if let Some(true) = self.try_get_secure() {
             cookie_string.push_str(COOKIE_SECURE_ATTRIBUTE_LOWERCASE);
         }
-        if let Some(true) = self.get_http_only() {
+        if let Some(true) = self.try_get_http_only() {
             cookie_string.push_str(COOKIE_HTTP_ONLY_ATTRIBUTE_LOWERCASE);
         }
-        if let Some(same_site_value) = self.get_same_site() {
+        if let Some(same_site_value) = self.try_get_same_site() {
             cookie_string.push_str(COOKIE_SAME_SITE_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(same_site_value);
         }

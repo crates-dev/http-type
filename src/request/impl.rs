@@ -224,7 +224,7 @@ impl Request {
     where
         R: AsyncBufReadExt + Unpin,
     {
-        let buffer_size: usize = *config.get_buffer_size();
+        let buffer_size: usize = config.get_buffer_size();
         let mut headers: RequestHeaders = hash_map_xx_hash3_64();
         let mut host: RequestHost = String::new();
         let mut content_length: usize = 0;
@@ -308,7 +308,7 @@ impl Request {
             Duration::from_millis(config.http_read_timeout_ms),
             async move {
                 let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
-                let buffer_size: usize = *config.get_buffer_size();
+                let buffer_size: usize = config.get_buffer_size();
                 let reader: &mut BufReader<&mut TcpStream> =
                     &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
                 let mut request_line: String = String::with_capacity(buffer_size);
@@ -395,7 +395,7 @@ impl Request {
         stream: &ArcRwLockStream,
         config: &RequestConfig,
     ) -> Result<Request, RequestError> {
-        let buffer_size: usize = *config.get_buffer_size();
+        let buffer_size: usize = config.get_buffer_size();
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let temp_buffer_size: usize = buffer_size;
         let mut temp_buffer: Vec<u8> = vec![0; temp_buffer_size];
