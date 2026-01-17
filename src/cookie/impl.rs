@@ -128,14 +128,17 @@ impl CookieBuilder {
     ///
     /// # Arguments
     ///
-    /// - `i64` - The maximum age in seconds.
+    /// - `Into<i64>` - The maximum age in seconds.
     ///
     /// # Returns
     ///
     /// The `CookieBuilder` instance for method chaining.
     #[inline(always)]
-    pub fn set_max_age(&mut self, max_age: i64) -> &mut Self {
-        self.max_age = Some(max_age);
+    pub fn set_max_age<M>(&mut self, max_age: M) -> &mut Self
+    where
+        M: Into<i64>,
+    {
+        self.max_age = Some(max_age.into());
         self
     }
 
@@ -198,6 +201,34 @@ impl CookieBuilder {
     #[inline(always)]
     pub fn http_only(&mut self) -> &mut Self {
         self.http_only = Some(true);
+        self
+    }
+
+    /// Explicitly disables the `Secure` flag for the cookie.
+    ///
+    /// This method explicitly sets the `Secure` flag to `false`, which may be useful
+    /// for overriding default secure settings or for testing purposes.
+    ///
+    /// # Returns
+    ///
+    /// The `CookieBuilder` instance for method chaining.
+    #[inline(always)]
+    pub fn disable_secure(&mut self) -> &mut Self {
+        self.secure = Some(false);
+        self
+    }
+
+    /// Explicitly disables the `HttpOnly` flag for the cookie.
+    ///
+    /// This method explicitly sets the `HttpOnly` flag to `false`, which may be useful
+    /// for overriding default HttpOnly settings or for testing purposes.
+    ///
+    /// # Returns
+    ///
+    /// The `CookieBuilder` instance for method chaining.
+    #[inline(always)]
+    pub fn disable_http_only(&mut self) -> &mut Self {
+        self.http_only = Some(false);
         self
     }
 
