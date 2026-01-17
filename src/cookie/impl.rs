@@ -25,8 +25,8 @@ impl CookieBuilder {
             max_age: None,
             domain: None,
             path: None,
-            secure: false,
-            http_only: false,
+            secure: None,
+            http_only: None,
             same_site: None,
         }
     }
@@ -72,21 +72,21 @@ impl CookieBuilder {
                 let value: String = value.trim().to_string();
                 match key_lowercase.as_str() {
                     COOKIE_EXPIRES_LOWERCASE => {
-                        cookie_builder.expires = Some(value);
+                        cookie_builder.set_expires(value);
                     }
                     COOKIE_MAX_AGE_LOWERCASE => {
                         if let Ok(max_age_value) = value.parse::<i64>() {
-                            cookie_builder.max_age = Some(max_age_value);
+                            cookie_builder.set_max_age(max_age_value);
                         }
                     }
                     COOKIE_DOMAIN_LOWERCASE => {
-                        cookie_builder.domain = Some(value);
+                        cookie_builder.set_domain(value);
                     }
                     COOKIE_PATH_LOWERCASE => {
-                        cookie_builder.path = Some(value);
+                        cookie_builder.set_path(value);
                     }
                     COOKIE_SAME_SITE_LOWERCASE => {
-                        cookie_builder.same_site = Some(value);
+                        cookie_builder.set_same_site(value);
                     }
                     _ => {}
                 }
@@ -94,10 +94,10 @@ impl CookieBuilder {
                 let attribute_lowercase: String = part.to_lowercase();
                 match attribute_lowercase.as_str() {
                     COOKIE_SECURE_LOWERCASE => {
-                        cookie_builder.secure = true;
+                        cookie_builder.secure = Some(true);
                     }
                     COOKIE_HTTP_ONLY_LOWERCASE => {
-                        cookie_builder.http_only = true;
+                        cookie_builder.http_only = Some(true);
                     }
                     _ => {}
                 }
@@ -116,7 +116,7 @@ impl CookieBuilder {
     ///
     /// The `CookieBuilder` instance for method chaining.
     #[inline(always)]
-    pub fn expires<E>(&mut self, expires: E) -> &mut Self
+    pub fn set_expires<E>(&mut self, expires: E) -> &mut Self
     where
         E: AsRef<str>,
     {
@@ -134,7 +134,7 @@ impl CookieBuilder {
     ///
     /// The `CookieBuilder` instance for method chaining.
     #[inline(always)]
-    pub fn max_age(&mut self, max_age: i64) -> &mut Self {
+    pub fn set_max_age(&mut self, max_age: i64) -> &mut Self {
         self.max_age = Some(max_age);
         self
     }
@@ -149,7 +149,7 @@ impl CookieBuilder {
     ///
     /// The `CookieBuilder` instance for method chaining.
     #[inline(always)]
-    pub fn domain<D>(&mut self, domain: D) -> &mut Self
+    pub fn set_domain<D>(&mut self, domain: D) -> &mut Self
     where
         D: AsRef<str>,
     {
@@ -167,7 +167,7 @@ impl CookieBuilder {
     ///
     /// The `CookieBuilder` instance for method chaining.
     #[inline(always)]
-    pub fn path<T>(&mut self, path: T) -> &mut Self
+    pub fn set_path<T>(&mut self, path: T) -> &mut Self
     where
         T: AsRef<str>,
     {
@@ -184,7 +184,7 @@ impl CookieBuilder {
     /// The `CookieBuilder` instance for method chaining.
     #[inline(always)]
     pub fn secure(&mut self) -> &mut Self {
-        self.secure = true;
+        self.secure = Some(true);
         self
     }
 
@@ -197,7 +197,7 @@ impl CookieBuilder {
     /// The `CookieBuilder` instance for method chaining.
     #[inline(always)]
     pub fn http_only(&mut self) -> &mut Self {
-        self.http_only = true;
+        self.http_only = Some(true);
         self
     }
 
@@ -211,7 +211,7 @@ impl CookieBuilder {
     ///
     /// The `CookieBuilder` instance for method chaining.
     #[inline(always)]
-    pub fn same_site<T>(&mut self, same_site: T) -> &mut Self
+    pub fn set_same_site<T>(&mut self, same_site: T) -> &mut Self
     where
         T: AsRef<str>,
     {
@@ -225,33 +225,33 @@ impl CookieBuilder {
     ///
     /// - `String` - A formatted cookie string ready to be sent in a `Set-Cookie` header.
     pub fn build(&self) -> String {
-        if self.name.is_empty() {
+        if self.get_name().is_empty() {
             return String::new();
         }
-        let mut cookie_string: String = format!("{}={}", self.name, self.value);
-        if let Some(ref expires_value) = self.expires {
+        let mut cookie_string: String = format!("{}={}", self.get_name(), self.get_value());
+        if let Some(expires_value) = self.get_expires() {
             cookie_string.push_str(COOKIE_EXPIRES_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(expires_value);
         }
-        if let Some(max_age_value) = self.max_age {
+        if let Some(max_age_value) = self.get_max_age() {
             cookie_string.push_str(COOKIE_MAX_AGE_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(&max_age_value.to_string());
         }
-        if let Some(ref domain_value) = self.domain {
+        if let Some(domain_value) = self.get_domain() {
             cookie_string.push_str(COOKIE_DOMAIN_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(domain_value);
         }
-        if let Some(ref path_value) = self.path {
+        if let Some(path_value) = self.get_path() {
             cookie_string.push_str(COOKIE_PATH_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(path_value);
         }
-        if self.secure {
+        if let Some(true) = self.get_secure() {
             cookie_string.push_str(COOKIE_SECURE_ATTRIBUTE_LOWERCASE);
         }
-        if self.http_only {
+        if let Some(true) = self.get_http_only() {
             cookie_string.push_str(COOKIE_HTTP_ONLY_ATTRIBUTE_LOWERCASE);
         }
-        if let Some(ref same_site_value) = self.same_site {
+        if let Some(same_site_value) = self.get_same_site() {
             cookie_string.push_str(COOKIE_SAME_SITE_ATTRIBUTE_LOWERCASE);
             cookie_string.push_str(same_site_value);
         }
