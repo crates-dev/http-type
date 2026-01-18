@@ -481,49 +481,6 @@ impl Response {
         self
     }
 
-    /// Sets the body of the response.
-    ///
-    /// This method allows you to set the body of the response by converting the provided
-    /// value as_ref a `ResponseBody` type. The `body` is updated with the converted value.
-    ///
-    /// # Arguments
-    ///
-    /// - `AsRef<[u8]>` - The body content (must implement AsRef<[u8]>).
-    ///
-    /// # Returns
-    ///
-    /// - `&mut Self` - A mutable reference to self for chaining.
-    #[inline(always)]
-    pub fn set_body<T>(&mut self, body: T) -> &mut Self
-    where
-        T: AsRef<[u8]>,
-    {
-        self.body = body.as_ref().to_owned();
-        self
-    }
-
-    /// Sets the reason phrase of the response.
-    ///
-    /// This method allows you to set the reason phrase of the response by converting the
-    /// provided value as_ref a `ResponseReasonPhrase` type. The `reason_phrase` is updated
-    /// with the converted value.
-    ///
-    /// # Arguments
-    ///
-    /// - `AsRef<str>` - The reason phrase (must implement AsRef<str>).
-    ///
-    /// # Returns
-    ///
-    /// - `&mut Self` - A mutable reference to self for chaining.
-    #[inline(always)]
-    pub fn set_reason_phrase<T>(&mut self, reason_phrase: T) -> &mut Self
-    where
-        T: AsRef<str>,
-    {
-        self.reason_phrase = reason_phrase.as_ref().to_owned();
-        self
-    }
-
     /// Pushes a header with a key and value as_ref the response string.
     ///
     /// # Arguments
@@ -566,7 +523,7 @@ impl Response {
     /// - `ResponseData` - The complete HTTP response bytes.
     pub fn build(&mut self) -> ResponseData {
         if self.reason_phrase.is_empty() {
-            self.set_reason_phrase(HttpStatus::phrase(*self.get_status_code()));
+            self.set_reason_phrase(HttpStatus::phrase(self.get_status_code()));
         }
         let mut response_string: String = String::with_capacity(DEFAULT_BUFFER_SIZE);
         self.push_http_first_line(&mut response_string);
