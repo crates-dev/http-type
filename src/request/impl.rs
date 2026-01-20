@@ -186,7 +186,11 @@ impl PartialEq for RequestConfig {
         if Arc::as_ptr(self_arc) == Arc::as_ptr(other_arc) {
             return true;
         }
-        *self_arc.blocking_read() == *other_arc.blocking_read()
+        if let (Ok(s), Ok(o)) = (self.get_0().try_read(), other.get_0().try_read()) {
+            *s == *o
+        } else {
+            false
+        }
     }
 }
 
