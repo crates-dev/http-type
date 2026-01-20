@@ -517,7 +517,7 @@ impl Request {
     /// # Arguments
     ///
     /// - `&mut R` - A mutable reference to a buffered reader implementing `AsyncBufReadExt`.
-    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
+    /// - `&RequestConfigData` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
@@ -528,18 +528,17 @@ impl Request {
     ///   - Or an error if parsing fails
     async fn parse_headers<R>(
         reader: &mut R,
-        config: &RequestConfig,
+        config: &RequestConfigData,
     ) -> Result<(RequestHeaders, RequestHost, usize), RequestError>
     where
         R: AsyncBufReadExt + Unpin,
     {
-        let config_inner: RequestConfigData = config.get_data().await;
-        let buffer_size: usize = config_inner.get_buffer_size();
-        let max_header_line_length: usize = config_inner.get_max_header_line_length();
-        let max_header_count: usize = config_inner.get_max_header_count();
-        let max_header_key_length: usize = config_inner.get_max_header_key_length();
-        let max_header_value_length: usize = config_inner.get_max_header_value_length();
-        let max_body_size: usize = config_inner.get_max_body_size();
+        let buffer_size: usize = config.get_buffer_size();
+        let max_header_line_length: usize = config.get_max_header_line_length();
+        let max_header_count: usize = config.get_max_header_count();
+        let max_header_key_length: usize = config.get_max_header_key_length();
+        let max_header_value_length: usize = config.get_max_header_value_length();
+        let max_body_size: usize = config.get_max_body_size();
         let mut headers: RequestHeaders = hash_map_xx_hash3_64();
         let mut host: RequestHost = String::new();
         let mut content_length: usize = 0;
@@ -610,21 +609,20 @@ impl Request {
     /// # Arguments
     ///
     /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
+    /// - `&RequestConfigData` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
     /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn http_from_stream(
         stream: &ArcRwLockStream,
-        config: &RequestConfig,
+        config: &RequestConfigData,
     ) -> Result<Request, RequestError> {
-        let config_inner: RequestConfigData = config.get_data().await;
-        let buffer_size: usize = config_inner.get_buffer_size();
-        let max_request_line_length: usize = config_inner.get_max_request_line_length();
-        let max_path_length: usize = config_inner.get_max_path_length();
-        let max_query_length: usize = config_inner.get_max_query_length();
-        let http_read_timeout_ms: u64 = config_inner.get_http_read_timeout_ms();
+        let buffer_size: usize = config.get_buffer_size();
+        let max_request_line_length: usize = config.get_max_request_line_length();
+        let max_path_length: usize = config.get_max_path_length();
+        let max_query_length: usize = config.get_max_query_length();
+        let http_read_timeout_ms: u64 = config.get_http_read_timeout_ms();
         timeout(Duration::from_millis(http_read_timeout_ms), async move {
             let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
             let reader: &mut BufReader<&mut TcpStream> =
@@ -702,7 +700,7 @@ impl Request {
     /// # Arguments
     ///
     /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
+    /// - `&RequestConfigData` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
@@ -710,13 +708,12 @@ impl Request {
     pub async fn ws_from_stream(
         &self,
         stream: &ArcRwLockStream,
-        config: &RequestConfig,
+        config: &RequestConfigData,
     ) -> Result<Request, RequestError> {
-        let config_inner: RequestConfigData = config.get_data().await;
-        let buffer_size: usize = config_inner.get_buffer_size();
-        let max_ws_frame_size: usize = config_inner.get_max_ws_frame_size();
-        let ws_read_timeout_ms: u64 = config_inner.get_ws_read_timeout_ms();
-        let max_ws_frames: usize = config_inner.get_max_ws_frames();
+        let buffer_size: usize = config.get_buffer_size();
+        let max_ws_frame_size: usize = config.get_max_ws_frame_size();
+        let ws_read_timeout_ms: u64 = config.get_ws_read_timeout_ms();
+        let max_ws_frames: usize = config.get_max_ws_frames();
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
         let mut full_frame: Vec<u8> = Vec::with_capacity(max_ws_frame_size);
