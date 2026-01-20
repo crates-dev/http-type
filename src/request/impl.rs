@@ -8,6 +8,7 @@ impl Default for RequestError {
     /// Provides a default value for `RequestError`.
     ///
     /// Returns a `RequestError::Unknown` with `HttpStatus::InternalServerError`.
+    #[inline(always)]
     fn default() -> Self {
         RequestError::Unknown(HttpStatus::InternalServerError)
     }
@@ -25,7 +26,6 @@ impl RequestError {
     /// # Returns
     ///
     /// - `HttpStatus` - The HTTP status associated with this error.
-    #[inline(always)]
     pub fn get_http_status(&self) -> HttpStatus {
         match self {
             Self::HttpRead(status) => *status,
@@ -166,6 +166,22 @@ impl From<RequestConfigData> for RequestConfig {
     #[inline(always)]
     fn from(ctx: RequestConfigData) -> Self {
         Self(arc_rwlock(ctx))
+    }
+}
+
+/// Implementation of `Default` trait for `RequestConfig`.
+impl Default for RequestConfig {
+    /// Creates a new `RequestConfig` with default secure settings.
+    ///
+    /// This constructor initializes the configuration with standard security limits
+    /// suitable for most HTTP request parsing scenarios.
+    ///
+    /// # Returns
+    ///
+    /// - `Self` - A new `RequestConfig` instance with default settings.
+    #[inline(always)]
+    fn default() -> Self {
+        Self(arc_rwlock(RequestConfigData::default()))
     }
 }
 
