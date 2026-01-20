@@ -3,7 +3,7 @@ use crate::*;
 /// Represents HTTP-related protocols.
 ///
 /// This enum defines the different protocols that can be used in HTTP communication.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Protocol {
     /// Represents the HTTP protocol.
     ///

@@ -3,7 +3,7 @@ use crate::*;
 /// Supported HTTP content types.
 ///
 /// Defines common content types for HTTP communication.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Default, Serialize, Deserialize)]
 pub enum ContentType {
     /// `application/json` content type.
     ///

@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Represents various errors that can occur during HTTP response processing.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default)]
 pub enum ResponseError {
     /// Represents an unknown error with a message.
     #[default]

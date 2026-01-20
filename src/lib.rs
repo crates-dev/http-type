@@ -72,7 +72,7 @@ pub(crate) use std::{
 pub(crate) use tokio::{
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
     net::TcpStream,
-    sync::{Mutex, MutexGuard, RwLock, RwLockReadGuard, RwLockWriteGuard},
+    sync::{Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard},
     time::timeout,
 };
 pub(crate) use url::Url;

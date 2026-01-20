@@ -5,7 +5,7 @@ use crate::*;
 /// This enum provides a comprehensive list of standard HTTP methods,
 /// such as GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS, CONNECT, and TRACE.
 /// It also includes an `UNKNOWN` variant for unrecognized methods.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Method {
     /// Represents the HTTP `GET` method.
     Get,

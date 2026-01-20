@@ -38,7 +38,7 @@ impl ArcRwLockStream {
     /// # Returns
     ///
     /// - `RwLockReadGuardTcpStream` - The read guard for the stream.
-    pub async fn read(&'_ self) -> RwLockReadGuardTcpStream<'_> {
+    pub async fn read(&'_ self) -> RwLockReadGuard<'_, TcpStream> {
         self.get_0().read().await
     }
 
@@ -49,7 +49,7 @@ impl ArcRwLockStream {
     /// # Returns
     ///
     /// - `RwLockWriteGuardTcpStream` - The write guard for the stream.
-    pub(crate) async fn write(&'_ self) -> RwLockWriteGuardTcpStream<'_> {
+    pub(crate) async fn write(&'_ self) -> RwLockWriteGuard<'_, TcpStream> {
         self.get_0().write().await
     }
 
@@ -141,7 +141,7 @@ impl ArcRwLockStream {
         I: IntoIterator<Item = D>,
         D: AsRef<[u8]>,
     {
-        let mut stream: RwLockWriteGuardTcpStream = self.write().await;
+        let mut stream: RwLockWriteGuard<'_, TcpStream> = self.write().await;
         for data in data_iter {
             stream
                 .write_all(data.as_ref())

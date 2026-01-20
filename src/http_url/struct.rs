@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// This struct holds various parts of a URL, including the protocol, host, port,
 /// path, query, and fragment, allowing for structured access to URL information.
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Eq, PartialEq, Default)]
 pub struct HttpUrlComponents {
     /// The URL scheme, such as "http" or "https".
     pub protocol: Protocol,

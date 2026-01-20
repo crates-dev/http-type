@@ -97,12 +97,12 @@ impl RequestError {
     }
 }
 
-impl Default for RequestConfig {
+impl Default for RequestConfigData {
     /// Creates a `RequestConfig` with secure default values.
     ///
     /// # Returns
     ///
-    /// - `RequestConfig` - A new config instance with secure defaults.
+    /// - `RequestConfigData ` - A new config instance with secure defaults.
     #[inline(always)]
     fn default() -> Self {
         Self {
@@ -123,7 +123,7 @@ impl Default for RequestConfig {
     }
 }
 
-impl RequestConfig {
+impl RequestConfigData {
     /// Creates a config optimized for high-security environments.
     ///
     /// This configuration uses more restrictive limits to provide
@@ -131,9 +131,9 @@ impl RequestConfig {
     ///
     /// # Returns
     ///
-    /// - `RequestConfig` - A new config with high-security settings.
+    /// - `RequestConfigData ` - A new config with high-security settings.
     #[inline(always)]
-    pub fn high_security() -> Self {
+    pub(super) fn high_security() -> Self {
         Self {
             buffer_size: DEFAULT_HIGH_SECURITY_BUFFER_SIZE,
             max_request_line_length: DEFAULT_HIGH_SECURITY_MAX_REQUEST_LINE_LENGTH,
@@ -149,6 +149,290 @@ impl RequestConfig {
             http_read_timeout_ms: DEFAULT_HIGH_SECURITY_HTTP_READ_TIMEOUT_MS,
             ws_read_timeout_ms: DEFAULT_HIGH_SECURITY_WS_READ_TIMEOUT_MS,
         }
+    }
+}
+
+/// Implementation of `From` trait for `RequestConfig`.
+impl From<RequestConfigData> for RequestConfig {
+    /// Converts a `RequestConfigData` into a `RequestConfig`.
+    ///
+    /// # Arguments
+    ///
+    /// - `RequestConfigData` - The wrapped context data.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestConfig` - The newly created context instance.
+    #[inline(always)]
+    fn from(ctx: RequestConfigData) -> Self {
+        Self(arc_rwlock(ctx))
+    }
+}
+
+impl RequestConfig {
+    /// Creates a new `RequestConfig` with default secure settings.
+    ///
+    /// This constructor initializes the configuration with standard security limits
+    /// suitable for most HTTP request parsing scenarios.
+    ///
+    /// # Returns
+    ///
+    /// - `Self` - A new `RequestConfig` instance with default settings.
+    pub async fn new() -> Self {
+        Self(arc_rwlock(RequestConfigData::default()))
+    }
+
+    /// Creates a new `RequestConfig` with high-security settings.
+    ///
+    /// This constructor initializes the configuration with more restrictive limits
+    /// to provide maximum protection against various attacks in high-risk environments.
+    ///
+    /// # Returns
+    ///
+    /// - `Self` - A new `RequestConfig` instance with high-security settings.
+    pub async fn high_security() -> Self {
+        Self(arc_rwlock(RequestConfigData::high_security()))
+    }
+
+    /// Acquires a read lock on the inner configuration.
+    ///
+    /// This method returns a `RwLockReadGuard` that allows reading the
+    /// `RequestConfigData ` values. Multiple threads can read concurrently.
+    ///
+    /// # Returns
+    ///
+    /// - `RwLockReadGuard<'_, RequestConfigData >` - A read guard providing access to the inner configuration.
+    async fn read(&'_ self) -> RwLockReadGuard<'_, RequestConfigData> {
+        self.get_0().read().await
+    }
+
+    /// Acquires a write lock on the inner configuration.
+    ///
+    /// This method returns a `RwLockWriteGuard` that allows mutating the
+    /// `RequestConfigData ` values. Write access is exclusive.
+    ///
+    /// # Returns
+    ///
+    /// - `RwLockWriteGuard<'_, RequestConfigData >` - A write guard providing exclusive access to the inner configuration.
+    async fn write(&'_ self) -> RwLockWriteGuard<'_, RequestConfigData> {
+        self.get_0().write().await
+    }
+
+    /// Sets the configuration data.
+    ///
+    /// # Arguments
+    ///
+    /// - `RequestConfigData` - The configuration data.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn data(&self, data: RequestConfigData) -> &Self {
+        *self.write().await = data;
+        self
+    }
+
+    /// Gets the configuration data.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestConfigData ` - The inner configuration.
+    pub async fn get_data(&self) -> RequestConfigData {
+        *self.read().await
+    }
+
+    /// Sets the buffer size for reading operations.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The buffer size in bytes.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn buffer_size(&self, buffer_size: usize) -> &Self {
+        self.write().await.set_buffer_size(buffer_size);
+        self
+    }
+
+    /// Sets the maximum length for HTTP request line in bytes.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum request line length.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_request_line_length(&self, max_request_line_length: usize) -> &Self {
+        self.write()
+            .await
+            .set_max_request_line_length(max_request_line_length);
+        self
+    }
+
+    /// Sets the maximum length for URL path in bytes.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum path length.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_path_length(&self, max_path_length: usize) -> &Self {
+        self.write().await.set_max_path_length(max_path_length);
+        self
+    }
+
+    /// Sets the maximum length for query string in bytes.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum query string length.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_query_length(&self, max_query_length: usize) -> &Self {
+        self.write().await.set_max_query_length(max_query_length);
+        self
+    }
+
+    /// Sets the maximum length for a single header line in bytes.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum header line length.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_header_line_length(&self, max_header_line_length: usize) -> &Self {
+        self.write()
+            .await
+            .set_max_header_line_length(max_header_line_length);
+        self
+    }
+
+    /// Sets the maximum number of headers allowed in a request.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum header count.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_header_count(&self, max_header_count: usize) -> &Self {
+        self.write().await.set_max_header_count(max_header_count);
+        self
+    }
+
+    /// Sets the maximum length for a header key in bytes.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum header key length.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_header_key_length(&self, max_header_key_length: usize) -> &Self {
+        self.write()
+            .await
+            .set_max_header_key_length(max_header_key_length);
+        self
+    }
+
+    /// Sets the maximum length for a header value in bytes.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum header value length.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_header_value_length(&self, max_header_value_length: usize) -> &Self {
+        self.write()
+            .await
+            .set_max_header_value_length(max_header_value_length);
+        self
+    }
+
+    /// Sets the maximum size for request body in bytes.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum body size.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_body_size(&self, max_body_size: usize) -> &Self {
+        self.write().await.set_max_body_size(max_body_size);
+        self
+    }
+
+    /// Sets the maximum size for WebSocket frame in bytes.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum WebSocket frame size.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_ws_frame_size(&self, max_ws_frame_size: usize) -> &Self {
+        self.write().await.set_max_ws_frame_size(max_ws_frame_size);
+        self
+    }
+
+    /// Sets the maximum number of WebSocket frames to process in a single request.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize` - The maximum WebSocket frames count.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn max_ws_frames(&self, max_ws_frames: usize) -> &Self {
+        self.write().await.set_max_ws_frames(max_ws_frames);
+        self
+    }
+
+    /// Sets the timeout for reading HTTP request in milliseconds.
+    ///
+    /// # Arguments
+    ///
+    /// - `u64` - The HTTP read timeout in milliseconds.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn http_read_timeout_ms(&self, http_read_timeout_ms: u64) -> &Self {
+        self.write()
+            .await
+            .set_http_read_timeout_ms(http_read_timeout_ms);
+        self
+    }
+
+    /// Sets the timeout for reading WebSocket frames in milliseconds.
+    ///
+    /// # Arguments
+    ///
+    /// - `u64` - The WebSocket read timeout in milliseconds.
+    ///
+    /// # Returns
+    ///
+    /// - `&Self` - The RequestConfig instance for chaining.
+    pub async fn ws_read_timeout_ms(&self, ws_read_timeout_ms: u64) -> &Self {
+        self.write()
+            .await
+            .set_ws_read_timeout_ms(ws_read_timeout_ms);
+        self
     }
 }
 
@@ -224,7 +508,13 @@ impl Request {
     where
         R: AsyncBufReadExt + Unpin,
     {
-        let buffer_size: usize = config.get_buffer_size();
+        let config_inner: RequestConfigData = config.get_data().await;
+        let buffer_size: usize = config_inner.get_buffer_size();
+        let max_header_line_length: usize = config_inner.get_max_header_line_length();
+        let max_header_count: usize = config_inner.get_max_header_count();
+        let max_header_key_length: usize = config_inner.get_max_header_key_length();
+        let max_header_value_length: usize = config_inner.get_max_header_value_length();
+        let max_body_size: usize = config_inner.get_max_body_size();
         let mut headers: RequestHeaders = hash_map_xx_hash3_64();
         let mut host: RequestHost = String::new();
         let mut content_length: usize = 0;
@@ -234,7 +524,7 @@ impl Request {
             let bytes_read: usize = AsyncBufReadExt::read_line(reader, header_line)
                 .await
                 .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-            if bytes_read > config.max_header_line_length {
+            if bytes_read > max_header_line_length {
                 return Err(RequestError::HeaderLineTooLong(
                     HttpStatus::RequestHeaderFieldsTooLarge,
                 ));
@@ -244,7 +534,7 @@ impl Request {
                 break;
             }
             header_count += 1;
-            if header_count > config.max_header_count {
+            if header_count > max_header_count {
                 return Err(RequestError::TooManyHeaders(
                     HttpStatus::RequestHeaderFieldsTooLarge,
                 ));
@@ -254,13 +544,13 @@ impl Request {
                 if key.is_empty() {
                     continue;
                 }
-                if key.len() > config.max_header_key_length {
+                if key.len() > max_header_key_length {
                     return Err(RequestError::HeaderKeyTooLong(
                         HttpStatus::RequestHeaderFieldsTooLarge,
                     ));
                 }
                 let value: String = value_part.trim().to_string();
-                if value.len() > config.max_header_value_length {
+                if value.len() > max_header_value_length {
                     return Err(RequestError::HeaderValueTooLong(
                         HttpStatus::RequestHeaderFieldsTooLarge,
                     ));
@@ -270,7 +560,7 @@ impl Request {
                 } else if key == CONTENT_LENGTH {
                     match value.parse::<usize>() {
                         Ok(length) => {
-                            if length > config.max_body_size {
+                            if length > max_body_size {
                                 return Err(RequestError::ContentLengthTooLarge(
                                     HttpStatus::PayloadTooLarge,
                                 ));
@@ -304,76 +594,78 @@ impl Request {
         stream: &ArcRwLockStream,
         config: &RequestConfig,
     ) -> Result<Request, RequestError> {
-        timeout(
-            Duration::from_millis(config.http_read_timeout_ms),
-            async move {
-                let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
-                let buffer_size: usize = config.get_buffer_size();
-                let reader: &mut BufReader<&mut TcpStream> =
-                    &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
-                let mut request_line: String = String::with_capacity(buffer_size);
-                let bytes_read: usize = AsyncBufReadExt::read_line(reader, &mut request_line)
+        let config_inner: RequestConfigData = config.get_data().await;
+        let buffer_size: usize = config_inner.get_buffer_size();
+        let max_request_line_length: usize = config_inner.get_max_request_line_length();
+        let max_path_length: usize = config_inner.get_max_path_length();
+        let max_query_length: usize = config_inner.get_max_query_length();
+        let http_read_timeout_ms: u64 = config_inner.get_http_read_timeout_ms();
+        timeout(Duration::from_millis(http_read_timeout_ms), async move {
+            let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
+            let reader: &mut BufReader<&mut TcpStream> =
+                &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
+            let mut request_line: String = String::with_capacity(buffer_size);
+            let bytes_read: usize = AsyncBufReadExt::read_line(reader, &mut request_line)
+                .await
+                .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
+            if bytes_read > max_request_line_length {
+                return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
+            }
+            let parts: Vec<&str> = request_line.split_whitespace().collect();
+            let parts_len: usize = parts.len();
+            if parts_len < 3 {
+                return Err(RequestError::HttpRequestPartsInsufficient(
+                    HttpStatus::BadRequest,
+                ));
+            }
+            let method: RequestMethod = parts[0]
+                .parse::<RequestMethod>()
+                .unwrap_or(Method::Unknown(parts[0].to_string()));
+            let full_path: &str = parts[1];
+            if full_path.len() > max_path_length {
+                return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
+            }
+            let full_path: RequestPath = full_path.to_string();
+            let version: RequestVersion = parts[2]
+                .parse::<RequestVersion>()
+                .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
+            let hash_index: Option<usize> = full_path.find(HASH);
+            let query_index: Option<usize> = full_path.find(QUERY);
+            let query_string: String = query_index.map_or_else(String::new, |i| {
+                let temp: &str = &full_path[i + 1..];
+                if hash_index.is_none() || hash_index.unwrap() <= i {
+                    return temp.to_owned();
+                }
+                temp.split(HASH).next().unwrap_or_default().to_owned()
+            });
+            if query_string.len() > max_query_length {
+                return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
+            }
+            let querys: RequestQuerys = Self::parse_querys(&query_string);
+            let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
+                full_path[..i].to_owned()
+            } else {
+                full_path.to_owned()
+            };
+            let (headers, host, content_length): (RequestHeaders, RequestHost, usize) =
+                Self::parse_headers(reader, config).await?;
+            let mut body: RequestBody = Vec::with_capacity(content_length);
+            if content_length > 0 {
+                body.resize(content_length, 0);
+                AsyncReadExt::read_exact(reader, &mut body)
                     .await
-                    .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-                if bytes_read > config.max_request_line_length {
-                    return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
-                }
-                let parts: Vec<&str> = request_line.split_whitespace().collect();
-                let parts_len: usize = parts.len();
-                if parts_len < 3 {
-                    return Err(RequestError::HttpRequestPartsInsufficient(
-                        HttpStatus::BadRequest,
-                    ));
-                }
-                let method: RequestMethod = parts[0]
-                    .parse::<RequestMethod>()
-                    .unwrap_or(Method::Unknown(parts[0].to_string()));
-                let full_path: &str = parts[1];
-                if full_path.len() > config.max_path_length {
-                    return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
-                }
-                let full_path: RequestPath = full_path.to_string();
-                let version: RequestVersion = parts[2]
-                    .parse::<RequestVersion>()
-                    .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
-                let hash_index: Option<usize> = full_path.find(HASH);
-                let query_index: Option<usize> = full_path.find(QUERY);
-                let query_string: String = query_index.map_or_else(String::new, |i| {
-                    let temp: &str = &full_path[i + 1..];
-                    if hash_index.is_none() || hash_index.unwrap() <= i {
-                        return temp.to_owned();
-                    }
-                    temp.split(HASH).next().unwrap_or_default().to_owned()
-                });
-                if query_string.len() > config.max_query_length {
-                    return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
-                }
-                let querys: RequestQuerys = Self::parse_querys(&query_string);
-                let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
-                    full_path[..i].to_owned()
-                } else {
-                    full_path.to_owned()
-                };
-                let (headers, host, content_length): (RequestHeaders, RequestHost, usize) =
-                    Self::parse_headers(reader, config).await?;
-                let mut body: RequestBody = Vec::with_capacity(content_length);
-                if content_length > 0 {
-                    body.resize(content_length, 0);
-                    AsyncReadExt::read_exact(reader, &mut body)
-                        .await
-                        .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
-                }
-                Ok(Request {
-                    method,
-                    host,
-                    version,
-                    path,
-                    querys,
-                    headers,
-                    body,
-                })
-            },
-        )
+                    .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
+            }
+            Ok(Request {
+                method,
+                host,
+                version,
+                path,
+                querys,
+                headers,
+                body,
+            })
+        })
         .await
         .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
     }
@@ -391,19 +683,21 @@ impl Request {
     ///
     /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
     pub async fn ws_from_stream(
-        &mut self,
+        &self,
         stream: &ArcRwLockStream,
         config: &RequestConfig,
     ) -> Result<Request, RequestError> {
-        let buffer_size: usize = config.get_buffer_size();
+        let config_inner: RequestConfigData = config.get_data().await;
+        let buffer_size: usize = config_inner.get_buffer_size();
+        let max_ws_frame_size: usize = config_inner.get_max_ws_frame_size();
+        let ws_read_timeout_ms: u64 = config_inner.get_ws_read_timeout_ms();
+        let max_ws_frames: usize = config_inner.get_max_ws_frames();
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
-        let temp_buffer_size: usize = buffer_size;
-        let mut temp_buffer: Vec<u8> = vec![0; temp_buffer_size];
-        let mut full_frame: Vec<u8> = Vec::with_capacity(config.max_ws_frame_size);
+        let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
+        let mut full_frame: Vec<u8> = Vec::with_capacity(max_ws_frame_size);
         let mut frame_count: usize = 0;
         let mut is_client_response: bool = false;
-        let ws_read_timeout_ms: u64 =
-            (config.ws_read_timeout_ms >> 1) + (config.ws_read_timeout_ms & 1);
+        let ws_read_timeout_ms: u64 = (ws_read_timeout_ms >> 1) + (ws_read_timeout_ms & 1);
         let timeout_duration: Duration = Duration::from_millis(ws_read_timeout_ms);
         loop {
             let len: usize = match timeout(
@@ -446,7 +740,7 @@ impl Request {
                 is_client_response = true;
                 dynamic_buffer.drain(0..consumed);
                 frame_count += 1;
-                if frame_count > config.max_ws_frames {
+                if frame_count > max_ws_frames {
                     return Err(RequestError::TooManyHeaders(
                         HttpStatus::RequestHeaderFieldsTooLarge,
                     ));
@@ -460,12 +754,12 @@ impl Request {
                     }
                     WebSocketOpcode::Text | WebSocketOpcode::Binary => {
                         let payload_data: &[u8] = frame.get_payload_data();
-                        if payload_data.len() > config.max_ws_frame_size {
+                        if payload_data.len() > max_ws_frame_size {
                             return Err(RequestError::WebSocketFrameTooLarge(
                                 HttpStatus::PayloadTooLarge,
                             ));
                         }
-                        if full_frame.len() + payload_data.len() > config.max_ws_frame_size {
+                        if full_frame.len() + payload_data.len() > max_ws_frame_size {
                             return Err(RequestError::WebSocketFrameTooLarge(
                                 HttpStatus::PayloadTooLarge,
                             ));

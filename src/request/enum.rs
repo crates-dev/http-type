@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, DisplayDebug)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, DisplayDebug)]
 pub enum RequestError {
     /// HTTP read error with HTTP status
     HttpRead(HttpStatus),

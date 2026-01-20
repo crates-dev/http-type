@@ -1,7 +1,7 @@
 use crate::*;
 
 /// WebSocket frame opcode types
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 #[repr(u8)]
 pub enum WebSocketOpcode {
     /// Represents a continuation frame (0x0).

@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Represents different upgrade types.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum UpgradeType {
     /// Represents an upgrade to the WebSocket protocol.
     WebSocket,

@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// Provides methods to set various cookie attributes like expiration,
 /// domain, path, and security flags before building the final cookie string.
-#[derive(Data, Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Data, Debug, Clone, Default, Eq, PartialEq)]
 pub struct CookieBuilder {
     /// Cookie name identifier.
     #[set(type(AsRef<str>))]
@@ -38,5 +38,5 @@ pub struct CookieBuilder {
 /// Parser for HTTP Cookie headers.
 ///
 /// Provides functionality to parse Cookie header strings into key-value pairs.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct Cookie;

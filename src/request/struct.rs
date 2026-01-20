@@ -18,7 +18,7 @@ use crate::*;
     Deserialize,
     Serialize,
 )]
-pub struct RequestConfig {
+pub struct RequestConfigData {
     /// Buffer size for reading operations.
     #[get(type(copy))]
     pub(super) buffer_size: usize,
@@ -60,10 +60,18 @@ pub struct RequestConfig {
     pub(super) ws_read_timeout_ms: u64,
 }
 
+/// Thread-safe configuration wrapper for HTTP request parsing.
+///
+/// This struct uses `ArcRwLock` to provide thread-safe access to `RequestConfigData `,
+/// allowing concurrent reads and exclusive writes. It is the public-facing API
+/// for configuring HTTP request parsing limits.
+#[derive(Clone, Getter, CustomDebug, DisplayDebug)]
+pub struct RequestConfig(#[get(pub(super))] pub(super) ArcRwLock<RequestConfigData>);
+
 /// HTTP request representation.
 ///
 /// Contains all components of an HTTP request.
-#[derive(Debug, Clone, PartialEq, Eq, Getter, DisplayDebug)]
+#[derive(Debug, Clone, Eq, PartialEq, Getter, DisplayDebug)]
 pub struct Request {
     /// HTTP request method.
     pub(super) method: RequestMethod,
