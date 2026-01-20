@@ -1,7 +1,7 @@
+use crate::*;
+
 #[test]
 fn test_content_type_from_str() {
-    use super::*;
-    use http_constant::*;
     assert_eq!(
         APPLICATION_JSON.parse::<ContentType>().unwrap(),
         ContentType::ApplicationJson
@@ -31,7 +31,6 @@ fn test_content_type_from_str() {
 
 #[test]
 fn test_content_type_from_str_case_insensitive() {
-    use super::*;
     assert_eq!(
         "APPLICATION/JSON".parse::<ContentType>().unwrap(),
         ContentType::ApplicationJson
@@ -56,13 +55,11 @@ fn test_content_type_from_str_case_insensitive() {
 
 #[test]
 fn test_content_type_default() {
-    use super::*;
     assert_eq!(ContentType::default(), ContentType::Unknown);
 }
 
 #[test]
 fn test_content_type_clone() {
-    use super::*;
     let content_type: ContentType = ContentType::ApplicationJson;
     let cloned_content_type: ContentType = content_type;
     assert_eq!(content_type, cloned_content_type);
@@ -70,7 +67,6 @@ fn test_content_type_clone() {
 
 #[test]
 fn test_content_type_debug() {
-    use super::*;
     let content_type: ContentType = ContentType::ApplicationJson;
     let debug_str: String = format!("{content_type:?}");
     assert_eq!(debug_str, "ApplicationJson");
@@ -78,7 +74,6 @@ fn test_content_type_debug() {
 
 #[test]
 fn test_content_type_equality() {
-    use super::*;
     assert_eq!(ContentType::ApplicationJson, ContentType::ApplicationJson);
     assert_ne!(ContentType::ApplicationJson, ContentType::ApplicationXml);
     assert_eq!(ContentType::Unknown, ContentType::Unknown);
@@ -87,7 +82,6 @@ fn test_content_type_equality() {
 
 #[test]
 fn test_content_type_get_body_string_with_simple_string() {
-    use super::*;
     let data: String = "Hello, World!".to_string();
     let json_result: String = ContentType::ApplicationJson.get_body_string(&data);
     assert_eq!(json_result, "\"Hello, World!\"");
@@ -100,7 +94,6 @@ fn test_content_type_get_body_string_with_simple_string() {
 
 #[test]
 fn test_content_type_get_body_string_with_number() {
-    use super::*;
     let data: i32 = 42;
     let json_result: String = ContentType::ApplicationJson.get_body_string(&data);
     assert_eq!(json_result, "42");
@@ -112,7 +105,6 @@ fn test_content_type_get_body_string_with_number() {
 
 #[test]
 fn test_content_type_format_content_type_with_charset() {
-    use super::*;
     let result: String = ContentType::format_content_type_with_charset("text/html", "utf-8");
     assert_eq!(result, "text/html; charset=utf-8");
     let result2: String =
@@ -122,7 +114,6 @@ fn test_content_type_format_content_type_with_charset() {
 
 #[test]
 fn test_content_type_format_content_type_with_charset_declaration() {
-    use super::*;
     let result: String =
         ContentType::format_content_type_with_charset_declaration("text/html", "charset=utf-8");
     assert_eq!(result, "text/html; charset=utf-8");
@@ -135,7 +126,6 @@ fn test_content_type_format_content_type_with_charset_declaration() {
 
 #[test]
 fn test_content_type_all_variants() {
-    use super::*;
     let content_types: Vec<ContentType> = vec![
         ContentType::ApplicationJson,
         ContentType::ApplicationXml,
@@ -152,7 +142,6 @@ fn test_content_type_all_variants() {
 
 #[test]
 fn test_content_type_pattern_matching() {
-    use super::*;
     let content_type: ContentType = ContentType::ApplicationJson;
     match content_type {
         ContentType::ApplicationJson => {}
@@ -166,7 +155,6 @@ fn test_content_type_pattern_matching() {
 
 #[test]
 fn test_content_type_charset_formatting_edge_cases() {
-    use super::*;
     let result_empty: String = ContentType::format_content_type_with_charset("", "");
     assert_eq!(result_empty, "; charset=");
     let result_spaces: String =
@@ -184,7 +172,6 @@ fn test_content_type_charset_formatting_edge_cases() {
 
 #[test]
 fn test_content_type_memory_size() {
-    use super::*;
     use std::mem;
     let size: usize = mem::size_of::<ContentType>();
     assert!(size > 0);
@@ -195,7 +182,6 @@ fn test_content_type_memory_size() {
 
 #[test]
 fn test_content_type_get_body_string_unknown() {
-    use super::*;
     let data: String = "test_data".to_string();
     let content_type: ContentType = ContentType::Unknown;
     let result: String = content_type.get_body_string(&data);
@@ -204,7 +190,6 @@ fn test_content_type_get_body_string_unknown() {
 
 #[test]
 fn test_content_type_get_body_string_xml() {
-    use super::*;
     let data: String = "test_data".to_string();
     let content_type: ContentType = ContentType::ApplicationXml;
     let result: String = content_type.get_body_string(&data);
@@ -213,7 +198,6 @@ fn test_content_type_get_body_string_xml() {
 
 #[test]
 fn test_content_type_get_body_string_form_url_encoded() {
-    use super::*;
     let data: String = "test_data".to_string();
     let content_type: ContentType = ContentType::FormUrlEncoded;
     let result: String = content_type.get_body_string(&data);
@@ -222,7 +206,6 @@ fn test_content_type_get_body_string_form_url_encoded() {
 
 #[test]
 fn test_content_type_from_str_with_parameters() {
-    use super::*;
     assert_eq!(
         "application/json; charset=utf-8"
             .parse::<ContentType>()
@@ -237,7 +220,6 @@ fn test_content_type_from_str_with_parameters() {
 
 #[test]
 fn test_content_type_case_variations() {
-    use super::*;
     assert_eq!(
         "application/JSON".parse::<ContentType>().unwrap(),
         ContentType::ApplicationJson

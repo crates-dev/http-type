@@ -1,6 +1,7 @@
+use crate::*;
+
 #[test]
 fn test_http_status_code() {
-    use super::*;
     assert_eq!(HttpStatus::Continue.code(), 100);
     assert_eq!(HttpStatus::SwitchingProtocols.code(), 101);
     assert_eq!(HttpStatus::Processing.code(), 102);
@@ -68,7 +69,6 @@ fn test_http_status_code() {
 
 #[test]
 fn test_http_status_phrase() {
-    use super::*;
     assert_eq!(HttpStatus::phrase(100), "Continue");
     assert_eq!(HttpStatus::phrase(101), "Switching Protocols");
     assert_eq!(HttpStatus::phrase(102), "Processing");
@@ -136,7 +136,6 @@ fn test_http_status_phrase() {
 
 #[test]
 fn test_http_status_display() {
-    use super::*;
     assert_eq!(HttpStatus::Ok.to_string(), "OK");
     assert_eq!(HttpStatus::NotFound.to_string(), "Not Found");
     assert_eq!(
@@ -150,7 +149,6 @@ fn test_http_status_display() {
 
 #[test]
 fn test_http_status_same() {
-    use super::*;
     assert!(HttpStatus::Ok.same("OK"));
     assert!(HttpStatus::Ok.same("ok"));
     assert!(HttpStatus::Ok.same("Ok"));
@@ -163,7 +161,6 @@ fn test_http_status_same() {
 
 #[test]
 fn test_http_status_from_str() {
-    use super::*;
     assert_eq!("100".parse::<HttpStatus>().unwrap(), HttpStatus::Continue);
     assert_eq!("200".parse::<HttpStatus>().unwrap(), HttpStatus::Ok);
     assert_eq!("404".parse::<HttpStatus>().unwrap(), HttpStatus::NotFound);
@@ -178,13 +175,11 @@ fn test_http_status_from_str() {
 
 #[test]
 fn test_http_status_default() {
-    use super::*;
     assert_eq!(HttpStatus::default(), HttpStatus::Ok);
 }
 
 #[test]
 fn test_http_status_clone() {
-    use super::*;
     let status: HttpStatus = HttpStatus::Ok;
     let cloned_status: HttpStatus = status;
     assert_eq!(status, cloned_status);
@@ -192,7 +187,6 @@ fn test_http_status_clone() {
 
 #[test]
 fn test_http_status_debug() {
-    use super::*;
     let status: HttpStatus = HttpStatus::Ok;
     let debug_str: String = format!("{status:?}");
     assert_eq!(debug_str, "Ok");
@@ -200,7 +194,6 @@ fn test_http_status_debug() {
 
 #[test]
 fn test_http_status_equality() {
-    use super::*;
     assert_eq!(HttpStatus::Ok, HttpStatus::Ok);
     assert_ne!(HttpStatus::Ok, HttpStatus::NotFound);
     assert_eq!(
@@ -212,7 +205,6 @@ fn test_http_status_equality() {
 
 #[test]
 fn test_http_status_informational() {
-    use super::*;
     assert_eq!(HttpStatus::Continue.code(), 100);
     assert_eq!(HttpStatus::SwitchingProtocols.code(), 101);
     assert_eq!(HttpStatus::Processing.code(), 102);
@@ -221,7 +213,6 @@ fn test_http_status_informational() {
 
 #[test]
 fn test_http_status_success() {
-    use super::*;
     assert_eq!(HttpStatus::Ok.code(), 200);
     assert_eq!(HttpStatus::Created.code(), 201);
     assert_eq!(HttpStatus::Accepted.code(), 202);
@@ -230,7 +221,6 @@ fn test_http_status_success() {
 
 #[test]
 fn test_http_status_redirection() {
-    use super::*;
     assert_eq!(HttpStatus::MultipleChoices.code(), 300);
     assert_eq!(HttpStatus::MovedPermanently.code(), 301);
     assert_eq!(HttpStatus::Found.code(), 302);
@@ -239,7 +229,6 @@ fn test_http_status_redirection() {
 
 #[test]
 fn test_http_status_client_error() {
-    use super::*;
     assert_eq!(HttpStatus::BadRequest.code(), 400);
     assert_eq!(HttpStatus::Unauthorized.code(), 401);
     assert_eq!(HttpStatus::Forbidden.code(), 403);
@@ -249,7 +238,6 @@ fn test_http_status_client_error() {
 
 #[test]
 fn test_http_status_server_error() {
-    use super::*;
     assert_eq!(HttpStatus::InternalServerError.code(), 500);
     assert_eq!(HttpStatus::NotImplemented.code(), 501);
     assert_eq!(HttpStatus::BadGateway.code(), 502);
@@ -259,7 +247,6 @@ fn test_http_status_server_error() {
 
 #[test]
 fn test_http_status_special_codes() {
-    use super::*;
     assert_eq!(HttpStatus::ImATeapot.code(), 418);
     assert_eq!(HttpStatus::ImATeapot.to_string(), "I'm a teapot");
     assert_eq!(HttpStatus::Unknown.code(), 0);

@@ -152,23 +152,6 @@ impl RequestConfigData {
     }
 }
 
-/// Implementation of `From` trait for `RequestConfig`.
-impl From<RequestConfigData> for RequestConfig {
-    /// Converts a `RequestConfigData` into a `RequestConfig`.
-    ///
-    /// # Arguments
-    ///
-    /// - `RequestConfigData` - The wrapped context data.
-    ///
-    /// # Returns
-    ///
-    /// - `RequestConfig` - The newly created context instance.
-    #[inline(always)]
-    fn from(ctx: RequestConfigData) -> Self {
-        Self(arc_rwlock(ctx))
-    }
-}
-
 /// Implementation of `Default` trait for `RequestConfig`.
 impl Default for RequestConfig {
     /// Creates a new `RequestConfig` with default secure settings.
@@ -210,6 +193,23 @@ impl PartialEq for RequestConfig {
 /// Implementation of `Eq` trait for `RequestConfig`.
 impl Eq for RequestConfig {}
 
+/// Implementation of `From` trait for `RequestConfig`.
+impl From<RequestConfigData> for RequestConfig {
+    /// Converts a `RequestConfigData` into a `RequestConfig`.
+    ///
+    /// # Arguments
+    ///
+    /// - `RequestConfigData` - The wrapped context data.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestConfig` - The newly created context instance.
+    #[inline(always)]
+    fn from(ctx: RequestConfigData) -> Self {
+        Self(arc_rwlock(ctx))
+    }
+}
+
 impl RequestConfig {
     /// Creates a new `RequestConfig` with default secure settings.
     ///
@@ -221,6 +221,22 @@ impl RequestConfig {
     /// - `Self` - A new `RequestConfig` instance with default settings.
     pub async fn new() -> Self {
         Self(arc_rwlock(RequestConfigData::default()))
+    }
+
+    /// Creates a new `RequestConfig` from a JSON string.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The configuration.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RequestConfig, serde_json::Error>` - The parsed `RequestConfig` or an error.
+    pub fn from_json<C>(json: C) -> Result<RequestConfig, serde_json::Error>
+    where
+        C: AsRef<str>,
+    {
+        serde_json::from_str(json.as_ref()).map(|data: RequestConfigData| Self::from(data))
     }
 
     /// Creates a new `RequestConfig` with high-security settings.

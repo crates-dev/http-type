@@ -1,7 +1,7 @@
+use crate::*;
+
 #[test]
 fn test_protocol_display() {
-    use super::*;
-    use http_constant::*;
     assert_eq!(Protocol::Http.to_string(), HTTP_LOWERCASE);
     assert_eq!(Protocol::Https.to_string(), HTTPS_LOWERCASE);
     assert_eq!(Protocol::Unknown("ftp".to_string()).to_string(), "ftp");
@@ -9,8 +9,6 @@ fn test_protocol_display() {
 
 #[test]
 fn test_protocol_from_str() {
-    use super::*;
-    use http_constant::*;
     assert_eq!(HTTP_LOWERCASE.parse::<Protocol>().unwrap(), Protocol::Http);
     assert_eq!(
         HTTPS_LOWERCASE.parse::<Protocol>().unwrap(),
@@ -30,13 +28,11 @@ fn test_protocol_from_str() {
 
 #[test]
 fn test_protocol_default() {
-    use super::*;
     assert_eq!(Protocol::default(), Protocol::Unknown(String::new()));
 }
 
 #[test]
 fn test_protocol_is_http() {
-    use super::*;
     assert!(Protocol::Http.is_http());
     assert!(!Protocol::Https.is_http());
     assert!(!Protocol::Unknown("http".to_string()).is_http());
@@ -46,7 +42,6 @@ fn test_protocol_is_http() {
 
 #[test]
 fn test_protocol_is_https() {
-    use super::*;
     assert!(!Protocol::Http.is_https());
     assert!(Protocol::Https.is_https());
     assert!(!Protocol::Unknown("https".to_string()).is_https());
@@ -56,7 +51,6 @@ fn test_protocol_is_https() {
 
 #[test]
 fn test_protocol_get_port() {
-    use super::*;
     assert_eq!(Protocol::Http.get_port(), 80);
     assert_eq!(Protocol::Https.get_port(), 443);
     assert_eq!(Protocol::Unknown("ftp".to_string()).get_port(), 80);
@@ -65,7 +59,6 @@ fn test_protocol_get_port() {
 
 #[test]
 fn test_protocol_clone() {
-    use super::*;
     let protocol: Protocol = Protocol::Http;
     let cloned_protocol: Protocol = protocol.clone();
     assert_eq!(protocol, cloned_protocol);
@@ -76,7 +69,6 @@ fn test_protocol_clone() {
 
 #[test]
 fn test_protocol_debug() {
-    use super::*;
     let protocol: Protocol = Protocol::Http;
     let debug_str: String = format!("{protocol:?}");
     assert_eq!(debug_str, "Http");
@@ -87,7 +79,6 @@ fn test_protocol_debug() {
 
 #[test]
 fn test_protocol_equality() {
-    use super::*;
     assert_eq!(Protocol::Http, Protocol::Http);
     assert_ne!(Protocol::Http, Protocol::Https);
     assert_eq!(
@@ -103,8 +94,6 @@ fn test_protocol_equality() {
 
 #[test]
 fn test_protocol_case_sensitivity() {
-    use super::*;
-    use http_constant::*;
     assert_eq!(HTTP_LOWERCASE.parse::<Protocol>().unwrap(), Protocol::Http);
     assert_eq!("HTTP".parse::<Protocol>().unwrap(), Protocol::Http);
     assert_eq!(
@@ -116,7 +105,6 @@ fn test_protocol_case_sensitivity() {
 
 #[test]
 fn test_protocol_all_variants() {
-    use super::*;
     let protocols: Vec<Protocol> = vec![
         Protocol::Http,
         Protocol::Https,
@@ -137,7 +125,6 @@ fn test_protocol_all_variants() {
 
 #[test]
 fn test_protocol_unknown_with_empty_string() {
-    use super::*;
     let protocol: Protocol = Protocol::Unknown("".to_string());
     assert_eq!(protocol.to_string(), "");
     assert!(!protocol.is_http());
@@ -148,7 +135,6 @@ fn test_protocol_unknown_with_empty_string() {
 
 #[test]
 fn test_protocol_unknown_with_special_characters() {
-    use super::*;
     let protocol: Protocol = Protocol::Unknown("custom-protocol".to_string());
     assert_eq!(protocol.to_string(), "custom-protocol");
     assert!(!protocol.is_http());
@@ -159,7 +145,6 @@ fn test_protocol_unknown_with_special_characters() {
 
 #[test]
 fn test_protocol_pattern_matching() {
-    use super::*;
     let protocol: Protocol = Protocol::Http;
     match protocol {
         Protocol::Http => {}
@@ -170,7 +155,6 @@ fn test_protocol_pattern_matching() {
 
 #[test]
 fn test_protocol_unknown_pattern_matching() {
-    use super::*;
     let protocol: Protocol = Protocol::Unknown("custom".to_string());
     match protocol {
         Protocol::Http => panic!("Should not match HTTP"),
@@ -183,7 +167,6 @@ fn test_protocol_unknown_pattern_matching() {
 
 #[test]
 fn test_protocol_secure_check() {
-    use super::*;
     assert!(!Protocol::Http.is_https());
     assert!(Protocol::Https.is_https());
     assert!(!Protocol::Unknown("http".to_string()).is_https());
@@ -192,7 +175,6 @@ fn test_protocol_secure_check() {
 
 #[test]
 fn test_protocol_port_mapping() {
-    use super::*;
     let http_port: u16 = Protocol::Http.get_port();
     let https_port: u16 = Protocol::Https.get_port();
     let unknown_port: u16 = Protocol::Unknown("custom".to_string()).get_port();
@@ -204,7 +186,6 @@ fn test_protocol_port_mapping() {
 
 #[test]
 fn test_protocol_ordering() {
-    use super::*;
     let mut protocols: Vec<Protocol> = vec![
         Protocol::Unknown("z".to_string()),
         Protocol::Https,
@@ -234,7 +215,6 @@ fn test_protocol_ordering() {
 
 #[test]
 fn test_protocol_memory_size() {
-    use super::*;
     use std::mem;
     let size: usize = mem::size_of::<Protocol>();
     assert!(size > 0);
@@ -245,7 +225,6 @@ fn test_protocol_memory_size() {
 
 #[test]
 fn test_protocol_from_str_error_type() {
-    use super::*;
     let result: Result<Protocol, &'static str> = "invalid".parse();
     assert!(result.is_ok());
     assert_eq!(result.unwrap(), Protocol::Unknown("invalid".to_string()));
@@ -253,7 +232,6 @@ fn test_protocol_from_str_error_type() {
 
 #[test]
 fn test_protocol_common_protocols() {
-    use super::*;
     let common_protocols: Vec<&str> = vec!["ftp", "ssh", "telnet", "smtp", "pop3", "imap"];
     for proto_str in common_protocols {
         let protocol: Protocol = proto_str.parse().unwrap();

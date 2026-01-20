@@ -1,6 +1,7 @@
+use crate::*;
+
 #[test]
 fn test_cookie_builder_new() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
@@ -15,7 +16,6 @@ fn test_cookie_builder_new() {
 
 #[test]
 fn test_cookie_builder_default() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::default();
     assert_eq!(cookie.get_name(), "");
     assert_eq!(cookie.get_value(), "");
@@ -30,7 +30,6 @@ fn test_cookie_builder_default() {
 
 #[test]
 fn test_cookie_builder_parse_basic() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
@@ -45,7 +44,6 @@ fn test_cookie_builder_parse_basic() {
 
 #[test]
 fn test_cookie_builder_parse_with_expires() {
-    use super::*;
     let cookie: CookieBuilder =
         CookieBuilder::parse("session_id=abc123; expires=Wed, 21 Oct 2015 07:28:00 GMT");
     assert_eq!(cookie.get_name(), "session_id");
@@ -64,7 +62,6 @@ fn test_cookie_builder_parse_with_expires() {
 
 #[test]
 fn test_cookie_builder_parse_with_max_age() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; max-age=3600");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
@@ -79,7 +76,6 @@ fn test_cookie_builder_parse_with_max_age() {
 
 #[test]
 fn test_cookie_builder_parse_with_domain() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; domain=example.com");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
@@ -94,7 +90,6 @@ fn test_cookie_builder_parse_with_domain() {
 
 #[test]
 fn test_cookie_builder_parse_with_path() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; path=/admin");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
@@ -109,7 +104,6 @@ fn test_cookie_builder_parse_with_path() {
 
 #[test]
 fn test_cookie_builder_parse_with_secure() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; secure");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
@@ -124,7 +118,6 @@ fn test_cookie_builder_parse_with_secure() {
 
 #[test]
 fn test_cookie_builder_parse_with_http_only() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; httponly");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
@@ -139,7 +132,6 @@ fn test_cookie_builder_parse_with_http_only() {
 
 #[test]
 fn test_cookie_builder_parse_with_same_site() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse("session_id=abc123; samesite=strict");
     assert_eq!(cookie.get_name(), "session_id");
     assert_eq!(cookie.get_value(), "abc123");
@@ -154,7 +146,6 @@ fn test_cookie_builder_parse_with_same_site() {
 
 #[test]
 fn test_cookie_builder_parse_complex() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse(
         "session_id=abc123; expires=Wed, 21 Oct 2015 07:28:00 GMT; max-age=3600; domain=example.com; path=/admin; secure; httponly; samesite=lax",
     );
@@ -174,7 +165,6 @@ fn test_cookie_builder_parse_complex() {
 
 #[test]
 fn test_cookie_builder_parse_empty_string() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse("");
     assert_eq!(cookie.get_name(), "");
     assert_eq!(cookie.get_value(), "");
@@ -189,7 +179,6 @@ fn test_cookie_builder_parse_empty_string() {
 
 #[test]
 fn test_cookie_builder_parse_case_insensitive() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::parse(
         "session_id=abc123; DOMAIN=example.com; SECURE; HTTPONLY; SAMESITE=Strict",
     );
@@ -206,7 +195,6 @@ fn test_cookie_builder_parse_case_insensitive() {
 
 #[test]
 fn test_cookie_builder_expires() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_expires("Wed, 21 Oct 2015 07:28:00 GMT");
     assert_eq!(
@@ -217,7 +205,6 @@ fn test_cookie_builder_expires() {
 
 #[test]
 fn test_cookie_builder_max_age() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_max_age(3600);
     assert_eq!(*cookie.try_get_max_age(), Some(3600));
@@ -225,7 +212,6 @@ fn test_cookie_builder_max_age() {
 
 #[test]
 fn test_cookie_builder_domain() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_domain("example.com");
     assert_eq!(*cookie.try_get_domain(), Some("example.com".to_string()));
@@ -233,7 +219,6 @@ fn test_cookie_builder_domain() {
 
 #[test]
 fn test_cookie_builder_path() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_path("/admin");
     assert_eq!(*cookie.try_get_path(), Some("/admin".to_string()));
@@ -241,7 +226,6 @@ fn test_cookie_builder_path() {
 
 #[test]
 fn test_cookie_builder_secure() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.secure();
     assert_eq!(*cookie.try_get_secure(), Some(true));
@@ -249,7 +233,6 @@ fn test_cookie_builder_secure() {
 
 #[test]
 fn test_cookie_builder_http_only() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.http_only();
     assert_eq!(*cookie.try_get_http_only(), Some(true));
@@ -257,7 +240,6 @@ fn test_cookie_builder_http_only() {
 
 #[test]
 fn test_cookie_builder_same_site() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("test", "value");
     cookie.set_same_site("Strict");
     assert_eq!(*cookie.try_get_same_site(), Some("Strict".to_string()));
@@ -265,7 +247,6 @@ fn test_cookie_builder_same_site() {
 
 #[test]
 fn test_cookie_builder_chaining() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie
         .set_expires("Wed, 21 Oct 2015 07:28:00 GMT")
@@ -291,7 +272,6 @@ fn test_cookie_builder_chaining() {
 
 #[test]
 fn test_cookie_builder_build_basic() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     let result: String = cookie.build();
     assert_eq!(result, "session_id=abc123");
@@ -299,7 +279,6 @@ fn test_cookie_builder_build_basic() {
 
 #[test]
 fn test_cookie_builder_build_empty_name() {
-    use super::*;
     let cookie: CookieBuilder = CookieBuilder::new("", "abc123");
     let result: String = cookie.build();
     assert_eq!(result, "");
@@ -307,7 +286,6 @@ fn test_cookie_builder_build_empty_name() {
 
 #[test]
 fn test_cookie_builder_build_with_expires() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie.set_expires("Wed, 21 Oct 2015 07:28:00 GMT");
     let result: String = cookie.build();
@@ -319,7 +297,6 @@ fn test_cookie_builder_build_with_expires() {
 
 #[test]
 fn test_cookie_builder_build_with_max_age() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie.set_max_age(3600);
     let result: String = cookie.build();
@@ -328,7 +305,6 @@ fn test_cookie_builder_build_with_max_age() {
 
 #[test]
 fn test_cookie_builder_build_with_domain() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie.set_domain("example.com");
     let result: String = cookie.build();
@@ -337,7 +313,6 @@ fn test_cookie_builder_build_with_domain() {
 
 #[test]
 fn test_cookie_builder_build_with_path() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie.set_path("/admin");
     let result: String = cookie.build();
@@ -346,7 +321,6 @@ fn test_cookie_builder_build_with_path() {
 
 #[test]
 fn test_cookie_builder_build_with_secure() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie.secure();
     let result: String = cookie.build();
@@ -355,7 +329,6 @@ fn test_cookie_builder_build_with_secure() {
 
 #[test]
 fn test_cookie_builder_build_with_http_only() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie.http_only();
     let result: String = cookie.build();
@@ -364,7 +337,6 @@ fn test_cookie_builder_build_with_http_only() {
 
 #[test]
 fn test_cookie_builder_build_with_same_site() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie.set_same_site("strict");
     let result: String = cookie.build();
@@ -373,7 +345,6 @@ fn test_cookie_builder_build_with_same_site() {
 
 #[test]
 fn test_cookie_builder_build_all_attributes() {
-    use super::*;
     let mut cookie: CookieBuilder = CookieBuilder::new("session_id", "abc123");
     cookie
         .set_expires("Wed, 21 Oct 2015 07:28:00 GMT")

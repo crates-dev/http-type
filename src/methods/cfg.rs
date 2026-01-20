@@ -1,7 +1,7 @@
+use crate::*;
+
 #[test]
 fn test_method_display() {
-    use super::*;
-    use http_constant::*;
     assert_eq!(Method::Get.to_string(), GET);
     assert_eq!(Method::Post.to_string(), POST);
     assert_eq!(Method::Put.to_string(), PUT);
@@ -16,8 +16,6 @@ fn test_method_display() {
 
 #[test]
 fn test_method_from_str() {
-    use super::*;
-    use http_constant::*;
     assert_eq!(GET.parse::<Method>().unwrap(), Method::Get);
     assert_eq!(POST.parse::<Method>().unwrap(), Method::Post);
     assert_eq!(PUT.parse::<Method>().unwrap(), Method::Put);
@@ -39,13 +37,11 @@ fn test_method_from_str() {
 
 #[test]
 fn test_method_default() {
-    use super::*;
     assert_eq!(Method::default(), Method::Unknown(String::new()));
 }
 
 #[test]
 fn test_method_is_get() {
-    use super::*;
     assert!(Method::Get.is_get());
     assert!(!Method::Post.is_get());
     assert!(!Method::Put.is_get());
@@ -60,7 +56,6 @@ fn test_method_is_get() {
 
 #[test]
 fn test_method_is_post() {
-    use super::*;
     assert!(!Method::Get.is_post());
     assert!(Method::Post.is_post());
     assert!(!Method::Put.is_post());
@@ -75,7 +70,6 @@ fn test_method_is_post() {
 
 #[test]
 fn test_method_is_put() {
-    use super::*;
     assert!(!Method::Get.is_put());
     assert!(!Method::Post.is_put());
     assert!(Method::Put.is_put());
@@ -90,7 +84,6 @@ fn test_method_is_put() {
 
 #[test]
 fn test_method_is_delete() {
-    use super::*;
     assert!(!Method::Get.is_delete());
     assert!(!Method::Post.is_delete());
     assert!(!Method::Put.is_delete());
@@ -105,7 +98,6 @@ fn test_method_is_delete() {
 
 #[test]
 fn test_method_is_patch() {
-    use super::*;
     assert!(!Method::Get.is_patch());
     assert!(!Method::Post.is_patch());
     assert!(!Method::Put.is_patch());
@@ -120,7 +112,6 @@ fn test_method_is_patch() {
 
 #[test]
 fn test_method_is_head() {
-    use super::*;
     assert!(!Method::Get.is_head());
     assert!(!Method::Post.is_head());
     assert!(!Method::Put.is_head());
@@ -135,7 +126,6 @@ fn test_method_is_head() {
 
 #[test]
 fn test_method_is_options() {
-    use super::*;
     assert!(!Method::Get.is_options());
     assert!(!Method::Post.is_options());
     assert!(!Method::Put.is_options());
@@ -150,7 +140,6 @@ fn test_method_is_options() {
 
 #[test]
 fn test_method_is_connect() {
-    use super::*;
     assert!(!Method::Get.is_connect());
     assert!(!Method::Post.is_connect());
     assert!(!Method::Put.is_connect());
@@ -165,7 +154,6 @@ fn test_method_is_connect() {
 
 #[test]
 fn test_method_is_trace() {
-    use super::*;
     assert!(!Method::Get.is_trace());
     assert!(!Method::Post.is_trace());
     assert!(!Method::Put.is_trace());
@@ -180,7 +168,6 @@ fn test_method_is_trace() {
 
 #[test]
 fn test_method_is_unknown() {
-    use super::*;
     assert!(!Method::Get.is_unknown());
     assert!(!Method::Post.is_unknown());
     assert!(!Method::Put.is_unknown());
@@ -196,7 +183,6 @@ fn test_method_is_unknown() {
 
 #[test]
 fn test_method_clone() {
-    use super::*;
     let method: Method = Method::Get;
     let cloned_method: Method = method.clone();
     assert_eq!(method, cloned_method);
@@ -207,7 +193,6 @@ fn test_method_clone() {
 
 #[test]
 fn test_method_debug() {
-    use super::*;
     let method: Method = Method::Get;
     let debug_str: String = format!("{method:?}");
     assert_eq!(debug_str, "Get");
@@ -218,7 +203,6 @@ fn test_method_debug() {
 
 #[test]
 fn test_method_equality() {
-    use super::*;
     assert_eq!(Method::Get, Method::Get);
     assert_ne!(Method::Get, Method::Post);
     assert_eq!(
@@ -234,7 +218,6 @@ fn test_method_equality() {
 
 #[test]
 fn test_method_case_sensitivity() {
-    use super::*;
     assert_eq!(
         "get".parse::<Method>().unwrap(),
         Method::Unknown("get".to_string())
@@ -252,7 +235,6 @@ fn test_method_case_sensitivity() {
 
 #[test]
 fn test_method_all_variants() {
-    use super::*;
     let methods: Vec<Method> = vec![
         Method::Get,
         Method::Post,
@@ -275,7 +257,6 @@ fn test_method_all_variants() {
 
 #[test]
 fn test_method_unknown_with_empty_string() {
-    use super::*;
     let method: Method = Method::Unknown("".to_string());
     assert_eq!(method.to_string(), "");
     assert!(method.is_unknown());
@@ -284,7 +265,6 @@ fn test_method_unknown_with_empty_string() {
 
 #[test]
 fn test_method_unknown_with_special_characters() {
-    use super::*;
     let method: Method = Method::Unknown("CUSTOM-METHOD".to_string());
     assert_eq!(method.to_string(), "CUSTOM-METHOD");
     assert!(method.is_unknown());

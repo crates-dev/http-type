@@ -1,7 +1,7 @@
+use crate::*;
+
 #[test]
 fn test_http_version_display() {
-    use super::*;
-    use http_constant::*;
     assert_eq!(HttpVersion::Http0_9.to_string(), HTTP_VERSION_0_9);
     assert_eq!(HttpVersion::Http1_0.to_string(), HTTP_VERSION_1_0);
     assert_eq!(HttpVersion::Http1_1.to_string(), HTTP_VERSION_1_1);
@@ -15,13 +15,11 @@ fn test_http_version_display() {
 
 #[test]
 fn test_http_version_default() {
-    use super::*;
     assert_eq!(HttpVersion::default(), HttpVersion::Http1_1);
 }
 
 #[test]
 fn test_http_version_clone() {
-    use super::*;
     let version: HttpVersion = HttpVersion::Http1_1;
     let cloned_version: HttpVersion = version.clone();
     assert_eq!(version, cloned_version);
@@ -29,7 +27,6 @@ fn test_http_version_clone() {
 
 #[test]
 fn test_http_version_debug() {
-    use super::*;
     let version: HttpVersion = HttpVersion::Http1_1;
     let debug_str: String = format!("{version:?}");
     assert_eq!(debug_str, "Http1_1");
@@ -37,7 +34,6 @@ fn test_http_version_debug() {
 
 #[test]
 fn test_http_version_equality() {
-    use super::*;
     assert_eq!(HttpVersion::Http1_1, HttpVersion::Http1_1);
     assert_ne!(HttpVersion::Http1_1, HttpVersion::Http2);
     assert_eq!(HttpVersion::Http0_9, HttpVersion::Http0_9);
@@ -54,7 +50,6 @@ fn test_http_version_equality() {
 
 #[test]
 fn test_http_version_all_variants() {
-    use super::*;
     let versions: Vec<HttpVersion> = vec![
         HttpVersion::Http0_9,
         HttpVersion::Http1_0,
@@ -73,7 +68,6 @@ fn test_http_version_all_variants() {
 
 #[test]
 fn test_http_version_unknown_with_empty_string() {
-    use super::*;
     let version: HttpVersion = HttpVersion::Unknown("".to_string());
     assert_eq!(version.to_string(), "");
     assert_eq!(format!("{version:?}"), "Unknown(\"\")");
@@ -81,7 +75,6 @@ fn test_http_version_unknown_with_empty_string() {
 
 #[test]
 fn test_http_version_unknown_with_special_characters() {
-    use super::*;
     let version: HttpVersion = HttpVersion::Unknown("HTTP/1.1-custom".to_string());
     assert_eq!(version.to_string(), "HTTP/1.1-custom");
     assert_eq!(format!("{version:?}"), "Unknown(\"HTTP/1.1-custom\")");
@@ -89,7 +82,6 @@ fn test_http_version_unknown_with_special_characters() {
 
 #[test]
 fn test_http_version_pattern_matching() {
-    use super::*;
     let version: HttpVersion = HttpVersion::Http1_1;
     match version {
         HttpVersion::Http0_9 => panic!("Should not match HTTP0_9"),
@@ -103,7 +95,6 @@ fn test_http_version_pattern_matching() {
 
 #[test]
 fn test_http_version_unknown_pattern_matching() {
-    use super::*;
     let version: HttpVersion = HttpVersion::Unknown("custom".to_string());
     match version {
         HttpVersion::Http0_9 => panic!("Should not match HTTP0_9"),
@@ -119,7 +110,6 @@ fn test_http_version_unknown_pattern_matching() {
 
 #[test]
 fn test_http_version_is_http1() {
-    use super::*;
     assert!(matches!(HttpVersion::Http1_0, HttpVersion::Http1_0));
     assert!(matches!(HttpVersion::Http1_1, HttpVersion::Http1_1));
     assert!(!matches!(
@@ -138,7 +128,6 @@ fn test_http_version_is_http1() {
 
 #[test]
 fn test_http_version_is_modern() {
-    use super::*;
     assert!(matches!(
         HttpVersion::Http2,
         HttpVersion::Http2 | HttpVersion::Http3
@@ -163,7 +152,6 @@ fn test_http_version_is_modern() {
 
 #[test]
 fn test_http_version_ordering() {
-    use super::*;
     let mut versions: Vec<HttpVersion> = vec![
         HttpVersion::Http3,
         HttpVersion::Http1_0,
@@ -199,7 +187,6 @@ fn test_http_version_ordering() {
 
 #[test]
 fn test_http_version_memory_size() {
-    use super::*;
     use std::mem;
     let size: usize = mem::size_of::<HttpVersion>();
     assert!(size > 0);
