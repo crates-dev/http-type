@@ -181,9 +181,7 @@ impl PartialEq for RequestConfig {
     ///
     /// - `bool` - `true` if the instances are equal, `false` otherwise.
     fn eq(&self, other: &Self) -> bool {
-        let self_arc: &Arc<RwLock<RequestConfigData>> = self.get_0();
-        let other_arc: &Arc<RwLock<RequestConfigData>> = other.get_0();
-        if Arc::as_ptr(self_arc) == Arc::as_ptr(other_arc) {
+        if Arc::ptr_eq(self.get_0(), other.get_0()) {
             return true;
         }
         if let (Ok(s), Ok(o)) = (self.get_0().try_read(), other.get_0().try_read()) {

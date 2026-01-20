@@ -1,5 +1,25 @@
 use crate::*;
 
+/// Implementation of `PartialEq` trait for `ArcRwLockStream`.
+impl PartialEq for ArcRwLockStream {
+    /// Compares two `ArcRwLockStream` instances for equality.
+    ///
+    /// # Arguments
+    ///
+    /// - `&self` - The first `ArcRwLockStream` instance.
+    /// - `other` - The second `ArcRwLockStream` instance to compare.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - `true` if the instances point to the same Arc, `false` otherwise.
+    fn eq(&self, other: &Self) -> bool {
+        Arc::as_ptr(self.get_0()) == Arc::as_ptr(other.get_0())
+    }
+}
+
+/// Implementation of `Eq` trait for `ArcRwLockStream`.
+impl Eq for ArcRwLockStream {}
+
 impl ArcRwLockStream {
     /// Creates a new ArcRwLockStream from an Arc<RwLock<TcpStream>>.
     ///
