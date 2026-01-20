@@ -169,6 +169,31 @@ impl From<RequestConfigData> for RequestConfig {
     }
 }
 
+/// Implementation of `PartialEq` trait for `RequestConfig`.
+impl PartialEq for RequestConfig {
+    /// Compares two `RequestConfig` instances for equality.
+    ///
+    /// # Arguments
+    ///
+    /// - `&self` - The first `RequestConfig` instance.
+    /// - `other` - The second `RequestConfig` instance to compare.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - `true` if the instances are equal, `false` otherwise.
+    fn eq(&self, other: &Self) -> bool {
+        let self_arc: &Arc<RwLock<RequestConfigData>> = self.get_0();
+        let other_arc: &Arc<RwLock<RequestConfigData>> = other.get_0();
+        if Arc::as_ptr(self_arc) == Arc::as_ptr(other_arc) {
+            return true;
+        }
+        *self_arc.blocking_read() == *other_arc.blocking_read()
+    }
+}
+
+/// Implementation of `Eq` trait for `RequestConfig`.
+impl Eq for RequestConfig {}
+
 impl RequestConfig {
     /// Creates a new `RequestConfig` with default secure settings.
     ///
