@@ -1,7 +1,7 @@
 use crate::*;
 
 #[tokio::test]
-async fn request_config() {
+async fn request_config_from_json() {
     let request_config_json: &'static str = r#"
     {
         "buffer_size": 8192,
@@ -19,9 +19,9 @@ async fn request_config() {
         "ws_read_timeout_ms": 1800000
     }
     "#;
-    let config: RequestConfig = RequestConfig::from_json(request_config_json).unwrap();
-    let new_config: RequestConfig = RequestConfig::new().await;
-    new_config
+    let request_config: RequestConfig = RequestConfig::from_json(request_config_json).unwrap();
+    let new_request_config: RequestConfig = RequestConfig::new().await;
+    new_request_config
         .buffer_size(8192)
         .await
         .max_request_line_length(8192)
@@ -48,5 +48,5 @@ async fn request_config() {
         .await
         .ws_read_timeout_ms(1800000)
         .await;
-    assert_eq!(config, new_config);
+    assert_eq!(request_config, new_request_config);
 }
