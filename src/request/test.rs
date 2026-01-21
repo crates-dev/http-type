@@ -2,7 +2,7 @@ use crate::*;
 
 #[tokio::test]
 async fn request_config() {
-    let config_str: &'static str = r#"
+    let request_config_json: &'static str = r#"
     {
         "buffer_size": 8192,
         "max_request_line_length": 8192,
@@ -19,7 +19,7 @@ async fn request_config() {
         "ws_read_timeout_ms": 1800000
     }
     "#;
-    let config: RequestConfig = RequestConfig::from_json(config_str).unwrap();
+    let config: RequestConfig = RequestConfig::from_json(request_config_json).unwrap();
     let new_config: RequestConfig = RequestConfig::new().await;
     new_config
         .buffer_size(8192)
