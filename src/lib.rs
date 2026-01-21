@@ -50,13 +50,15 @@ use std::{
     time::Duration,
 };
 
-use core::hash::BuildHasherDefault;
-use lombok_macros::*;
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
-use tokio::{
-    io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
-    net::TcpStream,
-    sync::{Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard},
-    time::timeout,
+use {
+    core::hash::BuildHasherDefault,
+    lombok_macros::*,
+    serde::{Deserialize, Serialize, de::DeserializeOwned},
+    tokio::{
+        io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
+        net::TcpStream,
+        sync::{Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard},
+        time::timeout,
+    },
+    url::Url,
 };
-use url::Url;
