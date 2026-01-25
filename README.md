@@ -10,9 +10,9 @@
 
 </center>
 
-[Official Documentation](https://docs.ltpp.vip/HTTP-TYPE/)
+[Official Documentation](https://docs.ltpp.vip/http-type/)
 
-[Api Docs](https://docs.rs/http-type/latest/http_type/)
+[Api Docs](https://docs.rs/http-type/latest/)
 
 > A comprehensive Rust library providing essential types for HTTP operations. Includes core HTTP abstractions (request/response, methods, status codes, versions), content types, cookies, WebSocket support, and thread-safe concurrent types (ArcMutex, ArcRwLock). Also provides convenient Option-wrapped primitive types for flexible HTTP handling.
 
