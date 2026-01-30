@@ -124,6 +124,33 @@ impl Default for RequestConfigData {
 }
 
 impl RequestConfigData {
+    /// Creates a config optimized for low-security environments.
+    ///
+    /// This configuration uses less restrictive limits to provide
+    /// basic protection against common attacks.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestConfigData ` - A new config with low-security settings.
+    #[inline(always)]
+    pub(super) fn low_security() -> Self {
+        Self {
+            buffer_size: DEFAULT_LOW_SECURITY_BUFFER_SIZE,
+            max_request_line_length: DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_LENGTH,
+            max_path_length: DEFAULT_LOW_SECURITY_MAX_PATH_LENGTH,
+            max_query_length: DEFAULT_LOW_SECURITY_MAX_QUERY_LENGTH,
+            max_header_line_length: DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_LENGTH,
+            max_header_count: DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT,
+            max_header_key_length: DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_LENGTH,
+            max_header_value_length: DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_LENGTH,
+            max_body_size: DEFAULT_LOW_SECURITY_MAX_BODY_SIZE,
+            max_ws_frame_size: DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE,
+            max_ws_frames: DEFAULT_LOW_SECURITY_MAX_WS_FRAMES,
+            http_read_timeout_ms: DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS,
+            ws_read_timeout_ms: DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS,
+        }
+    }
+
     /// Creates a config optimized for high-security environments.
     ///
     /// This configuration uses more restrictive limits to provide
@@ -239,6 +266,18 @@ impl RequestConfig {
         C: AsRef<str>,
     {
         serde_json::from_str(json.as_ref()).map(|data: RequestConfigData| Self::from(data))
+    }
+
+    /// Creates a new `RequestConfig` with low-security settings.
+    ///
+    /// This constructor initializes the configuration with less restrictive limits
+    /// to provide maximum protection against various attacks in high-risk environments.
+    ///
+    /// # Returns
+    ///
+    /// - `Self` - A new `RequestConfig` instance with low-security settings.
+    pub async fn low_security() -> Self {
+        Self(arc_rwlock(RequestConfigData::low_security()))
     }
 
     /// Creates a new `RequestConfig` with high-security settings.
@@ -582,7 +621,9 @@ impl Request {
             let bytes_read: usize = AsyncBufReadExt::read_line(reader, header_line)
                 .await
                 .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-            if bytes_read > max_header_line_length {
+            if bytes_read > max_header_line_length
+                && max_header_line_length != DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_LENGTH
+            {
                 return Err(RequestError::HeaderLineTooLong(
                     HttpStatus::RequestHeaderFieldsTooLarge,
                 ));
@@ -592,7 +633,9 @@ impl Request {
                 break;
             }
             header_count += 1;
-            if header_count > max_header_count {
+            if header_count > max_header_count
+                && max_header_count != DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT
+            {
                 return Err(RequestError::TooManyHeaders(
                     HttpStatus::RequestHeaderFieldsTooLarge,
                 ));
@@ -602,13 +645,17 @@ impl Request {
                 if key.is_empty() {
                     continue;
                 }
-                if key.len() > max_header_key_length {
+                if key.len() > max_header_key_length
+                    && max_header_key_length != DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_LENGTH
+                {
                     return Err(RequestError::HeaderKeyTooLong(
                         HttpStatus::RequestHeaderFieldsTooLarge,
                     ));
                 }
                 let value: String = value_part.trim().to_string();
-                if value.len() > max_header_value_length {
+                if value.len() > max_header_value_length
+                    && max_header_value_length != DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_LENGTH
+                {
                     return Err(RequestError::HeaderValueTooLong(
                         HttpStatus::RequestHeaderFieldsTooLarge,
                     ));
@@ -618,7 +665,9 @@ impl Request {
                 } else if key == CONTENT_LENGTH {
                     match value.parse::<usize>() {
                         Ok(length) => {
-                            if length > max_body_size {
+                            if length > max_body_size
+                                && max_body_size != DEFAULT_LOW_SECURITY_MAX_BODY_SIZE
+                            {
                                 return Err(RequestError::ContentLengthTooLarge(
                                     HttpStatus::PayloadTooLarge,
                                 ));
@@ -663,7 +712,9 @@ impl Request {
         let bytes_read: usize = AsyncBufReadExt::read_line(reader, &mut request_line)
             .await
             .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-        if bytes_read > max_request_line_length {
+        if bytes_read > max_request_line_length
+            && max_request_line_length != DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_LENGTH
+        {
             return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
         }
         let parts: Vec<&str> = request_line.split_whitespace().collect();
@@ -677,7 +728,9 @@ impl Request {
             .parse::<RequestMethod>()
             .unwrap_or(Method::Unknown(parts[0].to_string()));
         let full_path: &str = parts[1];
-        if full_path.len() > max_path_length {
+        if full_path.len() > max_path_length
+            && max_path_length != DEFAULT_LOW_SECURITY_MAX_PATH_LENGTH
+        {
             return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
         }
         let full_path: RequestPath = full_path.to_string();
@@ -693,7 +746,9 @@ impl Request {
             }
             temp.split(HASH).next().unwrap_or_default().to_owned()
         });
-        if query_string.len() > max_query_length {
+        if query_string.len() > max_query_length
+            && max_query_length != DEFAULT_LOW_SECURITY_MAX_QUERY_LENGTH
+        {
             return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
         }
         let querys: RequestQuerys = Self::parse_querys(&query_string);
