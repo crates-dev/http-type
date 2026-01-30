@@ -858,11 +858,11 @@ impl Request {
         stream: &ArcRwLockStream,
         config: &RequestConfigData,
     ) -> Result<Request, RequestError> {
-        let http_read_timeout_ms: u64 = config.get_http_read_timeout_ms();
-        if http_read_timeout_ms == DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS {
+        let timeout_ms: u64 = config.get_http_read_timeout_ms();
+        if timeout_ms == DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS {
             return Self::parse_http_from_stream(stream, config).await;
         }
-        let duration: Duration = Duration::from_millis(http_read_timeout_ms);
+        let duration: Duration = Duration::from_millis(timeout_ms);
         timeout(duration, Self::parse_http_from_stream(stream, config))
             .await
             .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
