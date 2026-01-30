@@ -895,6 +895,129 @@ impl Request {
             .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
     }
 
+    /// Converts an I/O error to a `RequestError`.
+    ///
+    /// # Arguments
+    ///
+    /// - `std::io::Error`: The I/O error to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestError`: The corresponding request error.
+    #[inline(always)]
+    fn io_error_to_request_error(error: std::io::Error) -> RequestError {
+        let kind: ErrorKind = error.kind();
+        if kind == ErrorKind::ConnectionReset || kind == ErrorKind::ConnectionAborted {
+            return RequestError::ClientDisconnected(HttpStatus::BadRequest);
+        }
+        RequestError::Unknown(HttpStatus::InternalServerError)
+    }
+
+    /// Checks if the WebSocket frame count exceeds the maximum allowed.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize`: The current number of frames.
+    /// - `usize`: The maximum allowed number of frames.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    #[inline(always)]
+    fn check_ws_frame_count(frame_count: usize, max_ws_frames: usize) -> Option<RequestError> {
+        if frame_count > max_ws_frames && max_ws_frames != DEFAULT_LOW_SECURITY_MAX_WS_FRAMES {
+            return Some(RequestError::TooManyHeaders(
+                HttpStatus::RequestHeaderFieldsTooLarge,
+            ));
+        }
+        None
+    }
+
+    /// Reads data from the stream with optional timeout handling.
+    ///
+    /// # Arguments
+    ///
+    /// - `&ArcRwLockStream`: The TCP stream to read from.
+    /// - `&mut [u8]`: The buffer to read data into.
+    /// - `Duration`: The timeout duration.
+    /// - `bool`: Whether to use timeout.
+    /// - `&mut bool`: Mutable reference to track if we got a client response.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<usize>, RequestError>`: The number of bytes read, None for timeout/ping, or an error.
+    async fn read_stream_ws_data(
+        stream: &ArcRwLockStream,
+        temp_buffer: &mut [u8],
+        timeout_duration: Duration,
+        use_timeout: bool,
+        is_client_response: &mut bool,
+    ) -> Result<Option<usize>, RequestError> {
+        if use_timeout {
+            return match timeout(timeout_duration, stream.write().await.read(temp_buffer)).await {
+                Ok(result) => match result {
+                    Ok(len) => Ok(Some(len)),
+                    Err(error) => Err(Self::io_error_to_request_error(error)),
+                },
+                Err(_) => {
+                    if !*is_client_response {
+                        return Err(RequestError::ReadTimeout(HttpStatus::RequestTimeout));
+                    }
+                    *is_client_response = false;
+                    stream
+                        .try_send_body(&PING_FRAME)
+                        .await
+                        .map_err(|_| RequestError::WriteTimeout(HttpStatus::InternalServerError))?;
+                    Ok(None)
+                }
+            };
+        }
+        match stream.write().await.read(temp_buffer).await {
+            Ok(len) => Ok(Some(len)),
+            Err(error) => Err(Self::io_error_to_request_error(error)),
+        }
+    }
+
+    /// Handles a decoded WebSocket Text or Binary frame and accumulates payload data.
+    ///
+    /// # Arguments
+    ///
+    /// - `&WebSocketFrame`: The decoded WebSocket frame.
+    /// - `&mut Vec<u8>`: The accumulated frame data.
+    /// - `usize`: Maximum allowed frame size.
+    /// - `&Request`: The request to update on completion.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<Request>, RequestError>`: Some(request) if frame is complete, None to continue, or error.
+    #[inline(always)]
+    fn handle_ws_text_binary_frame(
+        frame: &WebSocketFrame,
+        full_frame: &mut Vec<u8>,
+        max_ws_frame_size: usize,
+        request: &Request,
+    ) -> Result<Option<Request>, RequestError> {
+        let payload_data: &[u8] = frame.get_payload_data();
+        if payload_data.len() > max_ws_frame_size {
+            return Err(RequestError::WebSocketFrameTooLarge(
+                HttpStatus::PayloadTooLarge,
+            ));
+        }
+        let len: usize = full_frame.len() + payload_data.len();
+        if len > max_ws_frame_size && max_ws_frame_size != DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE {
+            return Err(RequestError::WebSocketFrameTooLarge(
+                HttpStatus::PayloadTooLarge,
+            ));
+        }
+        full_frame.extend_from_slice(payload_data);
+        if *frame.get_fin() {
+            let mut result: Request = request.clone();
+            result.body = full_frame.clone();
+            return Ok(Some(result));
+        }
+        Ok(None)
+    }
+
     /// Parses a WebSocket request from a TCP stream.
     ///
     /// Wraps the stream in a buffered reader and delegates to `ws_from_reader`.
@@ -902,12 +1025,12 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `&RequestConfigData` - Configuration for security limits and buffer settings.
+    /// - `&ArcRwLock<TcpStream>`: The TCP stream to read from.
+    /// - `&RequestConfigData`: Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
-    /// - `Result<Request, RequestError>` - The parsed WebSocket request or an error.
+    /// - `Result<Request, RequestError>`: The parsed WebSocket request or an error.
     pub async fn ws_from_stream(
         &self,
         stream: &ArcRwLockStream,
@@ -926,51 +1049,18 @@ impl Request {
         let timeout_duration: Duration = Duration::from_millis(adjusted_timeout_ms);
         let use_timeout: bool = ws_read_timeout_ms != u64::MAX;
         loop {
-            let len: usize = if use_timeout {
-                match timeout(
-                    timeout_duration,
-                    stream.write().await.read(&mut temp_buffer),
-                )
-                .await
-                {
-                    Ok(result) => match result {
-                        Ok(len) => len,
-                        Err(error) => {
-                            let kind: ErrorKind = error.kind();
-                            if kind == ErrorKind::ConnectionReset
-                                || kind == ErrorKind::ConnectionAborted
-                            {
-                                return Err(RequestError::ClientDisconnected(
-                                    HttpStatus::BadRequest,
-                                ));
-                            }
-                            return Err(RequestError::Unknown(HttpStatus::InternalServerError));
-                        }
-                    },
-                    Err(_) => {
-                        if !is_client_response {
-                            return Err(RequestError::ReadTimeout(HttpStatus::RequestTimeout));
-                        }
-                        is_client_response = false;
-                        stream.try_send_body(&PING_FRAME).await.map_err(|_| {
-                            RequestError::WriteTimeout(HttpStatus::InternalServerError)
-                        })?;
-                        continue;
-                    }
-                }
-            } else {
-                match stream.write().await.read(&mut temp_buffer).await {
-                    Ok(len) => len,
-                    Err(error) => {
-                        let kind: ErrorKind = error.kind();
-                        if kind == ErrorKind::ConnectionReset
-                            || kind == ErrorKind::ConnectionAborted
-                        {
-                            return Err(RequestError::ClientDisconnected(HttpStatus::BadRequest));
-                        }
-                        return Err(RequestError::Unknown(HttpStatus::InternalServerError));
-                    }
-                }
+            let len: usize = match Self::read_stream_ws_data(
+                stream,
+                &mut temp_buffer,
+                timeout_duration,
+                use_timeout,
+                &mut is_client_response,
+            )
+            .await
+            {
+                Ok(Some(len)) => len,
+                Ok(None) => continue,
+                Err(error) => return Err(error),
             };
             if len == 0 {
                 return Err(RequestError::IncompleteWebSocketFrame(
@@ -982,39 +1072,24 @@ impl Request {
                 is_client_response = true;
                 dynamic_buffer.drain(0..consumed);
                 frame_count += 1;
-                if frame_count > max_ws_frames
-                    && max_ws_frames != DEFAULT_LOW_SECURITY_MAX_WS_FRAMES
-                {
-                    return Err(RequestError::TooManyHeaders(
-                        HttpStatus::RequestHeaderFieldsTooLarge,
-                    ));
+                if let Some(err) = Self::check_ws_frame_count(frame_count, max_ws_frames) {
+                    return Err(err);
                 }
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
                         return Err(RequestError::ClientClosedConnection(HttpStatus::BadRequest));
                     }
-                    WebSocketOpcode::Ping | WebSocketOpcode::Pong => {
-                        continue;
-                    }
+                    WebSocketOpcode::Ping | WebSocketOpcode::Pong => continue,
                     WebSocketOpcode::Text | WebSocketOpcode::Binary => {
-                        let payload_data: &[u8] = frame.get_payload_data();
-                        if payload_data.len() > max_ws_frame_size {
-                            return Err(RequestError::WebSocketFrameTooLarge(
-                                HttpStatus::PayloadTooLarge,
-                            ));
-                        }
-                        if full_frame.len() + payload_data.len() > max_ws_frame_size
-                            && max_ws_frame_size != DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE
-                        {
-                            return Err(RequestError::WebSocketFrameTooLarge(
-                                HttpStatus::PayloadTooLarge,
-                            ));
-                        }
-                        full_frame.extend_from_slice(payload_data);
-                        if *frame.get_fin() {
-                            let mut request: Request = self.clone();
-                            request.body = full_frame;
-                            return Ok(request);
+                        match Self::handle_ws_text_binary_frame(
+                            &frame,
+                            &mut full_frame,
+                            max_ws_frame_size,
+                            self,
+                        ) {
+                            Ok(Some(result)) => return Ok(result),
+                            Ok(None) => continue,
+                            Err(error) => return Err(error),
                         }
                     }
                     _ => {
