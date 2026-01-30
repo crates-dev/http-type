@@ -728,14 +728,14 @@ impl Request {
                 Some(parts) => parts,
                 None => continue,
             };
-            let key: String = key_part.trim().to_ascii_lowercase();
+            let key: String = key_part.to_ascii_lowercase();
             if key.is_empty() {
                 continue;
             }
             if let Some(err) = Self::check_header_key_size(&key, max_header_key_size) {
                 return Err(err);
             }
-            let value: String = value_part.trim().to_string();
+            let value: String = value_part.to_string();
             if let Some(err) = Self::check_header_value_size(&value, max_header_value_size) {
                 return Err(err);
             }
@@ -751,18 +751,193 @@ impl Request {
         Ok((headers, host, content_size))
     }
 
+    /// Reads the HTTP request line from the buffered reader.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut BufReader<&mut TcpStream>`: The buffered reader to read from.
+    /// - `usize`: The buffer size for initial string capacity.
+    /// - `usize`: The maximum allowed request line size.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, RequestError>`: The request line string or an error.
+    #[inline(always)]
+    async fn read_request_line(
+        reader: &mut BufReader<&mut TcpStream>,
+        buffer_size: usize,
+        max_size: usize,
+    ) -> Result<String, RequestError> {
+        let mut line: String = String::with_capacity(buffer_size);
+        let size: usize = AsyncBufReadExt::read_line(reader, &mut line)
+            .await
+            .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
+        if size > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_SIZE {
+            return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
+        }
+        Ok(line)
+    }
+
+    /// Parses the request line into method, path, and version components.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The request line string to parse.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(RequestMethod, &str, RequestVersion), RequestError>`: A tuple containing:
+    ///   - The parsed HTTP method
+    ///   - The full path string
+    ///   - The parsed HTTP version
+    ///   - Or an error if parsing fails
+    #[inline(always)]
+    fn parse_request_line_components(
+        line: &str,
+    ) -> Result<(RequestMethod, &str, RequestVersion), RequestError> {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() < 3 {
+            return Err(RequestError::HttpRequestPartsInsufficient(
+                HttpStatus::BadRequest,
+            ));
+        }
+        let method: RequestMethod = parts[0]
+            .parse::<RequestMethod>()
+            .unwrap_or(Method::Unknown(parts[0].to_string()));
+        let full_path: &str = parts[1];
+        let version: RequestVersion = parts[2]
+            .parse::<RequestVersion>()
+            .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
+        Ok((method, full_path, version))
+    }
+
+    /// Validates the path length against the maximum allowed size.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The path string to validate.
+    /// - `usize`: The maximum allowed path size.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), RequestError>`: Ok if valid, or an error if the path is too long.
+    #[inline(always)]
+    fn validate_path_length(path: &str, max_size: usize) -> Result<(), RequestError> {
+        if path.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_PATH_SIZE {
+            return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
+        }
+        Ok(())
+    }
+
+    /// Extracts the query string from the full path.
+    ///
+    /// Handles both query parameters (after `?`) and hash fragments (after `#`),
+    /// ensuring proper extraction when both are present.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The full path string containing the query.
+    /// - `Option<usize>`: The index of the query separator (`?`), if present.
+    /// - `Option<usize>`: The index of the hash separator (`#`), if present.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The extracted query string, or empty string if no query.
+    #[inline(always)]
+    fn extract_query_string(
+        path: &str,
+        query_index: Option<usize>,
+        hash_index: Option<usize>,
+    ) -> String {
+        query_index.map_or_else(String::new, |i: usize| {
+            let temp: &str = &path[i + 1..];
+            match hash_index {
+                None => temp.to_owned(),
+                Some(hash_idx) if hash_idx <= i => temp.to_owned(),
+                Some(hash_idx) => temp[..hash_idx - i - 1].to_owned(),
+            }
+        })
+    }
+
+    /// Validates the query string length against the maximum allowed size.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The query string to validate.
+    /// - `usize`: The maximum allowed query size.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<(), RequestError>`: Ok if valid, or an error if the query is too long.
+    #[inline(always)]
+    fn validate_query_length(query: &str, max_size: usize) -> Result<(), RequestError> {
+        if query.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_QUERY_SIZE {
+            return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
+        }
+        Ok(())
+    }
+
+    /// Extracts the clean path without query string or hash fragment.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The full path string.
+    /// - `RequestPath`: The owned full path for fallback.
+    /// - `Option<usize>`: The index of the query separator (`?`), if present.
+    /// - `Option<usize>`: The index of the hash separator (`#`), if present.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestPath`: The clean path without query or hash.
+    #[inline(always)]
+    fn extract_clean_path(
+        path: &str,
+        query_index: Option<usize>,
+        hash_index: Option<usize>,
+    ) -> RequestPath {
+        match query_index.or(hash_index) {
+            Some(i) => path[..i].to_owned(),
+            None => path.to_owned(),
+        }
+    }
+
+    /// Reads the request body from the buffered reader.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut BufReader<&mut TcpStream>`: The buffered reader to read from.
+    /// - `usize`: The expected content size.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<RequestBody, RequestError>`: The body bytes or an error.
+    #[inline(always)]
+    async fn read_request_body(
+        reader: &mut BufReader<&mut TcpStream>,
+        content_size: usize,
+    ) -> Result<RequestBody, RequestError> {
+        let mut body: RequestBody = Vec::with_capacity(content_size);
+        if content_size > 0 {
+            body.resize(content_size, 0);
+            AsyncReadExt::read_exact(reader, &mut body)
+                .await
+                .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
+        }
+        Ok(body)
+    }
+
     /// Parses the HTTP request content from the stream.
     ///
     /// This is an internal helper function that performs the actual parsing.
     ///
     /// # Arguments
     ///
-    /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `&RequestConfigData` - Configuration for security limits and buffer settings.
+    /// - `&ArcRwLock<TcpStream>`: The TCP stream to read from.
+    /// - `&RequestConfigData`: Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
-    /// - `Result<Request, RequestError>` - The parsed request or an error.
+    /// - `Result<Request, RequestError>`: The parsed request or an error.
     async fn parse_http_from_stream(
         stream: &ArcRwLockStream,
         config: &RequestConfigData,
@@ -774,62 +949,20 @@ impl Request {
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let reader: &mut BufReader<&mut TcpStream> =
             &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
-        let mut request_line: String = String::with_capacity(buffer_size);
-        let bytes_read: usize = AsyncBufReadExt::read_line(reader, &mut request_line)
-            .await
-            .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-        if bytes_read > max_request_line_size
-            && max_request_line_size != DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_SIZE
-        {
-            return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
-        }
-        let parts: Vec<&str> = request_line.split_whitespace().collect();
-        let parts_len: usize = parts.len();
-        if parts_len < 3 {
-            return Err(RequestError::HttpRequestPartsInsufficient(
-                HttpStatus::BadRequest,
-            ));
-        }
-        let method: RequestMethod = parts[0]
-            .parse::<RequestMethod>()
-            .unwrap_or(Method::Unknown(parts[0].to_string()));
-        let full_path: &str = parts[1];
-        if full_path.len() > max_path_size && max_path_size != DEFAULT_LOW_SECURITY_MAX_PATH_SIZE {
-            return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
-        }
-        let full_path: RequestPath = full_path.to_string();
-        let version: RequestVersion = parts[2]
-            .parse::<RequestVersion>()
-            .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
-        let hash_index: Option<usize> = full_path.find(HASH);
-        let query_index: Option<usize> = full_path.find(QUERY);
-        let query_string: String = query_index.map_or_else(String::new, |i| {
-            let temp: &str = &full_path[i + 1..];
-            if hash_index.is_none() || hash_index.unwrap() <= i {
-                return temp.to_owned();
-            }
-            temp.split(HASH).next().unwrap_or_default().to_owned()
-        });
-        if query_string.len() > max_query_size
-            && max_query_size != DEFAULT_LOW_SECURITY_MAX_QUERY_SIZE
-        {
-            return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
-        }
+        let line: String =
+            Self::read_request_line(reader, buffer_size, max_request_line_size).await?;
+        let (method, path, version): (RequestMethod, &str, RequestVersion) =
+            Self::parse_request_line_components(&line)?;
+        Self::validate_path_length(path, max_path_size)?;
+        let hash_index: Option<usize> = path.find(HASH);
+        let query_index: Option<usize> = path.find(QUERY);
+        let query_string: String = Self::extract_query_string(path, query_index, hash_index);
+        Self::validate_query_length(&query_string, max_query_size)?;
         let querys: RequestQuerys = Self::parse_querys(&query_string);
-        let path: RequestPath = if let Some(i) = query_index.or(hash_index) {
-            full_path[..i].to_owned()
-        } else {
-            full_path.to_owned()
-        };
+        let path: RequestPath = Self::extract_clean_path(path, query_index, hash_index);
         let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =
             Self::parse_headers(reader, config).await?;
-        let mut body: RequestBody = Vec::with_capacity(content_size);
-        if content_size > 0 {
-            body.resize(content_size, 0);
-            AsyncReadExt::read_exact(reader, &mut body)
-                .await
-                .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
-        }
+        let body: RequestBody = Self::read_request_body(reader, content_size).await?;
         Ok(Request {
             method,
             host,
