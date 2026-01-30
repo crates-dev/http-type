@@ -107,16 +107,16 @@ impl Default for RequestConfigData {
     fn default() -> Self {
         Self {
             buffer_size: DEFAULT_BUFFER_SIZE,
-            max_request_line_length: DEFAULT_MAX_REQUEST_LINE_LENGTH,
-            max_path_length: DEFAULT_MAX_PATH_LENGTH,
-            max_query_length: DEFAULT_MAX_QUERY_LENGTH,
-            max_header_line_length: DEFAULT_MAX_HEADER_LINE_LENGTH,
+            max_request_line_size: DEFAULT_MAX_REQUEST_LINE_SIZE,
+            max_path_size: DEFAULT_MAX_PATH_SIZE,
+            max_query_size: DEFAULT_MAX_QUERY_SIZE,
+            max_header_line_size: DEFAULT_MAX_HEADER_LINE_SIZE,
             max_header_count: DEFAULT_MAX_HEADER_COUNT,
-            max_header_key_length: DEFAULT_MAX_HEADER_KEY_LENGTH,
-            max_header_value_length: DEFAULT_MAX_HEADER_VALUE_LENGTH,
+            max_header_key_size: DEFAULT_MAX_HEADER_KEY_SIZE,
+            max_header_value_size: DEFAULT_MAX_HEADER_VALUE_SIZE,
             max_body_size: DEFAULT_MAX_BODY_SIZE,
             max_ws_frame_size: DEFAULT_MAX_WS_FRAME_SIZE,
-            max_ws_frames: DEFAULT_MAX_WS_FRAMES,
+            max_ws_frames_count: DEFAULT_MAX_WS_FRAMES_COUNT,
             http_read_timeout_ms: DEFAULT_HTTP_READ_TIMEOUT_MS,
             ws_read_timeout_ms: DEFAULT_WS_READ_TIMEOUT_MS,
         }
@@ -136,16 +136,16 @@ impl RequestConfigData {
     pub(super) fn low_security() -> Self {
         Self {
             buffer_size: DEFAULT_LOW_SECURITY_BUFFER_SIZE,
-            max_request_line_length: DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_LENGTH,
-            max_path_length: DEFAULT_LOW_SECURITY_MAX_PATH_LENGTH,
-            max_query_length: DEFAULT_LOW_SECURITY_MAX_QUERY_LENGTH,
-            max_header_line_length: DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_LENGTH,
+            max_request_line_size: DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_SIZE,
+            max_path_size: DEFAULT_LOW_SECURITY_MAX_PATH_SIZE,
+            max_query_size: DEFAULT_LOW_SECURITY_MAX_QUERY_SIZE,
+            max_header_line_size: DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_SIZE,
             max_header_count: DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT,
-            max_header_key_length: DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_LENGTH,
-            max_header_value_length: DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_LENGTH,
+            max_header_key_size: DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_SIZE,
+            max_header_value_size: DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_SIZE,
             max_body_size: DEFAULT_LOW_SECURITY_MAX_BODY_SIZE,
             max_ws_frame_size: DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE,
-            max_ws_frames: DEFAULT_LOW_SECURITY_MAX_WS_FRAMES,
+            max_ws_frames_count: DEFAULT_LOW_SECURITY_MAX_WS_FRAMES_COUNT,
             http_read_timeout_ms: DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS,
             ws_read_timeout_ms: DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS,
         }
@@ -163,16 +163,16 @@ impl RequestConfigData {
     pub(super) fn high_security() -> Self {
         Self {
             buffer_size: DEFAULT_HIGH_SECURITY_BUFFER_SIZE,
-            max_request_line_length: DEFAULT_HIGH_SECURITY_MAX_REQUEST_LINE_LENGTH,
-            max_path_length: DEFAULT_HIGH_SECURITY_MAX_PATH_LENGTH,
-            max_query_length: DEFAULT_HIGH_SECURITY_MAX_QUERY_LENGTH,
-            max_header_line_length: DEFAULT_HIGH_SECURITY_MAX_HEADER_LINE_LENGTH,
+            max_request_line_size: DEFAULT_HIGH_SECURITY_MAX_REQUEST_LINE_SIZE,
+            max_path_size: DEFAULT_HIGH_SECURITY_MAX_PATH_SIZE,
+            max_query_size: DEFAULT_HIGH_SECURITY_MAX_QUERY_SIZE,
+            max_header_line_size: DEFAULT_HIGH_SECURITY_MAX_HEADER_LINE_SIZE,
             max_header_count: DEFAULT_HIGH_SECURITY_MAX_HEADER_COUNT,
-            max_header_key_length: DEFAULT_HIGH_SECURITY_MAX_HEADER_KEY_LENGTH,
-            max_header_value_length: DEFAULT_HIGH_SECURITY_MAX_HEADER_VALUE_LENGTH,
+            max_header_key_size: DEFAULT_HIGH_SECURITY_MAX_HEADER_KEY_SIZE,
+            max_header_value_size: DEFAULT_HIGH_SECURITY_MAX_HEADER_VALUE_SIZE,
             max_body_size: DEFAULT_HIGH_SECURITY_MAX_BODY_SIZE,
             max_ws_frame_size: DEFAULT_HIGH_SECURITY_MAX_WS_FRAME_SIZE,
-            max_ws_frames: DEFAULT_HIGH_SECURITY_MAX_WS_FRAMES,
+            max_ws_frames_count: DEFAULT_HIGH_SECURITY_MAX_WS_FRAMES_COUNT,
             http_read_timeout_ms: DEFAULT_HIGH_SECURITY_HTTP_READ_TIMEOUT_MS,
             ws_read_timeout_ms: DEFAULT_HIGH_SECURITY_WS_READ_TIMEOUT_MS,
         }
@@ -357,15 +357,13 @@ impl RequestConfig {
     ///
     /// # Arguments
     ///
-    /// - `usize` - The maximum request line length.
+    /// - `usize` - The maximum request line size.
     ///
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_request_line_length(&self, max_request_line_length: usize) -> &Self {
-        self.write()
-            .await
-            .set_max_request_line_length(max_request_line_length);
+    pub async fn max_request_line_size(&self, size: usize) -> &Self {
+        self.write().await.set_max_request_line_size(size);
         self
     }
 
@@ -378,8 +376,8 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_path_length(&self, max_path_length: usize) -> &Self {
-        self.write().await.set_max_path_length(max_path_length);
+    pub async fn max_path_size(&self, size: usize) -> &Self {
+        self.write().await.set_max_path_size(size);
         self
     }
 
@@ -392,8 +390,8 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_query_length(&self, max_query_length: usize) -> &Self {
-        self.write().await.set_max_query_length(max_query_length);
+    pub async fn max_query_size(&self, size: usize) -> &Self {
+        self.write().await.set_max_query_size(size);
         self
     }
 
@@ -401,15 +399,13 @@ impl RequestConfig {
     ///
     /// # Arguments
     ///
-    /// - `usize` - The maximum header line length.
+    /// - `usize` - The maximum header line size.
     ///
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_header_line_length(&self, max_header_line_length: usize) -> &Self {
-        self.write()
-            .await
-            .set_max_header_line_length(max_header_line_length);
+    pub async fn max_header_line_size(&self, size: usize) -> &Self {
+        self.write().await.set_max_header_line_size(size);
         self
     }
 
@@ -422,8 +418,8 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_header_count(&self, max_header_count: usize) -> &Self {
-        self.write().await.set_max_header_count(max_header_count);
+    pub async fn max_header_count(&self, count: usize) -> &Self {
+        self.write().await.set_max_header_count(count);
         self
     }
 
@@ -436,10 +432,8 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_header_key_length(&self, max_header_key_length: usize) -> &Self {
-        self.write()
-            .await
-            .set_max_header_key_length(max_header_key_length);
+    pub async fn max_header_key_size(&self, size: usize) -> &Self {
+        self.write().await.set_max_header_key_size(size);
         self
     }
 
@@ -452,10 +446,8 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_header_value_length(&self, max_header_value_length: usize) -> &Self {
-        self.write()
-            .await
-            .set_max_header_value_length(max_header_value_length);
+    pub async fn max_header_value_size(&self, size: usize) -> &Self {
+        self.write().await.set_max_header_value_size(size);
         self
     }
 
@@ -468,8 +460,8 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_body_size(&self, max_body_size: usize) -> &Self {
-        self.write().await.set_max_body_size(max_body_size);
+    pub async fn max_body_size(&self, size: usize) -> &Self {
+        self.write().await.set_max_body_size(size);
         self
     }
 
@@ -482,8 +474,8 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_ws_frame_size(&self, max_ws_frame_size: usize) -> &Self {
-        self.write().await.set_max_ws_frame_size(max_ws_frame_size);
+    pub async fn max_ws_frame_size(&self, size: usize) -> &Self {
+        self.write().await.set_max_ws_frame_size(size);
         self
     }
 
@@ -496,8 +488,8 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_ws_frames(&self, max_ws_frames: usize) -> &Self {
-        self.write().await.set_max_ws_frames(max_ws_frames);
+    pub async fn max_ws_frames_count(&self, size: usize) -> &Self {
+        self.write().await.set_max_ws_frames_count(size);
         self
     }
 
@@ -559,17 +551,14 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `AsRef<str>` - The query string to parse.
+    /// - `&str` - The query string to parse.
     ///
     /// # Returns
     ///
     /// - `RequestQuerys` - The parsed query parameters.
-    fn parse_querys<Q>(query: Q) -> RequestQuerys
-    where
-        Q: AsRef<str>,
-    {
+    fn parse_querys(query: &str) -> RequestQuerys {
         let mut query_map: RequestQuerys = hash_map_xx_hash3_64();
-        for pair in query.as_ref().split(AND) {
+        for pair in query.split(AND) {
             if let Some((key, value)) = pair.split_once(EQUAL) {
                 if !key.is_empty() {
                     query_map.insert(key.to_string(), value.to_string());
@@ -592,13 +581,8 @@ impl Request {
     ///
     /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_header_line_length(
-        bytes_read: usize,
-        max_header_line_length: usize,
-    ) -> Option<RequestError> {
-        if bytes_read > max_header_line_length
-            && max_header_line_length != DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_LENGTH
-        {
+    fn check_header_line_size(size: usize, max_size: usize) -> Option<RequestError> {
+        if size > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_SIZE {
             return Some(RequestError::HeaderLineTooLong(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
@@ -617,10 +601,8 @@ impl Request {
     ///
     /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_header_count(header_count: usize, max_header_count: usize) -> Option<RequestError> {
-        if header_count > max_header_count
-            && max_header_count != DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT
-        {
+    fn check_header_count(count: usize, max_count: usize) -> Option<RequestError> {
+        if count > max_count && max_count != DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT {
             return Some(RequestError::TooManyHeaders(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
@@ -639,10 +621,8 @@ impl Request {
     ///
     /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_header_key_length(key: &str, max_header_key_length: usize) -> Option<RequestError> {
-        if key.len() > max_header_key_length
-            && max_header_key_length != DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_LENGTH
-        {
+    fn check_header_key_size(key: &str, max_size: usize) -> Option<RequestError> {
+        if key.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_SIZE {
             return Some(RequestError::HeaderKeyTooLong(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
@@ -661,13 +641,8 @@ impl Request {
     ///
     /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_header_value_length(
-        value: &str,
-        max_header_value_length: usize,
-    ) -> Option<RequestError> {
-        if value.len() > max_header_value_length
-            && max_header_value_length != DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_LENGTH
-        {
+    fn check_header_value_size(value: &str, max_size: usize) -> Option<RequestError> {
+        if value.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_SIZE {
             return Some(RequestError::HeaderValueTooLong(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
@@ -686,11 +661,11 @@ impl Request {
     ///
     /// - `Result<usize, RequestError>`: The parsed content length or an error.
     #[inline(always)]
-    fn parse_content_length(value: &str, max_body_size: usize) -> Result<usize, RequestError> {
+    fn parse_content_size(value: &str, max_size: usize) -> Result<usize, RequestError> {
         let length: usize = value
             .parse::<usize>()
             .map_err(|_| RequestError::InvalidContentLength(HttpStatus::BadRequest))?;
-        if length > max_body_size && max_body_size != DEFAULT_LOW_SECURITY_MAX_BODY_SIZE {
+        if length > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_BODY_SIZE {
             return Err(RequestError::ContentLengthTooLarge(
                 HttpStatus::PayloadTooLarge,
             ));
@@ -724,21 +699,21 @@ impl Request {
         R: AsyncBufReadExt + Unpin,
     {
         let buffer_size: usize = config.get_buffer_size();
-        let max_header_line_length: usize = config.get_max_header_line_length();
+        let max_header_line_size: usize = config.get_max_header_line_size();
         let max_header_count: usize = config.get_max_header_count();
-        let max_header_key_length: usize = config.get_max_header_key_length();
-        let max_header_value_length: usize = config.get_max_header_value_length();
+        let max_header_key_size: usize = config.get_max_header_key_size();
+        let max_header_value_size: usize = config.get_max_header_value_size();
         let max_body_size: usize = config.get_max_body_size();
         let mut headers: RequestHeaders = hash_map_xx_hash3_64();
         let mut host: RequestHost = String::new();
-        let mut content_length: usize = 0;
+        let mut content_size: usize = 0;
         let mut header_count: usize = 0;
         loop {
             let header_line: &mut String = &mut String::with_capacity(buffer_size);
             let bytes_read: usize = AsyncBufReadExt::read_line(reader, header_line)
                 .await
                 .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-            if let Some(err) = Self::check_header_line_length(bytes_read, max_header_line_length) {
+            if let Some(err) = Self::check_header_line_size(bytes_read, max_header_line_size) {
                 return Err(err);
             }
             let header_line: &str = header_line.trim();
@@ -757,23 +732,23 @@ impl Request {
             if key.is_empty() {
                 continue;
             }
-            if let Some(err) = Self::check_header_key_length(&key, max_header_key_length) {
+            if let Some(err) = Self::check_header_key_size(&key, max_header_key_size) {
                 return Err(err);
             }
             let value: String = value_part.trim().to_string();
-            if let Some(err) = Self::check_header_value_length(&value, max_header_value_length) {
+            if let Some(err) = Self::check_header_value_size(&value, max_header_value_size) {
                 return Err(err);
             }
             match key.as_str() {
                 HOST => host = value.clone(),
                 CONTENT_LENGTH => {
-                    content_length = Self::parse_content_length(&value, max_body_size)?;
+                    content_size = Self::parse_content_size(&value, max_body_size)?;
                 }
                 _ => {}
             }
             headers.entry(key).or_default().push_back(value);
         }
-        Ok((headers, host, content_length))
+        Ok((headers, host, content_size))
     }
 
     /// Parses the HTTP request content from the stream.
@@ -793,9 +768,9 @@ impl Request {
         config: &RequestConfigData,
     ) -> Result<Request, RequestError> {
         let buffer_size: usize = config.get_buffer_size();
-        let max_request_line_length: usize = config.get_max_request_line_length();
-        let max_path_length: usize = config.get_max_path_length();
-        let max_query_length: usize = config.get_max_query_length();
+        let max_request_line_size: usize = config.get_max_request_line_size();
+        let max_path_size: usize = config.get_max_path_size();
+        let max_query_size: usize = config.get_max_query_size();
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let reader: &mut BufReader<&mut TcpStream> =
             &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
@@ -803,8 +778,8 @@ impl Request {
         let bytes_read: usize = AsyncBufReadExt::read_line(reader, &mut request_line)
             .await
             .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-        if bytes_read > max_request_line_length
-            && max_request_line_length != DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_LENGTH
+        if bytes_read > max_request_line_size
+            && max_request_line_size != DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_SIZE
         {
             return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
         }
@@ -819,9 +794,7 @@ impl Request {
             .parse::<RequestMethod>()
             .unwrap_or(Method::Unknown(parts[0].to_string()));
         let full_path: &str = parts[1];
-        if full_path.len() > max_path_length
-            && max_path_length != DEFAULT_LOW_SECURITY_MAX_PATH_LENGTH
-        {
+        if full_path.len() > max_path_size && max_path_size != DEFAULT_LOW_SECURITY_MAX_PATH_SIZE {
             return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
         }
         let full_path: RequestPath = full_path.to_string();
@@ -837,8 +810,8 @@ impl Request {
             }
             temp.split(HASH).next().unwrap_or_default().to_owned()
         });
-        if query_string.len() > max_query_length
-            && max_query_length != DEFAULT_LOW_SECURITY_MAX_QUERY_LENGTH
+        if query_string.len() > max_query_size
+            && max_query_size != DEFAULT_LOW_SECURITY_MAX_QUERY_SIZE
         {
             return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
         }
@@ -848,11 +821,11 @@ impl Request {
         } else {
             full_path.to_owned()
         };
-        let (headers, host, content_length): (RequestHeaders, RequestHost, usize) =
+        let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =
             Self::parse_headers(reader, config).await?;
-        let mut body: RequestBody = Vec::with_capacity(content_length);
-        if content_length > 0 {
-            body.resize(content_length, 0);
+        let mut body: RequestBody = Vec::with_capacity(content_size);
+        if content_size > 0 {
+            body.resize(content_size, 0);
             AsyncReadExt::read_exact(reader, &mut body)
                 .await
                 .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
@@ -871,7 +844,7 @@ impl Request {
     /// Parses an HTTP request from a TCP stream.
     ///
     /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
-    /// If the timeout is u64::MAX, no timeout is applied.
+    /// If the timeout is DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS, no timeout is applied.
     ///
     /// # Arguments
     ///
@@ -886,7 +859,7 @@ impl Request {
         config: &RequestConfigData,
     ) -> Result<Request, RequestError> {
         let http_read_timeout_ms: u64 = config.get_http_read_timeout_ms();
-        if http_read_timeout_ms == u64::MAX {
+        if http_read_timeout_ms == DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS {
             return Self::parse_http_from_stream(stream, config).await;
         }
         let duration: Duration = Duration::from_millis(http_read_timeout_ms);
@@ -924,8 +897,8 @@ impl Request {
     ///
     /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_ws_frame_count(frame_count: usize, max_ws_frames: usize) -> Option<RequestError> {
-        if frame_count > max_ws_frames && max_ws_frames != DEFAULT_LOW_SECURITY_MAX_WS_FRAMES {
+    fn check_ws_frame_count(count: usize, max_count: usize) -> Option<RequestError> {
+        if count > max_count && max_count != DEFAULT_LOW_SECURITY_MAX_WS_FRAMES_COUNT {
             return Some(RequestError::TooManyHeaders(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
@@ -948,13 +921,13 @@ impl Request {
     /// - `Result<Option<usize>, RequestError>`: The number of bytes read, None for timeout/ping, or an error.
     async fn read_stream_ws_data(
         stream: &ArcRwLockStream,
-        temp_buffer: &mut [u8],
-        timeout_duration: Duration,
+        buffer: &mut [u8],
+        duration: Duration,
         use_timeout: bool,
         is_client_response: &mut bool,
     ) -> Result<Option<usize>, RequestError> {
         if use_timeout {
-            return match timeout(timeout_duration, stream.write().await.read(temp_buffer)).await {
+            return match timeout(duration, stream.write().await.read(buffer)).await {
                 Ok(result) => match result {
                     Ok(len) => Ok(Some(len)),
                     Err(error) => Err(Self::io_error_to_request_error(error)),
@@ -972,7 +945,7 @@ impl Request {
                 }
             };
         }
-        match stream.write().await.read(temp_buffer).await {
+        match stream.write().await.read(buffer).await {
             Ok(len) => Ok(Some(len)),
             Err(error) => Err(Self::io_error_to_request_error(error)),
         }
@@ -1021,7 +994,7 @@ impl Request {
     /// Parses a WebSocket request from a TCP stream.
     ///
     /// Wraps the stream in a buffered reader and delegates to `ws_from_reader`.
-    /// If the timeout is u64::MAX, no timeout is applied.
+    /// If the timeout is DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS, no timeout is applied.
     ///
     /// # Arguments
     ///
@@ -1039,7 +1012,7 @@ impl Request {
         let buffer_size: usize = config.get_buffer_size();
         let max_ws_frame_size: usize = config.get_max_ws_frame_size();
         let ws_read_timeout_ms: u64 = config.get_ws_read_timeout_ms();
-        let max_ws_frames: usize = config.get_max_ws_frames();
+        let max_ws_frames_count: usize = config.get_max_ws_frames_count();
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
         let mut full_frame: Vec<u8> = Vec::with_capacity(max_ws_frame_size);
@@ -1047,7 +1020,7 @@ impl Request {
         let mut is_client_response: bool = false;
         let adjusted_timeout_ms: u64 = (ws_read_timeout_ms >> 1) + (ws_read_timeout_ms & 1);
         let timeout_duration: Duration = Duration::from_millis(adjusted_timeout_ms);
-        let use_timeout: bool = ws_read_timeout_ms != u64::MAX;
+        let use_timeout: bool = ws_read_timeout_ms != DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS;
         loop {
             let len: usize = match Self::read_stream_ws_data(
                 stream,
@@ -1072,7 +1045,7 @@ impl Request {
                 is_client_response = true;
                 dynamic_buffer.drain(0..consumed);
                 frame_count += 1;
-                if let Some(err) = Self::check_ws_frame_count(frame_count, max_ws_frames) {
+                if let Some(err) = Self::check_ws_frame_count(frame_count, max_ws_frames_count) {
                     return Err(err);
                 }
                 match frame.get_opcode() {
@@ -1272,7 +1245,7 @@ impl Request {
     ///
     /// - `Option<usize>` - The count of values for the header if exists.
     #[inline(always)]
-    pub fn try_get_header_length<K>(&self, key: K) -> Option<usize>
+    pub fn try_get_header_size<K>(&self, key: K) -> Option<usize>
     where
         K: AsRef<str>,
     {
@@ -1293,11 +1266,11 @@ impl Request {
     ///
     /// This function will panic if the header key is not found.
     #[inline(always)]
-    pub fn get_header_length<K>(&self, key: K) -> usize
+    pub fn get_header_size<K>(&self, key: K) -> usize
     where
         K: AsRef<str>,
     {
-        self.try_get_header_length(key).unwrap()
+        self.try_get_header_size(key).unwrap()
     }
 
     /// Retrieves the total number of header values across all headers.
@@ -1306,7 +1279,7 @@ impl Request {
     ///
     /// - `usize` - The total count of all header values.
     #[inline(always)]
-    pub fn get_headers_values_length(&self) -> usize {
+    pub fn get_headers_values_size(&self) -> usize {
         self.headers.values().map(|values| values.len()).sum()
     }
 
@@ -1316,7 +1289,7 @@ impl Request {
     ///
     /// - `usize` - The count of unique header keys.
     #[inline(always)]
-    pub fn get_headers_length(&self) -> usize {
+    pub fn get_headers_size(&self) -> usize {
         self.headers.len()
     }
 

@@ -22,27 +22,27 @@ pub struct RequestConfigData {
     /// Buffer size for reading operations.
     #[get(type(copy))]
     pub(super) buffer_size: usize,
-    /// Maximum length for HTTP request line in bytes.
+    /// Maximum size for HTTP request line in bytes.
     #[get(type(copy))]
-    pub(super) max_request_line_length: usize,
-    /// Maximum length for URL path in bytes.
+    pub(super) max_request_line_size: usize,
+    /// Maximum size for URL path in bytes.
     #[get(type(copy))]
-    pub(super) max_path_length: usize,
-    /// Maximum length for query string in bytes.
+    pub(super) max_path_size: usize,
+    /// Maximum size for query string in bytes.
     #[get(type(copy))]
-    pub(super) max_query_length: usize,
-    /// Maximum length for a single header line in bytes.
+    pub(super) max_query_size: usize,
+    /// Maximum size for a single header line in bytes.
     #[get(type(copy))]
-    pub(super) max_header_line_length: usize,
+    pub(super) max_header_line_size: usize,
     /// Maximum number of headers allowed in a request.
     #[get(type(copy))]
     pub(super) max_header_count: usize,
-    /// Maximum length for a header key in bytes.
+    /// Maximum size for a header key in bytes.
     #[get(type(copy))]
-    pub(super) max_header_key_length: usize,
-    /// Maximum length for a header value in bytes.
+    pub(super) max_header_key_size: usize,
+    /// Maximum size for a header value in bytes.
     #[get(type(copy))]
-    pub(super) max_header_value_length: usize,
+    pub(super) max_header_value_size: usize,
     /// Maximum size for request body in bytes.
     #[get(type(copy))]
     pub(super) max_body_size: usize,
@@ -51,7 +51,7 @@ pub struct RequestConfigData {
     pub(super) max_ws_frame_size: usize,
     /// Maximum number of WebSocket frames to process in a single request.
     #[get(type(copy))]
-    pub(super) max_ws_frames: usize,
+    pub(super) max_ws_frames_count: usize,
     /// Timeout for reading HTTP request in milliseconds.
     #[get(type(copy))]
     pub(super) http_read_timeout_ms: u64,
