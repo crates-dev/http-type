@@ -657,7 +657,7 @@ impl Request {
         let max_path_length: usize = config.get_max_path_length();
         let max_query_length: usize = config.get_max_query_length();
         let http_read_timeout_ms: u64 = config.get_http_read_timeout_ms();
-        timeout(Duration::from_millis(http_read_timeout_ms), async move {
+        timeout(Duration::from_millis(http_read_timeout_ms), async {
             let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
             let reader: &mut BufReader<&mut TcpStream> =
                 &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
