@@ -912,8 +912,7 @@ impl Request {
     ///
     /// - `&ArcRwLockStream`: The TCP stream to read from.
     /// - `&mut [u8]`: The buffer to read data into.
-    /// - `Duration`: The timeout duration.
-    /// - `bool`: Whether to use timeout.
+    /// - `Option<Duration>`: The optional timeout duration. If Some, timeout is applied; if None, no timeout.
     /// - `&mut bool`: Mutable reference to track if we got a client response.
     ///
     /// # Returns
@@ -922,11 +921,10 @@ impl Request {
     async fn read_stream_ws_data(
         stream: &ArcRwLockStream,
         buffer: &mut [u8],
-        duration: Duration,
-        use_timeout: bool,
+        duration_opt: Option<Duration>,
         is_client_response: &mut bool,
     ) -> Result<Option<usize>, RequestError> {
-        if use_timeout {
+        if let Some(duration) = duration_opt {
             return match timeout(duration, stream.write().await.read(buffer)).await {
                 Ok(result) => match result {
                     Ok(len) => Ok(Some(len)),
@@ -967,17 +965,18 @@ impl Request {
     fn handle_ws_text_binary_frame(
         frame: &WebSocketFrame,
         full_frame: &mut Vec<u8>,
-        max_ws_frame_size: usize,
+        max_size: usize,
         request: &Request,
     ) -> Result<Option<Request>, RequestError> {
         let payload_data: &[u8] = frame.get_payload_data();
-        if payload_data.len() > max_ws_frame_size {
+        let payload_data_len: usize = payload_data.len();
+        if payload_data_len > max_size {
             return Err(RequestError::WebSocketFrameTooLarge(
                 HttpStatus::PayloadTooLarge,
             ));
         }
-        let len: usize = full_frame.len() + payload_data.len();
-        if len > max_ws_frame_size && max_ws_frame_size != DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE {
+        let sum_len: usize = full_frame.len() + payload_data_len;
+        if sum_len > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE {
             return Err(RequestError::WebSocketFrameTooLarge(
                 HttpStatus::PayloadTooLarge,
             ));
@@ -1018,15 +1017,18 @@ impl Request {
         let mut full_frame: Vec<u8> = Vec::with_capacity(max_ws_frame_size);
         let mut frame_count: usize = 0;
         let mut is_client_response: bool = false;
-        let adjusted_timeout_ms: u64 = (ws_read_timeout_ms >> 1) + (ws_read_timeout_ms & 1);
-        let timeout_duration: Duration = Duration::from_millis(adjusted_timeout_ms);
-        let use_timeout: bool = ws_read_timeout_ms != DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS;
+        let duration_opt: Option<Duration> =
+            if ws_read_timeout_ms == DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS {
+                None
+            } else {
+                let adjusted_timeout_ms: u64 = (ws_read_timeout_ms >> 1) + (ws_read_timeout_ms & 1);
+                Some(Duration::from_millis(adjusted_timeout_ms))
+            };
         loop {
             let len: usize = match Self::read_stream_ws_data(
                 stream,
                 &mut temp_buffer,
-                timeout_duration,
-                use_timeout,
+                duration_opt,
                 &mut is_client_response,
             )
             .await
