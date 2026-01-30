@@ -725,7 +725,7 @@ impl Request {
     /// Parses an HTTP request from a TCP stream.
     ///
     /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
-    /// If the timeout is 0, no timeout is applied.
+    /// If the timeout is u64::MAX, no timeout is applied.
     ///
     /// # Arguments
     ///
@@ -740,7 +740,7 @@ impl Request {
         config: &RequestConfigData,
     ) -> Result<Request, RequestError> {
         let http_read_timeout_ms: u64 = config.get_http_read_timeout_ms();
-        if http_read_timeout_ms == 0 {
+        if http_read_timeout_ms == u64::MAX {
             return Self::parse_http_from_stream(stream, config).await;
         }
         let duration: Duration = Duration::from_millis(http_read_timeout_ms);
@@ -752,7 +752,7 @@ impl Request {
     /// Parses a WebSocket request from a TCP stream.
     ///
     /// Wraps the stream in a buffered reader and delegates to `ws_from_reader`.
-    /// If the timeout is 0, no timeout is applied.
+    /// If the timeout is u64::MAX, no timeout is applied.
     ///
     /// # Arguments
     ///
@@ -778,7 +778,7 @@ impl Request {
         let mut is_client_response: bool = false;
         let adjusted_timeout_ms: u64 = (ws_read_timeout_ms >> 1) + (ws_read_timeout_ms & 1);
         let timeout_duration: Duration = Duration::from_millis(adjusted_timeout_ms);
-        let use_timeout: bool = ws_read_timeout_ms > 0;
+        let use_timeout: bool = ws_read_timeout_ms != u64::MAX;
         loop {
             let len: usize = if use_timeout {
                 match timeout(
