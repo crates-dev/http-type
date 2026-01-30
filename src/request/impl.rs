@@ -559,11 +559,11 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `&str` - The query string to parse.
+    /// - `AsRef<str>` - The query string to parse.
     ///
     /// # Returns
     ///
-    /// - `HashMap<String, String>` - The parsed query parameters.
+    /// - `RequestQuerys` - The parsed query parameters.
     fn parse_querys<Q>(query: Q) -> RequestQuerys
     where
         Q: AsRef<str>,
@@ -581,6 +581,123 @@ impl Request {
         query_map
     }
 
+    /// Checks if a header line exceeds the maximum allowed length.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize`: The number of bytes read for the header line.
+    /// - `usize`: The maximum allowed length for a header line.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    #[inline(always)]
+    fn check_header_line_length(
+        bytes_read: usize,
+        max_header_line_length: usize,
+    ) -> Option<RequestError> {
+        if bytes_read > max_header_line_length
+            && max_header_line_length != DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_LENGTH
+        {
+            return Some(RequestError::HeaderLineTooLong(
+                HttpStatus::RequestHeaderFieldsTooLarge,
+            ));
+        }
+        None
+    }
+
+    /// Checks if the header count exceeds the maximum allowed.
+    ///
+    /// # Arguments
+    ///
+    /// - `usize`: The current number of headers parsed.
+    /// - `usize`: The maximum allowed number of headers.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    #[inline(always)]
+    fn check_header_count(header_count: usize, max_header_count: usize) -> Option<RequestError> {
+        if header_count > max_header_count
+            && max_header_count != DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT
+        {
+            return Some(RequestError::TooManyHeaders(
+                HttpStatus::RequestHeaderFieldsTooLarge,
+            ));
+        }
+        None
+    }
+
+    /// Checks if a header key exceeds the maximum allowed length.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The header key to check.
+    /// - `usize`: The maximum allowed length for a header key.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    #[inline(always)]
+    fn check_header_key_length(key: &str, max_header_key_length: usize) -> Option<RequestError> {
+        if key.len() > max_header_key_length
+            && max_header_key_length != DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_LENGTH
+        {
+            return Some(RequestError::HeaderKeyTooLong(
+                HttpStatus::RequestHeaderFieldsTooLarge,
+            ));
+        }
+        None
+    }
+
+    /// Checks if a header value exceeds the maximum allowed length.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The header value to check.
+    /// - `usize`: The maximum allowed length for a header value.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    #[inline(always)]
+    fn check_header_value_length(
+        value: &str,
+        max_header_value_length: usize,
+    ) -> Option<RequestError> {
+        if value.len() > max_header_value_length
+            && max_header_value_length != DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_LENGTH
+        {
+            return Some(RequestError::HeaderValueTooLong(
+                HttpStatus::RequestHeaderFieldsTooLarge,
+            ));
+        }
+        None
+    }
+
+    /// Parses the Content-Length header value and validates it against max body size.
+    ///
+    /// # Arguments
+    ///
+    /// - `&str`: The Content-Length header value string.
+    /// - `usize`: The maximum allowed body size.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<usize, RequestError>`: The parsed content length or an error.
+    #[inline(always)]
+    fn parse_content_length(value: &str, max_body_size: usize) -> Result<usize, RequestError> {
+        let length: usize = value
+            .parse::<usize>()
+            .map_err(|_| RequestError::InvalidContentLength(HttpStatus::BadRequest))?;
+        if length > max_body_size && max_body_size != DEFAULT_LOW_SECURITY_MAX_BODY_SIZE {
+            return Err(RequestError::ContentLengthTooLarge(
+                HttpStatus::PayloadTooLarge,
+            ));
+        }
+        Ok(length)
+    }
+
     /// Parses HTTP headers from a buffered reader.
     ///
     /// This method reads header lines from the provided buffered reader until an empty line
@@ -589,12 +706,12 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `&mut R` - A mutable reference to a buffered reader implementing `AsyncBufReadExt`.
-    /// - `&RequestConfigData` - Configuration for security limits and buffer settings.
+    /// - `&mut AsyncBufReadExt + Unpin`: A mutable reference to a buffered reader implementing `AsyncBufReadExt`.
+    /// - `&RequestConfigData`: Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
-    /// - `Result<(RequestHeaders, RequestHost, usize), RequestError>` - A tuple containing:
+    /// - `Result<(RequestHeaders, RequestHost, usize), RequestError>`: A tuple containing:
     ///   - The parsed headers as a hash map
     ///   - The host value extracted from the Host header
     ///   - The content length extracted from the Content-Length header
@@ -621,66 +738,40 @@ impl Request {
             let bytes_read: usize = AsyncBufReadExt::read_line(reader, header_line)
                 .await
                 .map_err(|_| RequestError::HttpRead(HttpStatus::BadRequest))?;
-            if bytes_read > max_header_line_length
-                && max_header_line_length != DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_LENGTH
-            {
-                return Err(RequestError::HeaderLineTooLong(
-                    HttpStatus::RequestHeaderFieldsTooLarge,
-                ));
+            if let Some(err) = Self::check_header_line_length(bytes_read, max_header_line_length) {
+                return Err(err);
             }
             let header_line: &str = header_line.trim();
             if header_line.is_empty() {
                 break;
             }
             header_count += 1;
-            if header_count > max_header_count
-                && max_header_count != DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT
-            {
-                return Err(RequestError::TooManyHeaders(
-                    HttpStatus::RequestHeaderFieldsTooLarge,
-                ));
+            if let Some(err) = Self::check_header_count(header_count, max_header_count) {
+                return Err(err);
             }
-            if let Some((key_part, value_part)) = header_line.split_once(COLON) {
-                let key: String = key_part.trim().to_ascii_lowercase();
-                if key.is_empty() {
-                    continue;
-                }
-                if key.len() > max_header_key_length
-                    && max_header_key_length != DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_LENGTH
-                {
-                    return Err(RequestError::HeaderKeyTooLong(
-                        HttpStatus::RequestHeaderFieldsTooLarge,
-                    ));
-                }
-                let value: String = value_part.trim().to_string();
-                if value.len() > max_header_value_length
-                    && max_header_value_length != DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_LENGTH
-                {
-                    return Err(RequestError::HeaderValueTooLong(
-                        HttpStatus::RequestHeaderFieldsTooLarge,
-                    ));
-                }
-                if key == HOST {
-                    host = value.clone();
-                } else if key == CONTENT_LENGTH {
-                    match value.parse::<usize>() {
-                        Ok(length) => {
-                            if length > max_body_size
-                                && max_body_size != DEFAULT_LOW_SECURITY_MAX_BODY_SIZE
-                            {
-                                return Err(RequestError::ContentLengthTooLarge(
-                                    HttpStatus::PayloadTooLarge,
-                                ));
-                            }
-                            content_length = length;
-                        }
-                        Err(_) => {
-                            return Err(RequestError::InvalidContentLength(HttpStatus::BadRequest));
-                        }
-                    }
-                }
-                headers.entry(key).or_default().push_back(value);
+            let (key_part, value_part): (&str, &str) = match header_line.split_once(COLON) {
+                Some(parts) => parts,
+                None => continue,
+            };
+            let key: String = key_part.trim().to_ascii_lowercase();
+            if key.is_empty() {
+                continue;
             }
+            if let Some(err) = Self::check_header_key_length(&key, max_header_key_length) {
+                return Err(err);
+            }
+            let value: String = value_part.trim().to_string();
+            if let Some(err) = Self::check_header_value_length(&value, max_header_value_length) {
+                return Err(err);
+            }
+            match key.as_str() {
+                HOST => host = value.clone(),
+                CONTENT_LENGTH => {
+                    content_length = Self::parse_content_length(&value, max_body_size)?;
+                }
+                _ => {}
+            }
+            headers.entry(key).or_default().push_back(value);
         }
         Ok((headers, host, content_length))
     }
