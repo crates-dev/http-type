@@ -891,7 +891,9 @@ impl Request {
                 is_client_response = true;
                 dynamic_buffer.drain(0..consumed);
                 frame_count += 1;
-                if frame_count > max_ws_frames {
+                if frame_count > max_ws_frames
+                    && max_ws_frames != DEFAULT_LOW_SECURITY_MAX_WS_FRAMES
+                {
                     return Err(RequestError::TooManyHeaders(
                         HttpStatus::RequestHeaderFieldsTooLarge,
                     ));
@@ -910,7 +912,9 @@ impl Request {
                                 HttpStatus::PayloadTooLarge,
                             ));
                         }
-                        if full_frame.len() + payload_data.len() > max_ws_frame_size {
+                        if full_frame.len() + payload_data.len() > max_ws_frame_size
+                            && max_ws_frame_size != DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE
+                        {
                             return Err(RequestError::WebSocketFrameTooLarge(
                                 HttpStatus::PayloadTooLarge,
                             ));
