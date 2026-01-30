@@ -57,7 +57,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     ///
-    /// - `RwLockReadGuardTcpStream` - The read guard for the stream.
+    /// - `RwLockReadGuard<'_, TcpStream>` - The read guard for the stream.
     pub async fn read(&'_ self) -> RwLockReadGuard<'_, TcpStream> {
         self.get_0().read().await
     }
@@ -68,7 +68,7 @@ impl ArcRwLockStream {
     ///
     /// # Returns
     ///
-    /// - `RwLockWriteGuardTcpStream` - The write guard for the stream.
+    /// - `RwLockWriteGuard<'_, TcpStream>` - The write guard for the stream.
     pub(crate) async fn write(&'_ self) -> RwLockWriteGuard<'_, TcpStream> {
         self.get_0().write().await
     }
