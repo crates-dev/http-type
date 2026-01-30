@@ -217,7 +217,7 @@ impl Response {
     ///
     /// - `usize` - The count of unique header keys.
     #[inline(always)]
-    pub fn get_headers_length(&self) -> usize {
+    pub fn get_headers_size(&self) -> usize {
         self.headers.len()
     }
 
@@ -231,7 +231,7 @@ impl Response {
     ///
     /// - `Option<usize>` - The count of values for the header.
     #[inline(always)]
-    pub fn try_get_header_length<K>(&self, key: K) -> Option<usize>
+    pub fn try_get_header_size<K>(&self, key: K) -> Option<usize>
     where
         K: AsRef<str>,
     {
@@ -252,11 +252,11 @@ impl Response {
     ///
     /// This function will panic if the header key is not found.
     #[inline(always)]
-    pub fn get_header_length<K>(&self, key: K) -> usize
+    pub fn get_header_size<K>(&self, key: K) -> usize
     where
         K: AsRef<str>,
     {
-        self.try_get_header_length(key).unwrap()
+        self.try_get_header_size(key).unwrap()
     }
 
     /// Gets the total number of header values in the response.
@@ -268,7 +268,7 @@ impl Response {
     ///
     /// - `usize` - The total count of all header values.
     #[inline(always)]
-    pub fn get_headers_values_length(&self) -> usize {
+    pub fn get_headers_values_size(&self) -> usize {
         self.headers.values().map(|values| values.len()).sum()
     }
 

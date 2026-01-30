@@ -822,7 +822,7 @@ impl Request {
     ///
     /// - `Result<(), RequestError>`: Ok if valid, or an error if the path is too long.
     #[inline(always)]
-    fn validate_path_length(path: &str, max_size: usize) -> Result<(), RequestError> {
+    fn validate_path_size(path: &str, max_size: usize) -> Result<(), RequestError> {
         if path.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_PATH_SIZE {
             return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
         }
@@ -870,7 +870,7 @@ impl Request {
     ///
     /// - `Result<(), RequestError>`: Ok if valid, or an error if the query is too long.
     #[inline(always)]
-    fn validate_query_length(query: &str, max_size: usize) -> Result<(), RequestError> {
+    fn validate_query_size(query: &str, max_size: usize) -> Result<(), RequestError> {
         if query.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_QUERY_SIZE {
             return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
         }
@@ -953,11 +953,11 @@ impl Request {
             Self::read_request_line(reader, buffer_size, max_request_line_size).await?;
         let (method, path, version): (RequestMethod, &str, RequestVersion) =
             Self::parse_request_line_components(&line)?;
-        Self::validate_path_length(path, max_path_size)?;
+        Self::validate_path_size(path, max_path_size)?;
         let hash_index: Option<usize> = path.find(HASH);
         let query_index: Option<usize> = path.find(QUERY);
         let query_string: String = Self::extract_query_string(path, query_index, hash_index);
-        Self::validate_query_length(&query_string, max_query_size)?;
+        Self::validate_query_size(&query_string, max_query_size)?;
         let querys: RequestQuerys = Self::parse_querys(&query_string);
         let path: RequestPath = Self::extract_clean_path(path, query_index, hash_index);
         let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =

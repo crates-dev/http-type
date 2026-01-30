@@ -312,12 +312,12 @@ impl WebSocketFrame {
         let data_ref: &[u8] = data.as_ref();
         let mut hash_state: [u32; 5] = HASH_STATE;
         let mut padded_data: Vec<u8> = Vec::from(data_ref);
-        let original_length_bits: u64 = (padded_data.len() * 8) as u64;
+        let original_size_bits: u64 = (padded_data.len() * 8) as u64;
         padded_data.push(0x80);
         while !(padded_data.len() + 8).is_multiple_of(64) {
             padded_data.push(0);
         }
-        padded_data.extend_from_slice(&original_length_bits.to_be_bytes());
+        padded_data.extend_from_slice(&original_size_bits.to_be_bytes());
         for block in padded_data.chunks_exact(64) {
             let mut message_schedule: [u32; 80] = [0u32; 80];
             for (i, block_chunk) in block.chunks_exact(4).enumerate().take(16) {
