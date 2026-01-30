@@ -661,7 +661,7 @@ impl Request {
     ///
     /// - `Result<usize, RequestError>`: The parsed content length or an error.
     #[inline(always)]
-    fn parse_content_size(value: &str, max_size: usize) -> Result<usize, RequestError> {
+    fn parse_body_size(value: &str, max_size: usize) -> Result<usize, RequestError> {
         let length: usize = value
             .parse::<usize>()
             .map_err(|_| RequestError::InvalidContentLength(HttpStatus::BadRequest))?;
@@ -742,7 +742,7 @@ impl Request {
             match key.as_str() {
                 HOST => host = value.clone(),
                 CONTENT_LENGTH => {
-                    content_size = Self::parse_content_size(&value, max_body_size)?;
+                    content_size = Self::parse_body_size(&value, max_body_size)?;
                 }
                 _ => {}
             }
@@ -763,7 +763,7 @@ impl Request {
     ///
     /// - `Result<String, RequestError>`: The request line string or an error.
     #[inline(always)]
-    async fn read_request_line(
+    async fn read_http_request_line(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
         max_size: usize,
@@ -950,7 +950,7 @@ impl Request {
         let reader: &mut BufReader<&mut TcpStream> =
             &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
         let line: String =
-            Self::read_request_line(reader, buffer_size, max_request_line_size).await?;
+            Self::read_http_request_line(reader, buffer_size, max_request_line_size).await?;
         let (method, path, version): (RequestMethod, &str, RequestVersion) =
             Self::parse_request_line_components(&line)?;
         Self::validate_path_size(path, max_path_size)?;
@@ -1011,7 +1011,7 @@ impl Request {
     ///
     /// - `RequestError`: The corresponding request error.
     #[inline(always)]
-    fn io_error_to_request_error(error: std::io::Error) -> RequestError {
+    fn ws_io_error_to_request_error(error: std::io::Error) -> RequestError {
         let kind: ErrorKind = error.kind();
         if kind == ErrorKind::ConnectionReset || kind == ErrorKind::ConnectionAborted {
             return RequestError::ClientDisconnected(HttpStatus::BadRequest);
@@ -1061,7 +1061,7 @@ impl Request {
             return match timeout(duration, stream.write().await.read(buffer)).await {
                 Ok(result) => match result {
                     Ok(len) => Ok(Some(len)),
-                    Err(error) => Err(Self::io_error_to_request_error(error)),
+                    Err(error) => Err(Self::ws_io_error_to_request_error(error)),
                 },
                 Err(_) => {
                     if !*is_client_response {
@@ -1078,7 +1078,7 @@ impl Request {
         }
         match stream.write().await.read(buffer).await {
             Ok(len) => Ok(Some(len)),
-            Err(error) => Err(Self::io_error_to_request_error(error)),
+            Err(error) => Err(Self::ws_io_error_to_request_error(error)),
         }
     }
 
