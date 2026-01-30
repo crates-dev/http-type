@@ -14,7 +14,7 @@ async fn request_config_from_json() {
         "max_header_value_size": 8192,
         "max_body_size": 2097152,
         "max_ws_frame_size": 65536,
-        "max_ws_frames": 6000,
+        "max_ws_frames_count": 6000,
         "http_read_timeout_ms": 6000,
         "ws_read_timeout_ms": 1800000
     }
