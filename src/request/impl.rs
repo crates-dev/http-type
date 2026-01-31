@@ -1695,16 +1695,6 @@ impl Request {
         self.get_version().is_http1_1()
     }
 
-    /// Checks if the HTTP version is HTTP/1.1 or higher.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP/1.1 or higher.
-    #[inline(always)]
-    pub fn is_http1_1_or_higher_version(&self) -> bool {
-        self.get_version().is_http1_1_or_higher()
-    }
-
     /// Checks whether the HTTP version is HTTP/2.
     ///
     /// # Returns
@@ -1725,14 +1715,14 @@ impl Request {
         self.get_version().is_http3()
     }
 
-    /// Checks whether the HTTP version is unknown.
+    /// Checks if the HTTP version is HTTP/1.1 or higher.
     ///
     /// # Returns
     ///
-    /// - `bool` - Whether the version is unknown.
+    /// - `bool` - Whether the version is HTTP/1.1 or higher.
     #[inline(always)]
-    pub fn is_unknown_version(&self) -> bool {
-        self.get_version().is_unknown()
+    pub fn is_http1_1_or_higher_version(&self) -> bool {
+        self.get_version().is_http1_1_or_higher()
     }
 
     /// Checks whether the version belongs to the HTTP family.
@@ -1743,6 +1733,16 @@ impl Request {
     #[inline(always)]
     pub fn is_http_version(&self) -> bool {
         self.get_version().is_http()
+    }
+
+    /// Checks whether the HTTP version is unknown.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is unknown.
+    #[inline(always)]
+    pub fn is_unknown_version(&self) -> bool {
+        self.get_version().is_unknown()
     }
 
     /// Checks whether the WebSocket upgrade is enabled for this request.
