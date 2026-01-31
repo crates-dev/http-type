@@ -1611,7 +1611,7 @@ impl Request {
     ///
     /// - `bool` - Whether WebSocket upgrade is enabled.
     #[inline(always)]
-    pub fn is_ws(&self) -> bool {
+    pub fn is_ws_upgrade_type(&self) -> bool {
         self.get_upgrade_type().is_ws()
     }
 
@@ -1621,7 +1621,7 @@ impl Request {
     ///
     /// - `bool` - Whether the upgrade type is h2c.
     #[inline(always)]
-    pub fn is_h2c(&self) -> bool {
+    pub fn is_h2c_upgrade_type(&self) -> bool {
         self.get_upgrade_type().is_h2c()
     }
 
@@ -1631,7 +1631,7 @@ impl Request {
     ///
     /// - `bool` - Whether the upgrade type is TLS.
     #[inline(always)]
-    pub fn is_tls(&self) -> bool {
+    pub fn is_tls_upgrade_type(&self) -> bool {
         self.get_upgrade_type().is_tls()
     }
 
@@ -1641,18 +1641,8 @@ impl Request {
     ///
     /// - `bool` - Whether the upgrade type is unknown.
     #[inline(always)]
-    pub fn is_unknown_upgrade(&self) -> bool {
+    pub fn is_unknown_upgrade_type(&self) -> bool {
         self.get_upgrade_type().is_unknown()
-    }
-
-    /// Checks if the HTTP version is HTTP/1.1 or higher.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP/1.1 or higher.
-    #[inline(always)]
-    pub fn is_http1_1_or_higher(&self) -> bool {
-        self.get_version().is_http1_1_or_higher()
     }
 
     /// Checks whether the HTTP version is HTTP/0.9.
@@ -1661,7 +1651,7 @@ impl Request {
     ///
     /// - `bool` - Whether the version is HTTP/0.9.
     #[inline(always)]
-    pub fn is_http0_9(&self) -> bool {
+    pub fn is_http0_9_version(&self) -> bool {
         self.get_version().is_http0_9()
     }
 
@@ -1671,7 +1661,7 @@ impl Request {
     ///
     /// - `bool` - Whether the version is HTTP/1.0.
     #[inline(always)]
-    pub fn is_http1_0(&self) -> bool {
+    pub fn is_http1_0_version(&self) -> bool {
         self.get_version().is_http1_0()
     }
 
@@ -1681,8 +1671,18 @@ impl Request {
     ///
     /// - `bool` - Whether the version is HTTP/1.1.
     #[inline(always)]
-    pub fn is_http1_1(&self) -> bool {
+    pub fn is_http1_1_version(&self) -> bool {
         self.get_version().is_http1_1()
+    }
+
+    /// Checks if the HTTP version is HTTP/1.1 or higher.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is HTTP/1.1 or higher.
+    #[inline(always)]
+    pub fn is_http1_1_or_higher_version(&self) -> bool {
+        self.get_version().is_http1_1_or_higher()
     }
 
     /// Checks whether the HTTP version is HTTP/2.
@@ -1691,7 +1691,7 @@ impl Request {
     ///
     /// - `bool` - Whether the version is HTTP/2.
     #[inline(always)]
-    pub fn is_http2(&self) -> bool {
+    pub fn is_http2_version(&self) -> bool {
         self.get_version().is_http2()
     }
 
@@ -1701,7 +1701,7 @@ impl Request {
     ///
     /// - `bool` - Whether the version is HTTP/3.
     #[inline(always)]
-    pub fn is_http3(&self) -> bool {
+    pub fn is_http3_version(&self) -> bool {
         self.get_version().is_http3()
     }
 
@@ -1721,7 +1721,7 @@ impl Request {
     ///
     /// - `bool` - Whether the version is HTTP.
     #[inline(always)]
-    pub fn is_http(&self) -> bool {
+    pub fn is_http_version(&self) -> bool {
         self.get_version().is_http()
     }
 
@@ -1731,7 +1731,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is GET.
     #[inline(always)]
-    pub fn is_get(&self) -> bool {
+    pub fn is_get_method(&self) -> bool {
         self.get_method().is_get()
     }
 
@@ -1741,7 +1741,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is POST.
     #[inline(always)]
-    pub fn is_post(&self) -> bool {
+    pub fn is_post_method(&self) -> bool {
         self.get_method().is_post()
     }
 
@@ -1751,7 +1751,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is PUT.
     #[inline(always)]
-    pub fn is_put(&self) -> bool {
+    pub fn is_put_method(&self) -> bool {
         self.get_method().is_put()
     }
 
@@ -1761,7 +1761,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is DELETE.
     #[inline(always)]
-    pub fn is_delete(&self) -> bool {
+    pub fn is_delete_method(&self) -> bool {
         self.get_method().is_delete()
     }
 
@@ -1771,7 +1771,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is PATCH.
     #[inline(always)]
-    pub fn is_patch(&self) -> bool {
+    pub fn is_patch_method(&self) -> bool {
         self.get_method().is_patch()
     }
 
@@ -1781,7 +1781,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is HEAD.
     #[inline(always)]
-    pub fn is_head(&self) -> bool {
+    pub fn is_head_method(&self) -> bool {
         self.get_method().is_head()
     }
 
@@ -1791,7 +1791,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is OPTIONS.
     #[inline(always)]
-    pub fn is_options(&self) -> bool {
+    pub fn is_options_method(&self) -> bool {
         self.get_method().is_options()
     }
 
@@ -1801,7 +1801,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is CONNECT.
     #[inline(always)]
-    pub fn is_connect(&self) -> bool {
+    pub fn is_connect_method(&self) -> bool {
         self.get_method().is_connect()
     }
 
@@ -1811,7 +1811,7 @@ impl Request {
     ///
     /// - `bool` - Whether the method is TRACE.
     #[inline(always)]
-    pub fn is_trace(&self) -> bool {
+    pub fn is_trace_method(&self) -> bool {
         self.get_method().is_trace()
     }
 
@@ -1846,10 +1846,10 @@ impl Request {
             if connection_value.eq_ignore_ascii_case(KEEP_ALIVE) {
                 return true;
             } else if connection_value.eq_ignore_ascii_case(CLOSE) {
-                return self.is_ws();
+                return self.is_ws_upgrade_type();
             }
         }
-        self.is_http1_1_or_higher() || self.is_ws()
+        self.is_http1_1_or_higher_version() || self.is_ws_upgrade_type()
     }
 
     /// Determines if keep-alive should be disabled for this request.

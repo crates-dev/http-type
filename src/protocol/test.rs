@@ -1,4 +1,4 @@
-use crate::protocol::*;
+use crate::*;
 
 #[test]
 fn test_is_http_with_lowercase() {
