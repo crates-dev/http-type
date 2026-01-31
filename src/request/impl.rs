@@ -764,15 +764,15 @@ impl Http {
     ///
     /// # Returns
     ///
-    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    /// - `Result<(), RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_header_line_size(size: usize, max_size: usize) -> Option<RequestError> {
+    fn check_header_line_size(size: usize, max_size: usize) -> Result<(), RequestError> {
         if size > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_SIZE {
-            return Some(RequestError::HeaderLineTooLong(
+            return Err(RequestError::HeaderLineTooLong(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
         }
-        None
+        Ok(())
     }
 
     /// Checks if the header count exceeds the maximum allowed.
@@ -784,15 +784,15 @@ impl Http {
     ///
     /// # Returns
     ///
-    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    /// - `Result<(), RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_header_count(count: usize, max_count: usize) -> Option<RequestError> {
+    fn check_header_count(count: usize, max_count: usize) -> Result<(), RequestError> {
         if count > max_count && max_count != DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT {
-            return Some(RequestError::TooManyHeaders(
+            return Err(RequestError::TooManyHeaders(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
         }
-        None
+        Ok(())
     }
 
     /// Checks if a header key exceeds the maximum allowed length.
@@ -804,15 +804,15 @@ impl Http {
     ///
     /// # Returns
     ///
-    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    /// - `Result<(), RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_header_key_size(key: &str, max_size: usize) -> Option<RequestError> {
+    fn check_header_key_size(key: &str, max_size: usize) -> Result<(), RequestError> {
         if key.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_SIZE {
-            return Some(RequestError::HeaderKeyTooLong(
+            return Err(RequestError::HeaderKeyTooLong(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
         }
-        None
+        Ok(())
     }
 
     /// Checks if a header value exceeds the maximum allowed length.
@@ -824,15 +824,15 @@ impl Http {
     ///
     /// # Returns
     ///
-    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    /// - `Result<(), RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_header_value_size(value: &str, max_size: usize) -> Option<RequestError> {
+    fn check_header_value_size(value: &str, max_size: usize) -> Result<(), RequestError> {
         if value.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_SIZE {
-            return Some(RequestError::HeaderValueTooLong(
+            return Err(RequestError::HeaderValueTooLong(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
         }
-        None
+        Ok(())
     }
 
     /// Parses the Content-Length header value and checks it against max body size.
@@ -896,17 +896,13 @@ impl Http {
         loop {
             let header_line: &mut String = &mut String::with_capacity(buffer_size);
             let bytes_read: usize = AsyncBufReadExt::read_line(reader, header_line).await?;
-            if let Some(err) = Self::check_header_line_size(bytes_read, max_header_line_size) {
-                return Err(err);
-            }
+            Self::check_header_line_size(bytes_read, max_header_line_size)?;
             let header_line: &str = header_line.trim();
             if header_line.is_empty() {
                 break;
             }
             header_count += 1;
-            if let Some(err) = Self::check_header_count(header_count, max_header_count) {
-                return Err(err);
-            }
+            Self::check_header_count(header_count, max_header_count)?;
             let (key_part, value_part): (&str, &str) = match header_line.split_once(COLON) {
                 Some(parts) => parts,
                 None => continue,
@@ -915,13 +911,9 @@ impl Http {
             if key.is_empty() {
                 continue;
             }
-            if let Some(err) = Self::check_header_key_size(&key, max_header_key_size) {
-                return Err(err);
-            }
+            Self::check_header_key_size(&key, max_header_key_size)?;
             let value: String = value_part.trim().to_string();
-            if let Some(err) = Self::check_header_value_size(&value, max_header_value_size) {
-                return Err(err);
-            }
+            Self::check_header_value_size(&value, max_header_value_size)?;
             match key.as_str() {
                 HOST => host = value.clone(),
                 CONTENT_LENGTH => {
@@ -1018,15 +1010,15 @@ impl Ws {
     ///
     /// # Returns
     ///
-    /// - `Option<RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
+    /// - `Result<(), RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
     #[inline(always)]
-    fn check_frame_count(count: usize, max_count: usize) -> Option<RequestError> {
+    fn check_frame_count(count: usize, max_count: usize) -> Result<(), RequestError> {
         if count > max_count && max_count != DEFAULT_LOW_SECURITY_MAX_WS_FRAMES_COUNT {
-            return Some(RequestError::TooManyHeaders(
+            return Err(RequestError::TooManyHeaders(
                 HttpStatus::RequestHeaderFieldsTooLarge,
             ));
         }
-        None
+        Ok(())
     }
 
     /// Reads data from the stream with optional timeout handling.
@@ -1197,9 +1189,7 @@ impl Request {
                 is_client_response = true;
                 dynamic_buffer.drain(0..consumed);
                 frame_count += 1;
-                if let Some(err) = Ws::check_frame_count(frame_count, max_ws_frames_count) {
-                    return Err(err);
-                }
+                Ws::check_frame_count(frame_count, max_ws_frames_count)?;
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
                         return Err(RequestError::ClientClosedConnection(HttpStatus::BadRequest));
