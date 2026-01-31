@@ -650,7 +650,7 @@ impl Request {
         None
     }
 
-    /// Parses the Content-Length header value and validates it against max body size.
+    /// Parses the Content-Length header value and checks it against max body size.
     ///
     /// # Arguments
     ///
@@ -676,7 +676,7 @@ impl Request {
     /// Parses HTTP headers from a buffered reader.
     ///
     /// This method reads header lines from the provided buffered reader until an empty line
-    /// is encountered, which indicates the end of headers. It validates header count, length,
+    /// is encountered, which indicates the end of headers. It checks header count, length,
     /// and content according to the provided configuration.
     ///
     /// # Arguments
@@ -728,14 +728,14 @@ impl Request {
                 Some(parts) => parts,
                 None => continue,
             };
-            let key: String = key_part.to_ascii_lowercase();
+            let key: String = key_part.trim().to_ascii_lowercase();
             if key.is_empty() {
                 continue;
             }
             if let Some(err) = Self::check_header_key_size(&key, max_header_key_size) {
                 return Err(err);
             }
-            let value: String = value_part.to_string();
+            let value: String = value_part.trim().to_string();
             if let Some(err) = Self::check_header_value_size(&value, max_header_value_size) {
                 return Err(err);
             }
@@ -815,14 +815,14 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The path string to validate.
+    /// - `&str`: The path string to check.
     /// - `usize`: The maximum allowed path size.
     ///
     /// # Returns
     ///
     /// - `Result<(), RequestError>`: Ok if valid, or an error if the path is too long.
     #[inline(always)]
-    fn validate_path_size(path: &str, max_size: usize) -> Result<(), RequestError> {
+    fn check_path_size(path: &str, max_size: usize) -> Result<(), RequestError> {
         if path.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_PATH_SIZE {
             return Err(RequestError::PathTooLong(HttpStatus::URITooLong));
         }
@@ -863,14 +863,14 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `&str`: The query string to validate.
+    /// - `&str`: The query string to check.
     /// - `usize`: The maximum allowed query size.
     ///
     /// # Returns
     ///
     /// - `Result<(), RequestError>`: Ok if valid, or an error if the query is too long.
     #[inline(always)]
-    fn validate_query_size(query: &str, max_size: usize) -> Result<(), RequestError> {
+    fn check_query_size(query: &str, max_size: usize) -> Result<(), RequestError> {
         if query.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_QUERY_SIZE {
             return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
         }
@@ -953,11 +953,11 @@ impl Request {
             Self::read_http_request_line(reader, buffer_size, max_request_line_size).await?;
         let (method, path, version): (RequestMethod, &str, RequestVersion) =
             Self::parse_request_line_components(&line)?;
-        Self::validate_path_size(path, max_path_size)?;
+        Self::check_path_size(path, max_path_size)?;
         let hash_index: Option<usize> = path.find(HASH);
         let query_index: Option<usize> = path.find(QUERY);
         let query_string: String = Self::extract_query_string(path, query_index, hash_index);
-        Self::validate_query_size(&query_string, max_query_size)?;
+        Self::check_query_size(&query_string, max_query_size)?;
         let querys: RequestQuerys = Self::parse_querys(&query_string);
         let path: RequestPath = Self::extract_clean_path(path, query_index, hash_index);
         let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =
