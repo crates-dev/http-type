@@ -1830,7 +1830,7 @@ impl Request {
     ///
     /// - `Vec<u8>`: The JSON representation of the request as a byte vector.
     #[inline(always)]
-    pub fn get_json_vec(&self) -> Vec<u8> {
+    pub fn json_vec(&self) -> Vec<u8> {
         serde_json::to_vec(self).unwrap_or_default()
     }
 
@@ -1840,7 +1840,7 @@ impl Request {
     ///
     /// - `String`: The JSON representation of the request as a string.
     #[inline(always)]
-    pub fn get_json_string(&self) -> String {
+    pub fn json_string(&self) -> String {
         serde_json::to_string(self).unwrap_or_default()
     }
 }
