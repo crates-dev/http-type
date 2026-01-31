@@ -763,7 +763,7 @@ impl Request {
     ///
     /// - `Result<String, RequestError>`: The request line string or an error.
     #[inline(always)]
-    async fn read_http_request_line(
+    async fn check_head_line(
         reader: &mut BufReader<&mut TcpStream>,
         buffer_size: usize,
         max_size: usize,
@@ -792,9 +792,7 @@ impl Request {
     ///   - The parsed HTTP version
     ///   - Or an error if parsing fails
     #[inline(always)]
-    fn parse_request_line_components(
-        line: &str,
-    ) -> Result<(RequestMethod, &str, RequestVersion), RequestError> {
+    fn parse_head_line(line: &str) -> Result<(RequestMethod, &str, RequestVersion), RequestError> {
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() < 3 {
             return Err(RequestError::HttpRequestPartsInsufficient(
@@ -938,7 +936,7 @@ impl Request {
     /// # Returns
     ///
     /// - `Result<Request, RequestError>`: The parsed request or an error.
-    async fn parse_http_from_stream(
+    async fn parse_request_from_stream(
         stream: &ArcRwLockStream,
         config: &RequestConfigData,
     ) -> Result<Request, RequestError> {
@@ -950,9 +948,9 @@ impl Request {
         let reader: &mut BufReader<&mut TcpStream> =
             &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
         let line: String =
-            Self::read_http_request_line(reader, buffer_size, max_request_line_size).await?;
+            Self::check_head_line(reader, buffer_size, max_request_line_size).await?;
         let (method, path, version): (RequestMethod, &str, RequestVersion) =
-            Self::parse_request_line_components(&line)?;
+            Self::parse_head_line(&line)?;
         Self::check_path_size(path, max_path_size)?;
         let hash_index: Option<usize> = path.find(HASH);
         let query_index: Option<usize> = path.find(QUERY);
@@ -993,10 +991,10 @@ impl Request {
     ) -> Result<Request, RequestError> {
         let timeout_ms: u64 = config.get_http_read_timeout_ms();
         if timeout_ms == DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS {
-            return Self::parse_http_from_stream(stream, config).await;
+            return Self::parse_request_from_stream(stream, config).await;
         }
         let duration: Duration = Duration::from_millis(timeout_ms);
-        timeout(duration, Self::parse_http_from_stream(stream, config))
+        timeout(duration, Self::parse_request_from_stream(stream, config))
             .await
             .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
     }
