@@ -58,7 +58,7 @@ use {
         io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
         net::TcpStream,
         sync::{Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard},
-        time::timeout,
+        time::{error::Elapsed, timeout},
     },
     url::Url,
 };

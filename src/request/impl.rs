@@ -23,7 +23,7 @@ impl From<std::io::Error> for RequestError {
     ///
     /// # Arguments
     ///
-    /// - `error`: The I/O error to convert.
+    /// - `std::io::Error`: The I/O error to convert.
     ///
     /// # Returns
     ///
@@ -35,6 +35,25 @@ impl From<std::io::Error> for RequestError {
             return RequestError::ClientDisconnected(HttpStatus::BadRequest);
         }
         RequestError::Unknown(HttpStatus::InternalServerError)
+    }
+}
+
+/// Converts a timeout elapsed error to a `RequestError`.
+///
+/// Maps timeout errors to `ReadTimeout` with `HttpStatus::RequestTimeout`.
+impl From<Elapsed> for RequestError {
+    /// Converts a timeout elapsed error to a `RequestError`.
+    ///
+    /// # Arguments
+    ///
+    /// - `Elapsed`: The elapsed error to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestError`: The corresponding request error as `ReadTimeout`.
+    #[inline(always)]
+    fn from(_error: Elapsed) -> Self {
+        RequestError::ReadTimeout(HttpStatus::RequestTimeout)
     }
 }
 
@@ -1034,9 +1053,9 @@ impl Ws {
                     Ok(len) => Ok(Some(len)),
                     Err(error) => Err(error.into()),
                 },
-                Err(_) => {
+                Err(error) => {
                     if !*is_client_response {
-                        return Err(RequestError::ReadTimeout(HttpStatus::RequestTimeout));
+                        return Err(error.into());
                     }
                     *is_client_response = false;
                     stream
@@ -1118,9 +1137,7 @@ impl Request {
             return Http::parse_from_stream(stream, config).await;
         }
         let duration: Duration = Duration::from_millis(timeout_ms);
-        timeout(duration, Http::parse_from_stream(stream, config))
-            .await
-            .map_err(|_| RequestError::ReadTimeout(HttpStatus::RequestTimeout))?
+        timeout(duration, Http::parse_from_stream(stream, config)).await?
     }
 
     /// Parses a WebSocket request from a TCP stream.
