@@ -661,7 +661,7 @@ impl Request {
     ///
     /// - `Result<usize, RequestError>`: The parsed content length or an error.
     #[inline(always)]
-    fn parse_body_size(value: &str, max_size: usize) -> Result<usize, RequestError> {
+    fn check_body_size(value: &str, max_size: usize) -> Result<usize, RequestError> {
         let length: usize = value
             .parse::<usize>()
             .map_err(|_| RequestError::InvalidContentLength(HttpStatus::BadRequest))?;
@@ -688,8 +688,8 @@ impl Request {
     ///
     /// - `Result<(RequestHeaders, RequestHost, usize), RequestError>`: A tuple containing:
     ///   - The parsed headers as a hash map
-    ///   - The host value extracted from the Host header
-    ///   - The content length extracted from the Content-Length header
+    ///   - The host value parseed from the Host header
+    ///   - The content length parseed from the Content-Length header
     ///   - Or an error if parsing fails
     async fn parse_headers<R>(
         reader: &mut R,
@@ -742,7 +742,7 @@ impl Request {
             match key.as_str() {
                 HOST => host = value.clone(),
                 CONTENT_LENGTH => {
-                    content_size = Self::parse_body_size(&value, max_body_size)?;
+                    content_size = Self::check_body_size(&value, max_body_size)?;
                 }
                 _ => {}
             }
@@ -829,10 +829,10 @@ impl Request {
         Ok(())
     }
 
-    /// Extracts the query string from the full path.
+    /// Parses the query string from the full path.
     ///
     /// Handles both query parameters (after `?`) and hash fragments (after `#`),
-    /// ensuring proper extraction when both are present.
+    /// ensuring proper parseion when both are present.
     ///
     /// # Arguments
     ///
@@ -842,9 +842,9 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `String`: The extracted query string, or empty string if no query.
+    /// - `String`: The parseed query string, or empty string if no query.
     #[inline(always)]
-    fn extract_query_string(
+    fn parse_query_string(
         path: &str,
         query_index: Option<usize>,
         hash_index: Option<usize>,
@@ -877,7 +877,7 @@ impl Request {
         Ok(())
     }
 
-    /// Extracts the clean path without query string or hash fragment.
+    /// Parses the request path without query string or hash fragment.
     ///
     /// # Arguments
     ///
@@ -888,9 +888,9 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `RequestPath`: The clean path without query or hash.
+    /// - `RequestPath`: The request path without query or hash.
     #[inline(always)]
-    fn extract_clean_path(
+    fn parse_request_path(
         path: &str,
         query_index: Option<usize>,
         hash_index: Option<usize>,
@@ -956,10 +956,10 @@ impl Request {
         Self::check_path_size(path, max_path_size)?;
         let hash_index: Option<usize> = path.find(HASH);
         let query_index: Option<usize> = path.find(QUERY);
-        let query_string: String = Self::extract_query_string(path, query_index, hash_index);
+        let query_string: String = Self::parse_query_string(path, query_index, hash_index);
         Self::check_query_size(&query_string, max_query_size)?;
         let querys: RequestQuerys = Self::parse_querys(&query_string);
-        let path: RequestPath = Self::extract_clean_path(path, query_index, hash_index);
+        let path: RequestPath = Self::parse_request_path(path, query_index, hash_index);
         let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =
             Self::parse_headers(reader, config).await?;
         let body: RequestBody = Self::read_request_body(reader, content_size).await?;
