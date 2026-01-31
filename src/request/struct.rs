@@ -88,3 +88,11 @@ pub struct Request {
     /// Request body content.
     pub(super) body: RequestBody,
 }
+
+/// HTTP request representation.
+#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq)]
+pub(crate) struct Http;
+
+/// WebSocket request representation.
+#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq)]
+pub(crate) struct Ws;
