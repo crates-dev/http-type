@@ -587,21 +587,63 @@ impl Response {
 
     /// Serializes the response to a JSON byte vector.
     ///
+    /// This method attempts to serialize the entire response structure into a JSON
+    /// formatted byte vector representation.
+    ///
     /// # Returns
     ///
-    /// - `Vec<u8>`: The JSON representation of the response as a byte vector.
+    /// - `Result<Vec<u8>, serde_json::Error>` - The serialized JSON bytes on success,
+    ///   or a serialization error on failure.
+    #[inline(always)]
+    pub fn try_json_vec(&self) -> Result<Vec<u8>, serde_json::Error> {
+        serde_json::to_vec(self)
+    }
+
+    /// Serializes the response to a JSON byte vector.
+    ///
+    /// This method serializes the entire response structure into a JSON formatted
+    /// byte vector representation.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<u8>` - The serialized JSON bytes.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the serialization fails.
     #[inline(always)]
     pub fn json_vec(&self) -> Vec<u8> {
-        serde_json::to_vec(self).unwrap_or_default()
+        self.try_json_vec().unwrap()
     }
 
     /// Serializes the response to a JSON string.
     ///
+    /// This method attempts to serialize the entire response structure into a JSON
+    /// formatted string representation.
+    ///
     /// # Returns
     ///
-    /// - `String`: The JSON representation of the response as a string.
+    /// - `Result<String, serde_json::Error>` - The serialized JSON string on success,
+    ///   or a serialization error on failure.
+    #[inline(always)]
+    pub fn try_json_string(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(self)
+    }
+
+    /// Serializes the response to a JSON string.
+    ///
+    /// This method serializes the entire response structure into a JSON formatted
+    /// string representation.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The serialized JSON string.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the serialization fails.
     #[inline(always)]
     pub fn json_string(&self) -> String {
-        serde_json::to_string(self).unwrap_or_default()
+        self.try_json_string().unwrap()
     }
 }
