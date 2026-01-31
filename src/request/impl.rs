@@ -1855,6 +1855,62 @@ impl Request {
         self.try_json_vec().unwrap()
     }
 
+    /// Serializes the request to a JSON byte vector with filtered fields.
+    ///
+    /// This method attempts to serialize the request structure into a JSON formatted
+    /// byte vector representation, keeping only the fields that satisfy the predicate.
+    ///
+    /// # Arguments
+    ///
+    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(key, value)),
+    ///   returns `true` to keep the field, `false` to remove it.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Vec<u8>, serde_json::Error>` - The serialized JSON bytes on success,
+    ///   or a serialization error on failure.
+    #[inline(always)]
+    pub fn try_json_vec_filter<F>(&self, predicate: F) -> Result<Vec<u8>, serde_json::Error>
+    where
+        F: FnMut(&(&String, &mut Value)) -> bool,
+    {
+        let mut value: Value = serde_json::to_value(self)?;
+        if let Some(map) = value.as_object_mut() {
+            let filtered: Map<String, Value> = map
+                .iter_mut()
+                .filter(predicate)
+                .map(|(key, value)| (key.clone(), value.clone()))
+                .collect();
+            return serde_json::to_vec(&Value::Object(filtered));
+        }
+        serde_json::to_vec(&value)
+    }
+
+    /// Serializes the request to a JSON byte vector with filtered fields.
+    ///
+    /// This method serializes the request structure into a JSON formatted byte vector
+    /// representation, keeping only the fields that satisfy the predicate.
+    ///
+    /// # Arguments
+    ///
+    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(key, value)),
+    ///   returns `true` to keep the field, `false` to remove it.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<u8>` - The serialized JSON bytes.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the serialization fails.
+    #[inline(always)]
+    pub fn json_vec_filter<F>(&self, predicate: F) -> Vec<u8>
+    where
+        F: FnMut(&(&String, &mut Value)) -> bool,
+    {
+        self.try_json_vec_filter(predicate).unwrap()
+    }
+
     /// Serializes the request to a JSON string.
     ///
     /// This method attempts to serialize the entire request structure into a JSON
@@ -1884,5 +1940,61 @@ impl Request {
     #[inline(always)]
     pub fn json_string(&self) -> String {
         self.try_json_string().unwrap()
+    }
+
+    /// Serializes the request to a JSON string with filtered fields.
+    ///
+    /// This method attempts to serialize the request structure into a JSON formatted
+    /// string representation, keeping only the fields that satisfy the predicate.
+    ///
+    /// # Arguments
+    ///
+    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(key, value)),
+    ///   returns `true` to keep the field, `false` to remove it.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<String, serde_json::Error>` - The serialized JSON string on success,
+    ///   or a serialization error on failure.
+    #[inline(always)]
+    pub fn try_json_string_filter<F>(&self, predicate: F) -> Result<String, serde_json::Error>
+    where
+        F: FnMut(&(&String, &mut Value)) -> bool,
+    {
+        let mut value: Value = serde_json::to_value(self)?;
+        if let Some(map) = value.as_object_mut() {
+            let filtered: Map<String, Value> = map
+                .iter_mut()
+                .filter(predicate)
+                .map(|(key, value)| (key.clone(), value.clone()))
+                .collect();
+            return serde_json::to_string(&Value::Object(filtered));
+        }
+        serde_json::to_string(&value)
+    }
+
+    /// Serializes the request to a JSON string with filtered fields.
+    ///
+    /// This method serializes the request structure into a JSON formatted string
+    /// representation, keeping only the fields that satisfy the predicate.
+    ///
+    /// # Arguments
+    ///
+    /// - `FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(key, value)),
+    ///   returns `true` to keep the field, `false` to remove it.
+    ///
+    /// # Returns
+    ///
+    /// - `String` - The serialized JSON string.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the serialization fails.
+    #[inline(always)]
+    pub fn json_string_filter<F>(&self, predicate: F) -> String
+    where
+        F: FnMut(&(&String, &mut Value)) -> bool,
+    {
+        self.try_json_string_filter(predicate).unwrap()
     }
 }
