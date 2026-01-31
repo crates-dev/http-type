@@ -6,7 +6,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `data` - The data of type T to be wrapped.
+/// - `T` - The data of type T to be wrapped.
 ///
 /// # Returns
 ///

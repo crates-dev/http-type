@@ -1,242 +1,177 @@
-use crate::*;
+use crate::protocol::*;
 
 #[test]
-fn test_protocol_display() {
-    assert_eq!(Protocol::Http.to_string(), HTTP_LOWERCASE);
-    assert_eq!(Protocol::Https.to_string(), HTTPS_LOWERCASE);
-    assert_eq!(Protocol::Unknown("ftp".to_string()).to_string(), "ftp");
+fn test_is_http_with_lowercase() {
+    assert!(Protocol::is_http("http"));
 }
 
 #[test]
-fn test_protocol_from_str() {
-    assert_eq!(HTTP_LOWERCASE.parse::<Protocol>().unwrap(), Protocol::Http);
-    assert_eq!(
-        HTTPS_LOWERCASE.parse::<Protocol>().unwrap(),
-        Protocol::Https
-    );
-    assert_eq!(
-        "ftp".parse::<Protocol>().unwrap(),
-        Protocol::Unknown("ftp".to_string())
-    );
-    assert_eq!(
-        "".parse::<Protocol>().unwrap(),
-        Protocol::Unknown("".to_string())
-    );
-    assert_eq!("HTTP".parse::<Protocol>().unwrap(), Protocol::Http);
-    assert_eq!("HTTPS".parse::<Protocol>().unwrap(), Protocol::Https);
+fn test_is_http_with_uppercase() {
+    assert!(Protocol::is_http("HTTP"));
+}
+
+#[test]
+fn test_is_http_with_mixed_case() {
+    assert!(Protocol::is_http("Http"));
+    assert!(Protocol::is_http("hTtP"));
+}
+
+#[test]
+fn test_is_http_with_non_http_protocol() {
+    assert!(!Protocol::is_http("https"));
+    assert!(!Protocol::is_http("ftp"));
+    assert!(!Protocol::is_http(""));
+}
+
+#[test]
+fn test_is_https_with_lowercase() {
+    assert!(Protocol::is_https("https"));
+}
+
+#[test]
+fn test_is_https_with_uppercase() {
+    assert!(Protocol::is_https("HTTPS"));
+}
+
+#[test]
+fn test_is_https_with_mixed_case() {
+    assert!(Protocol::is_https("Https"));
+    assert!(Protocol::is_https("hTtPs"));
+}
+
+#[test]
+fn test_is_https_with_non_https_protocol() {
+    assert!(!Protocol::is_https("http"));
+    assert!(!Protocol::is_https("ftp"));
+    assert!(!Protocol::is_https(""));
+}
+
+#[test]
+fn test_get_port_for_http() {
+    assert_eq!(Protocol::get_port("http"), 80);
+    assert_eq!(Protocol::get_port("HTTP"), 80);
+    assert_eq!(Protocol::get_port("Http"), 80);
+}
+
+#[test]
+fn test_get_port_for_https() {
+    assert_eq!(Protocol::get_port("https"), 443);
+    assert_eq!(Protocol::get_port("HTTPS"), 443);
+    assert_eq!(Protocol::get_port("Https"), 443);
+}
+
+#[test]
+fn test_get_port_for_ftp() {
+    assert_eq!(Protocol::get_port("ftp"), 21);
+    assert_eq!(Protocol::get_port("FTP"), 21);
+    assert_eq!(Protocol::get_port("Ftp"), 21);
+}
+
+#[test]
+fn test_get_port_for_ftps() {
+    assert_eq!(Protocol::get_port("ftps"), 990);
+    assert_eq!(Protocol::get_port("FTPS"), 990);
+    assert_eq!(Protocol::get_port("Ftps"), 990);
+}
+
+#[test]
+fn test_get_port_for_ssh() {
+    assert_eq!(Protocol::get_port("ssh"), 22);
+    assert_eq!(Protocol::get_port("SSH"), 22);
+    assert_eq!(Protocol::get_port("Ssh"), 22);
+}
+
+#[test]
+fn test_get_port_for_sftp() {
+    assert_eq!(Protocol::get_port("sftp"), 22);
+    assert_eq!(Protocol::get_port("SFTP"), 22);
+    assert_eq!(Protocol::get_port("Sftp"), 22);
+}
+
+#[test]
+fn test_get_port_for_telnet() {
+    assert_eq!(Protocol::get_port("telnet"), 23);
+    assert_eq!(Protocol::get_port("TELNET"), 23);
+    assert_eq!(Protocol::get_port("Telnet"), 23);
+}
+
+#[test]
+fn test_get_port_for_smtp() {
+    assert_eq!(Protocol::get_port("smtp"), 25);
+    assert_eq!(Protocol::get_port("SMTP"), 25);
+    assert_eq!(Protocol::get_port("Smtp"), 25);
+}
+
+#[test]
+fn test_get_port_for_smtps() {
+    assert_eq!(Protocol::get_port("smtps"), 465);
+    assert_eq!(Protocol::get_port("SMTPS"), 465);
+    assert_eq!(Protocol::get_port("Smtps"), 465);
+}
+
+#[test]
+fn test_get_port_for_pop3() {
+    assert_eq!(Protocol::get_port("pop3"), 110);
+    assert_eq!(Protocol::get_port("POP3"), 110);
+    assert_eq!(Protocol::get_port("Pop3"), 110);
+}
+
+#[test]
+fn test_get_port_for_pop3s() {
+    assert_eq!(Protocol::get_port("pop3s"), 995);
+    assert_eq!(Protocol::get_port("POP3S"), 995);
+    assert_eq!(Protocol::get_port("Pop3s"), 995);
+}
+
+#[test]
+fn test_get_port_for_imap() {
+    assert_eq!(Protocol::get_port("imap"), 143);
+    assert_eq!(Protocol::get_port("IMAP"), 143);
+    assert_eq!(Protocol::get_port("Imap"), 143);
+}
+
+#[test]
+fn test_get_port_for_imaps() {
+    assert_eq!(Protocol::get_port("imaps"), 993);
+    assert_eq!(Protocol::get_port("IMAPS"), 993);
+    assert_eq!(Protocol::get_port("Imaps"), 993);
+}
+
+#[test]
+fn test_get_port_for_dns() {
+    assert_eq!(Protocol::get_port("dns"), 53);
+    assert_eq!(Protocol::get_port("DNS"), 53);
+    assert_eq!(Protocol::get_port("Dns"), 53);
+}
+
+#[test]
+fn test_get_port_for_ws() {
+    assert_eq!(Protocol::get_port("ws"), 80);
+    assert_eq!(Protocol::get_port("WS"), 80);
+    assert_eq!(Protocol::get_port("Ws"), 80);
+}
+
+#[test]
+fn test_get_port_for_wss() {
+    assert_eq!(Protocol::get_port("wss"), 443);
+    assert_eq!(Protocol::get_port("WSS"), 443);
+    assert_eq!(Protocol::get_port("Wss"), 443);
+}
+
+#[test]
+fn test_get_port_for_unknown_protocol() {
+    assert_eq!(Protocol::get_port("unknown"), 80);
+    assert_eq!(Protocol::get_port(""), 80);
+    assert_eq!(Protocol::get_port("custom"), 80);
+}
+
+#[test]
+fn test_protocol_struct_creation() {
+    let protocol: Protocol = Protocol::new();
+    let _protocol_copy: Protocol = protocol;
 }
 
 #[test]
 fn test_protocol_default() {
-    assert_eq!(Protocol::default(), Protocol::Unknown(String::new()));
-}
-
-#[test]
-fn test_protocol_is_http() {
-    assert!(Protocol::Http.is_http());
-    assert!(!Protocol::Https.is_http());
-    assert!(!Protocol::Unknown("http".to_string()).is_http());
-    assert!(!Protocol::Unknown("HTTP".to_string()).is_http());
-    assert!(!Protocol::Unknown("ftp".to_string()).is_http());
-}
-
-#[test]
-fn test_protocol_is_https() {
-    assert!(!Protocol::Http.is_https());
-    assert!(Protocol::Https.is_https());
-    assert!(!Protocol::Unknown("https".to_string()).is_https());
-    assert!(!Protocol::Unknown("HTTPS".to_string()).is_https());
-    assert!(!Protocol::Unknown("ftp".to_string()).is_https());
-}
-
-#[test]
-fn test_protocol_get_port() {
-    assert_eq!(Protocol::Http.get_port(), 80);
-    assert_eq!(Protocol::Https.get_port(), 443);
-    assert_eq!(Protocol::Unknown("ftp".to_string()).get_port(), 80);
-    assert_eq!(Protocol::Unknown("custom".to_string()).get_port(), 80);
-}
-
-#[test]
-fn test_protocol_clone() {
-    let protocol: Protocol = Protocol::Http;
-    let cloned_protocol: Protocol = protocol.clone();
-    assert_eq!(protocol, cloned_protocol);
-    let unknown_protocol: Protocol = Protocol::Unknown("custom".to_string());
-    let cloned_unknown: Protocol = unknown_protocol.clone();
-    assert_eq!(unknown_protocol, cloned_unknown);
-}
-
-#[test]
-fn test_protocol_debug() {
-    let protocol: Protocol = Protocol::Http;
-    let debug_str: String = format!("{protocol:?}");
-    assert_eq!(debug_str, "Http");
-    let unknown_protocol: Protocol = Protocol::Unknown("custom".to_string());
-    let unknown_debug_str: String = format!("{unknown_protocol:?}");
-    assert_eq!(unknown_debug_str, "Unknown(\"custom\")");
-}
-
-#[test]
-fn test_protocol_equality() {
-    assert_eq!(Protocol::Http, Protocol::Http);
-    assert_ne!(Protocol::Http, Protocol::Https);
-    assert_eq!(
-        Protocol::Unknown("custom".to_string()),
-        Protocol::Unknown("custom".to_string())
-    );
-    assert_ne!(
-        Protocol::Unknown("custom1".to_string()),
-        Protocol::Unknown("custom2".to_string())
-    );
-    assert_ne!(Protocol::Http, Protocol::Unknown("http".to_string()));
-}
-
-#[test]
-fn test_protocol_case_sensitivity() {
-    assert_eq!(HTTP_LOWERCASE.parse::<Protocol>().unwrap(), Protocol::Http);
-    assert_eq!("HTTP".parse::<Protocol>().unwrap(), Protocol::Http);
-    assert_eq!(
-        HTTPS_LOWERCASE.parse::<Protocol>().unwrap(),
-        Protocol::Https
-    );
-    assert_eq!("HTTPS".parse::<Protocol>().unwrap(), Protocol::Https);
-}
-
-#[test]
-fn test_protocol_all_variants() {
-    let protocols: Vec<Protocol> = vec![
-        Protocol::Http,
-        Protocol::Https,
-        Protocol::Unknown("ftp".to_string()),
-        Protocol::Unknown("custom".to_string()),
-    ];
-    for protocol in protocols {
-        let display_str: String = protocol.to_string();
-        assert!(
-            !display_str.is_empty() || matches!(protocol, Protocol::Unknown(ref s) if s.is_empty())
-        );
-        let debug_str: String = format!("{protocol:?}");
-        assert!(!debug_str.is_empty());
-        let port: u16 = protocol.get_port();
-        assert!(port == 80 || port == 443);
-    }
-}
-
-#[test]
-fn test_protocol_unknown_with_empty_string() {
-    let protocol: Protocol = Protocol::Unknown("".to_string());
-    assert_eq!(protocol.to_string(), "");
-    assert!(!protocol.is_http());
-    assert!(!protocol.is_https());
-    assert_eq!(protocol.get_port(), 80);
-    assert_eq!(format!("{protocol:?}"), "Unknown(\"\")");
-}
-
-#[test]
-fn test_protocol_unknown_with_special_characters() {
-    let protocol: Protocol = Protocol::Unknown("custom-protocol".to_string());
-    assert_eq!(protocol.to_string(), "custom-protocol");
-    assert!(!protocol.is_http());
-    assert!(!protocol.is_https());
-    assert_eq!(protocol.get_port(), 80);
-    assert_eq!(format!("{protocol:?}"), "Unknown(\"custom-protocol\")");
-}
-
-#[test]
-fn test_protocol_pattern_matching() {
-    let protocol: Protocol = Protocol::Http;
-    match protocol {
-        Protocol::Http => {}
-        Protocol::Https => panic!("Should not match HTTPS"),
-        Protocol::Unknown(_) => panic!("Should not match Unknown"),
-    }
-}
-
-#[test]
-fn test_protocol_unknown_pattern_matching() {
-    let protocol: Protocol = Protocol::Unknown("custom".to_string());
-    match protocol {
-        Protocol::Http => panic!("Should not match HTTP"),
-        Protocol::Https => panic!("Should not match HTTPS"),
-        Protocol::Unknown(ref custom_protocol) => {
-            assert_eq!(custom_protocol, "custom");
-        }
-    }
-}
-
-#[test]
-fn test_protocol_secure_check() {
-    assert!(!Protocol::Http.is_https());
-    assert!(Protocol::Https.is_https());
-    assert!(!Protocol::Unknown("http".to_string()).is_https());
-    assert!(!Protocol::Unknown("https".to_string()).is_https());
-}
-
-#[test]
-fn test_protocol_port_mapping() {
-    let http_port: u16 = Protocol::Http.get_port();
-    let https_port: u16 = Protocol::Https.get_port();
-    let unknown_port: u16 = Protocol::Unknown("custom".to_string()).get_port();
-    assert_eq!(http_port, 80);
-    assert_eq!(https_port, 443);
-    assert_eq!(unknown_port, 80);
-    assert_ne!(http_port, https_port);
-}
-
-#[test]
-fn test_protocol_ordering() {
-    let mut protocols: Vec<Protocol> = vec![
-        Protocol::Unknown("z".to_string()),
-        Protocol::Https,
-        Protocol::Http,
-        Protocol::Unknown("a".to_string()),
-    ];
-    protocols.sort_by(|a, b| {
-        let order_a: u8 = match a {
-            Protocol::Http => 0,
-            Protocol::Https => 1,
-            Protocol::Unknown(_) => 2,
-        };
-        let order_b: u8 = match b {
-            Protocol::Http => 0,
-            Protocol::Https => 1,
-            Protocol::Unknown(_) => 2,
-        };
-        order_a
-            .cmp(&order_b)
-            .then_with(|| a.to_string().cmp(&b.to_string()))
-    });
-    assert_eq!(protocols[0], Protocol::Http);
-    assert_eq!(protocols[1], Protocol::Https);
-    assert!(matches!(protocols[2], Protocol::Unknown(_)));
-    assert!(matches!(protocols[3], Protocol::Unknown(_)));
-}
-
-#[test]
-fn test_protocol_memory_size() {
-    use std::mem;
-    let size: usize = mem::size_of::<Protocol>();
-    assert!(size > 0);
-    let http_size: usize = mem::size_of_val(&Protocol::Http);
-    let unknown_size: usize = mem::size_of_val(&Protocol::Unknown("test".to_string()));
-    assert_eq!(http_size, unknown_size);
-}
-
-#[test]
-fn test_protocol_from_str_error_type() {
-    let result: Result<Protocol, &'static str> = "invalid".parse();
-    assert!(result.is_ok());
-    assert_eq!(result.unwrap(), Protocol::Unknown("invalid".to_string()));
-}
-
-#[test]
-fn test_protocol_common_protocols() {
-    let common_protocols: Vec<&str> = vec!["ftp", "ssh", "telnet", "smtp", "pop3", "imap"];
-    for proto_str in common_protocols {
-        let protocol: Protocol = proto_str.parse().unwrap();
-        assert_eq!(protocol, Protocol::Unknown(proto_str.to_string()));
-        assert_eq!(protocol.to_string(), proto_str);
-        assert_eq!(protocol.get_port(), 80);
-    }
+    let _protocol: Protocol = Protocol;
 }

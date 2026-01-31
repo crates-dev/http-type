@@ -19,7 +19,7 @@ impl Display for Method {
     ///
     /// # Arguments
     ///
-    /// - `f` - The formatter to write the string into.
+    /// - `&mut fmt::Formatter<'_>` - The formatter to write the string into.
     ///
     /// # Returns
     ///
@@ -55,7 +55,7 @@ impl FromStr for Method {
     ///
     /// # Arguments
     ///
-    /// - `methods_str` - The string slice to convert.
+    /// - `&str` - The string slice to convert.
     ///
     /// # Returns
     ///

@@ -1134,7 +1134,7 @@ impl FromStr for FileExtension {
     ///
     /// # Arguments
     ///
-    /// - `data` - The string slice to parse.
+    /// - `&str` - The string slice to parse.
     ///
     /// # Returns
     ///
@@ -2210,7 +2210,7 @@ impl Display for FileExtension {
     ///
     /// # Arguments
     ///
-    /// - `f` - The formatter to write into.
+    /// - `&mut fmt::Formatter<'_>` - The formatter to write into.
     ///
     /// # Returns
     ///

@@ -7,7 +7,7 @@ use crate::*;
 #[derive(Debug, Clone, Eq, PartialEq, Default)]
 pub struct HttpUrlComponents {
     /// The URL scheme, such as "http" or "https".
-    pub protocol: Protocol,
+    pub protocol: String,
     /// The host part of the URL.
     pub host: Option<String>,
     /// The port number in the URL, if specified.

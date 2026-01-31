@@ -6,7 +6,7 @@ impl fmt::Display for HttpVersion {
     ///
     /// # Arguments
     ///
-    /// - `f` - The formatter to write the string into.
+    /// - `&mut fmt::Formatter<'_>` - The formatter to write the string into.
     ///
     /// # Returns
     ///
@@ -37,7 +37,7 @@ impl FromStr for HttpVersion {
     ///
     /// # Arguments
     ///
-    /// - `version_str` - The string slice to convert.
+    /// - `&str` - The string slice to convert.
     ///
     /// # Returns
     ///

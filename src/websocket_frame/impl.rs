@@ -26,7 +26,7 @@ impl WebSocketOpcode {
     ///
     /// # Arguments
     ///
-    /// - `opcode`: The raw opcode value.
+    /// - `u8`: The raw opcode value.
     ///
     /// # Returns
     ///

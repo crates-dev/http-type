@@ -71,7 +71,7 @@ pub struct RequestConfig(#[get(pub(super))] pub(super) ArcRwLock<RequestConfigDa
 /// HTTP request representation.
 ///
 /// Contains all components of an HTTP request.
-#[derive(Debug, Clone, Eq, PartialEq, Getter, DisplayDebug)]
+#[derive(Debug, Clone, Eq, PartialEq, Getter, DisplayDebug, Serialize, Deserialize)]
 pub struct Request {
     /// HTTP request method.
     pub(super) method: RequestMethod,
@@ -90,9 +90,9 @@ pub struct Request {
 }
 
 /// HTTP request representation.
-#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq, Serialize, Deserialize)]
 pub(crate) struct Http;
 
 /// WebSocket request representation.
-#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq)]
+#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq, Serialize, Deserialize)]
 pub(crate) struct Ws;

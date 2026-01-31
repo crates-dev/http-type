@@ -1,86 +1,70 @@
+use crate::protocol::*;
 use crate::*;
 
-/// Provides a default value for `Protocol`.
+/// Implementation of protocol identification and port resolution methods.
 ///
-/// The default `Protocol` is `Protocol::Unknown` with an empty string.
-impl Default for Protocol {
-    #[inline(always)]
-    fn default() -> Self {
-        Self::Unknown(String::new())
-    }
-}
-
-/// Provides utility methods for the `Protocol` type.
+/// This implementation block provides utility functions for working with
+/// HTTP protocol strings, enabling identification of HTTP/HTTPS variants
+/// and retrieval of their standard port numbers.
 impl Protocol {
-    /// Checks if the current protocol is `HTTP`.
+    /// Checks if the given protocol string represents HTTP.
+    ///
+    /// Performs a case-insensitive comparison against the HTTP protocol identifier.
     ///
     /// # Arguments
-    ///
-    /// - `self` - A reference to the `Protocol` instance.
+    /// - `&str`: A string slice representing the protocol to check.
     ///
     /// # Returns
-    ///
-    /// `true` if the protocol is `HTTP`, otherwise returns `false`.
+    /// - `bool`: Returns `true` if the protocol is HTTP (case-insensitive), `false` otherwise.
     #[inline(always)]
-    pub fn is_http(&self) -> bool {
-        *self == Self::Http
+    pub fn is_http(protocol: &str) -> bool {
+        matches!(protocol.to_lowercase().as_str(), HTTP_LOWERCASE)
     }
 
-    /// Checks if the current protocol is `HTTPS`.
+    /// Checks if the given protocol string represents HTTPS.
+    ///
+    /// Performs a case-insensitive comparison against the HTTPS protocol identifier.
     ///
     /// # Arguments
-    ///
-    /// - `self` - A reference to the `Protocol` instance.
+    /// - `&str`: A string slice representing the protocol to check.
     ///
     /// # Returns
-    ///
-    /// `true` if the protocol is `HTTPS`, otherwise returns `false`.
+    /// - `bool`: Returns `true` if the protocol is HTTPS (case-insensitive), `false` otherwise.
     #[inline(always)]
-    pub fn is_https(&self) -> bool {
-        *self == Self::Https
+    pub fn is_https(protocol: &str) -> bool {
+        matches!(protocol.to_lowercase().as_str(), HTTPS_LOWERCASE)
     }
 
-    /// Returns the default port associated with the protocol.
+    /// Returns the default port number for the given protocol.
+    ///
+    /// Performs a case-insensitive comparison to determine the protocol type
+    /// and returns the corresponding standard port number.
     ///
     /// # Arguments
-    ///
-    /// - `self` - A reference to the `Protocol` instance.
+    /// - `&str`: A string slice representing the protocol to lookup.
     ///
     /// # Returns
-    ///
-    /// The default port number for the protocol. Returns `80` for `HTTP` and unknown protocols,
-    /// and `443` for `HTTPS`.
+    /// - `u16`: The default port number for the protocol.
     #[inline(always)]
-    pub fn get_port(&self) -> u16 {
-        match self {
-            Self::Http => 80,
-            Self::Https => 443,
-            Self::Unknown(_) => 80,
-        }
-    }
-}
-
-impl Display for Protocol {
-    #[inline(always)]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let res: &str = match self {
-            Self::Http => HTTP_LOWERCASE,
-            Self::Https => HTTPS_LOWERCASE,
-            Self::Unknown(protocol) => protocol,
-        };
-        write!(f, "{res}")
-    }
-}
-
-impl FromStr for Protocol {
-    type Err = &'static str;
-
-    #[inline(always)]
-    fn from_str(data: &str) -> Result<Self, Self::Err> {
-        match data.to_ascii_lowercase().as_str() {
-            HTTP_LOWERCASE => Ok(Self::Http),
-            HTTPS_LOWERCASE => Ok(Self::Https),
-            _ => Ok(Self::Unknown(data.to_string())),
+    pub fn get_port(protocol: &str) -> u16 {
+        match protocol.to_lowercase().as_str() {
+            HTTP_LOWERCASE => 80,
+            HTTPS_LOWERCASE => 443,
+            FTP_LOWERCASE => 21,
+            FTPS_LOWERCASE => 990,
+            SFTP_LOWERCASE => 22,
+            SSH_LOWERCASE => 22,
+            TELNET_LOWERCASE => 23,
+            SMTP_LOWERCASE => 25,
+            SMTPS_LOWERCASE => 465,
+            POP3_LOWERCASE => 110,
+            POP3S_LOWERCASE => 995,
+            IMAP_LOWERCASE => 143,
+            IMAPS_LOWERCASE => 993,
+            DNS_LOWERCASE => 53,
+            WS_LOWERCASE => 80,
+            WSS_LOWERCASE => 443,
+            _ => 80,
         }
     }
 }

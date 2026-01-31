@@ -22,7 +22,7 @@ impl Display for UpgradeType {
     ///
     /// # Arguments
     ///
-    /// - `f`: A mutable reference to a `fmt::Formatter` used for writing the formatted string.
+    /// - `&mut fmt::Formatter<'_>`: A mutable reference to a `fmt::Formatter` used for writing the formatted string.
     ///
     /// # Returns
     ///
@@ -30,7 +30,7 @@ impl Display for UpgradeType {
     #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::WebSocket => write!(f, "{WEBSOCKET}"),
+            Self::WebSocket => write!(f, "{WEBSOCKET_LOWERCASE}"),
             Self::H2c => write!(f, "{H2C_LOWERCASE}"),
             Self::Tls(version) => write!(f, "{version}"),
             Self::Unknown(tmp_str) => write!(f, "{tmp_str}"),
@@ -51,7 +51,7 @@ impl FromStr for UpgradeType {
     ///
     /// # Arguments
     ///
-    /// - `from_str`: The string slice to parse.
+    /// - `&str`: The string slice to parse.
     ///
     /// # Returns
     ///
@@ -60,7 +60,7 @@ impl FromStr for UpgradeType {
     #[inline(always)]
     fn from_str(from_str: &str) -> Result<Self, Self::Err> {
         match from_str.to_ascii_lowercase().as_str() {
-            WEBSOCKET => Ok(Self::WebSocket),
+            WEBSOCKET_LOWERCASE => Ok(Self::WebSocket),
             H2C_LOWERCASE => Ok(Self::H2c),
             val if val.starts_with(TLS_LOWERCASE) => Ok(Self::Tls(val.to_string())),
             other => Ok(Self::Unknown(other.to_string())),
@@ -73,7 +73,7 @@ impl UpgradeType {
     ///
     /// # Returns
     ///
-    /// `true` if `self` is `Self::WebSocket`, otherwise `false`.
+    /// `bool` - `true` if `self` is `Self::WebSocket`, otherwise `false`.
     #[inline(always)]
     pub fn is_ws(&self) -> bool {
         matches!(self, &Self::WebSocket)
@@ -83,7 +83,7 @@ impl UpgradeType {
     ///
     /// # Returns
     ///
-    /// `true` if `self` is `Self::H2c`, otherwise `false`.
+    /// `bool` - `true` if `self` is `Self::H2c`, otherwise `false`.
     #[inline(always)]
     pub fn is_h2c(&self) -> bool {
         matches!(self, &Self::H2c)
@@ -93,7 +93,7 @@ impl UpgradeType {
     ///
     /// # Returns
     ///
-    /// `true` if `self` matches `Self::Tls(_)`, otherwise `false`.
+    /// `bool` - `true` if `self` matches `Self::Tls(_)`, otherwise `false`.
     #[inline(always)]
     pub fn is_tls(&self) -> bool {
         matches!(self, Self::Tls(_))
@@ -103,7 +103,7 @@ impl UpgradeType {
     ///
     /// # Returns
     ///
-    /// `true` if `self` is none of the known upgrade types, otherwise `false`.
+    /// `bool` - `true` if `self` is none of the known upgrade types, otherwise `false`.
     #[inline(always)]
     pub fn is_unknown(&self) -> bool {
         !self.is_ws() && !self.is_h2c() && !self.is_tls()

@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `K` - The type of the elements in the hash set.
+/// - `K: Eq + Hash` - The type of the elements in the hash set.
 ///
 /// # Returns
 ///

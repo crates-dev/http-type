@@ -520,7 +520,7 @@ impl Response {
     ///
     /// # Arguments
     ///
-    /// - `response_string`: A mutable reference to the string where the first line will be added.
+    /// - `&mut String`: A mutable reference to the string where the first line will be added.
     #[inline(always)]
     fn push_http_first_line(&self, response_string: &mut String) {
         response_string.push_str(&self.get_version().to_string());

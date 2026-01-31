@@ -9,7 +9,7 @@ impl Display for HttpUrlError {
     ///
     /// # Arguments
     ///
-    /// - `f` - The formatter to write the string into.
+    /// - `&mut fmt::Formatter<'_>` - The formatter to write the string into.
     ///
     /// # Returns
     ///
@@ -60,12 +60,9 @@ impl HttpUrlComponents {
         U: AsRef<str>,
     {
         let parsed_url: Url = Url::parse(url.as_ref())?;
+        let protocol: String = parsed_url.scheme().to_string();
         let res: Self = Self {
-            protocol: parsed_url
-                .scheme()
-                .to_string()
-                .parse::<Protocol>()
-                .unwrap_or_default(),
+            protocol,
             host: parsed_url.host_str().map(|h| h.to_string()),
             port: parsed_url.port(),
             path: Some(parsed_url.path().to_string()),

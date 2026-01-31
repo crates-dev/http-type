@@ -1,0 +1,9 @@
+use crate::*;
+
+/// A marker type representing HTTP protocol variants.
+///
+/// This struct serves as a namespace for protocol-related utility functions,
+/// providing methods to identify HTTP and HTTPS protocols and retrieve
+/// their default port numbers.
+#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq, Serialize, Deserialize)]
+pub struct Protocol;
