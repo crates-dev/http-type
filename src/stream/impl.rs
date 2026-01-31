@@ -86,12 +86,7 @@ impl ArcRwLockStream {
     where
         D: AsRef<[u8]>,
     {
-        self.write()
-            .await
-            .write_all(data.as_ref())
-            .await
-            .map_err(|error| ResponseError::Send(error.to_string()))?;
-        Ok(())
+        Ok(self.write().await.write_all(data.as_ref()).await?)
     }
 
     /// Sends HTTP response data over the stream.
@@ -123,12 +118,7 @@ impl ArcRwLockStream {
     where
         D: AsRef<[u8]>,
     {
-        self.write()
-            .await
-            .write_all(data.as_ref())
-            .await
-            .map_err(|error| ResponseError::Send(error.to_string()))?;
-        Ok(())
+        Ok(self.write().await.write_all(data.as_ref()).await?)
     }
 
     /// Sends HTTP response body.
@@ -163,10 +153,7 @@ impl ArcRwLockStream {
     {
         let mut stream: RwLockWriteGuard<'_, TcpStream> = self.write().await;
         for data in data_iter {
-            stream
-                .write_all(data.as_ref())
-                .await
-                .map_err(|error| ResponseError::Send(error.to_string()))?;
+            stream.write_all(data.as_ref()).await?;
         }
         Ok(())
     }
@@ -194,11 +181,7 @@ impl ArcRwLockStream {
     ///
     /// - `Result<(), ResponseError>` - Result indicating success or failure.
     pub async fn try_flush(&self) -> Result<(), ResponseError> {
-        self.write()
-            .await
-            .flush()
-            .await
-            .map_err(|error| ResponseError::FlushError(error.to_string()))
+        Ok(self.write().await.flush().await?)
     }
 
     /// Flushes all buffered data to the stream.

@@ -23,6 +23,25 @@ impl Display for HttpUrlError {
     }
 }
 
+/// Converts a URL parse error to a `HttpUrlError`.
+///
+/// Maps URL parse errors to `InvalidUrl`.
+impl From<ParseError> for HttpUrlError {
+    /// Converts a URL parse error to a `HttpUrlError`.
+    ///
+    /// # Arguments
+    ///
+    /// - `ParseError`: The URL parse error to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `HttpUrlError`: The corresponding error as `InvalidUrl`.
+    #[inline(always)]
+    fn from(_: ParseError) -> Self {
+        HttpUrlError::InvalidUrl
+    }
+}
+
 impl HttpUrlComponents {
     /// Parses a URL string into its components.
     ///
@@ -36,11 +55,11 @@ impl HttpUrlComponents {
     ///
     /// - `Result<HttpUrlComponents, HttpUrlError>` - Either the parsed components or an error.
     #[inline]
-    pub fn parse<U>(url_str: U) -> Result<Self, HttpUrlError>
+    pub fn parse<U>(url: U) -> Result<Self, HttpUrlError>
     where
         U: AsRef<str>,
     {
-        let parsed_url: Url = Url::parse(url_str.as_ref()).map_err(|_| HttpUrlError::InvalidUrl)?;
+        let parsed_url: Url = Url::parse(url.as_ref())?;
         let res: Self = Self {
             protocol: parsed_url
                 .scheme()

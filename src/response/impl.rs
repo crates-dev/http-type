@@ -4,6 +4,25 @@ use crate::*;
 /// This allows `ResponseError` to be treated as a standard Rust error type.
 impl std::error::Error for ResponseError {}
 
+/// Converts an I/O error to a `ResponseError`.
+///
+/// Maps I/O errors to `Send` variant with the error message.
+impl From<std::io::Error> for ResponseError {
+    /// Converts an I/O error to a `ResponseError`.
+    ///
+    /// # Arguments
+    ///
+    /// - `std::io::Error`: The I/O error to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseError`: The corresponding response error as `Send`.
+    #[inline(always)]
+    fn from(error: std::io::Error) -> Self {
+        ResponseError::Send(error.to_string())
+    }
+}
+
 /// Implements the `Display` trait for `ResponseError`.
 /// This allows `ResponseError` variants to be formatted into human-readable strings.
 impl Display for ResponseError {

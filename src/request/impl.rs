@@ -17,7 +17,7 @@ impl Default for RequestError {
 /// Converts an I/O error to a `RequestError`.
 ///
 /// Maps connection reset and aborted errors to `ClientDisconnected`,
-/// all other I/O errors are mapped to `Unknown`.
+/// all other I/O errors are mapped to `ReadConnection`.
 impl From<std::io::Error> for RequestError {
     /// Converts an I/O error to a `RequestError`.
     ///
@@ -34,7 +34,7 @@ impl From<std::io::Error> for RequestError {
         if kind == ErrorKind::ConnectionReset || kind == ErrorKind::ConnectionAborted {
             return RequestError::ClientDisconnected(HttpStatus::BadRequest);
         }
-        RequestError::Unknown(HttpStatus::InternalServerError)
+        RequestError::ReadConnection(HttpStatus::BadRequest)
     }
 }
 
@@ -52,8 +52,46 @@ impl From<Elapsed> for RequestError {
     ///
     /// - `RequestError`: The corresponding request error as `ReadTimeout`.
     #[inline(always)]
-    fn from(_error: Elapsed) -> Self {
+    fn from(_: Elapsed) -> Self {
         RequestError::ReadTimeout(HttpStatus::RequestTimeout)
+    }
+}
+
+/// Converts a parse int error to a `RequestError`.
+///
+/// Maps parse int errors to `InvalidContentLength` with `HttpStatus::BadRequest`.
+impl From<ParseIntError> for RequestError {
+    /// Converts a parse int error to a `RequestError`.
+    ///
+    /// # Arguments
+    ///
+    /// - `ParseIntError`: The parse error to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestError`: The corresponding request error as `InvalidContentLength`.
+    #[inline(always)]
+    fn from(_: ParseIntError) -> Self {
+        RequestError::InvalidContentLength(HttpStatus::BadRequest)
+    }
+}
+
+/// Converts a response error to a `RequestError`.
+///
+/// Maps response errors to `WriteTimeout` with `HttpStatus::InternalServerError`.
+impl From<ResponseError> for RequestError {
+    /// Converts a response error to a `RequestError`.
+    ///
+    /// # Arguments
+    ///
+    /// - `ResponseError`: The response error to convert.
+    ///
+    /// # Returns
+    ///
+    /// - `RequestError`: The corresponding request error as `WriteTimeout`.
+    #[inline(always)]
+    fn from(_: ResponseError) -> Self {
+        RequestError::WriteTimeout(HttpStatus::InternalServerError)
     }
 }
 
@@ -847,9 +885,7 @@ impl Http {
     /// - `Result<usize, RequestError>`: The parsed content length or an error.
     #[inline(always)]
     fn check_body_size(value: &str, max_size: usize) -> Result<usize, RequestError> {
-        let length: usize = value
-            .parse::<usize>()
-            .map_err(|_| RequestError::InvalidContentLength(HttpStatus::BadRequest))?;
+        let length: usize = value.parse::<usize>()?;
         if length > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_BODY_SIZE {
             return Err(RequestError::ContentLengthTooLarge(
                 HttpStatus::PayloadTooLarge,
@@ -944,9 +980,7 @@ impl Http {
         let mut body: RequestBody = Vec::with_capacity(content_size);
         if content_size > 0 {
             body.resize(content_size, 0);
-            AsyncReadExt::read_exact(reader, &mut body)
-                .await
-                .map_err(|_| RequestError::ReadConnection(HttpStatus::BadRequest))?;
+            AsyncReadExt::read_exact(reader, &mut body).await?;
         }
         Ok(body)
     }
@@ -1050,10 +1084,7 @@ impl Ws {
                         return Err(error.into());
                     }
                     *is_client_response = false;
-                    stream
-                        .try_send_body(&PING_FRAME)
-                        .await
-                        .map_err(|_| RequestError::WriteTimeout(HttpStatus::InternalServerError))?;
+                    stream.try_send_body(&PING_FRAME).await?;
                     Ok(None)
                 }
             };

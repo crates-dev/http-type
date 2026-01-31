@@ -43,6 +43,7 @@ use std::{
     hash::Hash,
     io::ErrorKind,
     net::IpAddr,
+    num::ParseIntError,
     rc::Rc,
     result::Result,
     str::FromStr,
@@ -60,5 +61,5 @@ use {
         sync::{Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard},
         time::{error::Elapsed, timeout},
     },
-    url::Url,
+    url::{ParseError, Url},
 };
