@@ -585,30 +585,23 @@ impl Response {
         response_bytes
     }
 
-    /// Converts the response to a formatted string representation.
-    ///
-    /// This method provides a human-readable summary of the response, including its version,
-    /// status code, reason phrase, headers, and body information.
+    /// Serializes the response to a JSON byte vector.
     ///
     /// # Returns
     ///
-    /// A `String` containing formatted response details.
+    /// - `Vec<u8>`: The JSON representation of the response as a byte vector.
     #[inline(always)]
-    pub fn get_string(&self) -> String {
-        let body: &Vec<u8> = self.get_body();
-        let body_type: &'static str = if std::str::from_utf8(body).is_ok() {
-            PLAIN
-        } else {
-            BINARY
-        };
-        format!(
-            "[Response] => [version]: {}; [status code]: {}; [reason]: {}; [headers]: {:?}; [body]: {} bytes {};",
-            self.get_version(),
-            self.get_status_code(),
-            self.get_reason_phrase(),
-            self.get_headers(),
-            body.len(),
-            body_type
-        )
+    pub fn get_json_vec(&self) -> Vec<u8> {
+        serde_json::to_vec(self).unwrap_or_default()
+    }
+
+    /// Serializes the response to a JSON string.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The JSON representation of the response as a string.
+    #[inline(always)]
+    pub fn get_json_string(&self) -> String {
+        serde_json::to_string(self).unwrap_or_default()
     }
 }

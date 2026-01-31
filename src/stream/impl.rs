@@ -6,8 +6,7 @@ impl PartialEq for ArcRwLockStream {
     ///
     /// # Arguments
     ///
-    /// - `&self` - The first `ArcRwLockStream` instance.
-    /// - `other` - The second `ArcRwLockStream` instance to compare.
+    /// - `&Self` - The second `ArcRwLockStream` instance to compare.
     ///
     /// # Returns
     ///

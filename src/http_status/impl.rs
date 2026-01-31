@@ -10,10 +10,6 @@ impl HttpStatus {
     ///
     /// Returns the corresponding HTTP status code number for the enum variant.
     ///
-    /// # Arguments
-    ///
-    /// - `&self` - The HttpStatus instance.
-    ///
     /// # Returns
     ///
     /// - `u16` - The numeric status code.
@@ -170,7 +166,6 @@ impl HttpStatus {
     ///
     /// # Arguments
     ///
-    /// - `&self` - The HttpStatus instance.
     /// - `AsRef<str>` - The string to compare against.
     ///
     /// # Returns

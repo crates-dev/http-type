@@ -100,10 +100,6 @@ impl RequestError {
     ///
     /// Returns the HttpStatus enum variant that corresponds to this error.
     ///
-    /// # Arguments
-    ///
-    /// - `&self` - The RequestError instance.
-    ///
     /// # Returns
     ///
     /// - `HttpStatus` - The HTTP status associated with this error.
@@ -165,10 +161,6 @@ impl RequestError {
     /// Gets the numeric HTTP status code associated with this error.
     ///
     /// Returns the numeric status code (e.g., 400, 404, 500) that corresponds to this error.
-    ///
-    /// # Arguments
-    ///
-    /// - `&self` - The RequestError instance.
     ///
     /// # Returns
     ///
@@ -282,7 +274,6 @@ impl PartialEq for RequestConfig {
     ///
     /// # Arguments
     ///
-    /// - `&self` - The first `RequestConfig` instance.
     /// - `other` - The second `RequestConfig` instance to compare.
     ///
     /// # Returns
@@ -1501,6 +1492,24 @@ impl Request {
         }
     }
 
+    /// Retrieves the upgrade type from the request headers.
+    ///
+    /// This method looks for the `UPGRADE` header and attempts to parse its value
+    /// as_ref an `UpgradeType`. If the header is missing or the value is invalid,
+    /// it returns the default `UpgradeType`.
+    ///
+    /// # Returns
+    ///
+    /// - `UpgradeType` - The parsed upgrade type.
+    #[inline(always)]
+    pub fn get_upgrade_type(&self) -> UpgradeType {
+        let upgrade_type: UpgradeType = self
+            .try_get_header_back(UPGRADE)
+            .and_then(|data| data.parse::<UpgradeType>().ok())
+            .unwrap_or_default();
+        upgrade_type
+    }
+
     /// Retrieves the body content of the request as a UTF-8 encoded string.
     ///
     /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` as_ref a string.
@@ -1554,175 +1563,6 @@ impl Request {
         T: DeserializeOwned,
     {
         self.try_get_body_json().unwrap()
-    }
-
-    /// Converts the request to a formatted string representation.
-    ///
-    /// This method provides a human-readable summary of the request, including its method,
-    /// host, version, path, query parameters, headers, and body information.
-    ///
-    /// # Returns
-    ///
-    /// - `String` - The formatted request details.
-    #[inline(always)]
-    pub fn get_string(&self) -> String {
-        let body: &Vec<u8> = self.get_body();
-        let body_type: &'static str = if std::str::from_utf8(body).is_ok() {
-            PLAIN
-        } else {
-            BINARY
-        };
-        format!(
-            "[Request] => [method]: {}; [host]: {}; [version]: {}; [path]: {}; [querys]: {:?}; [headers]: {:?}; [body]: {} bytes {};",
-            self.get_method(),
-            self.get_host(),
-            self.get_version(),
-            self.get_path(),
-            self.get_querys(),
-            self.get_headers(),
-            body.len(),
-            body_type
-        )
-    }
-
-    /// Retrieves the upgrade type from the request headers.
-    ///
-    /// This method looks for the `UPGRADE` header and attempts to parse its value
-    /// as_ref an `UpgradeType`. If the header is missing or the value is invalid,
-    /// it returns the default `UpgradeType`.
-    ///
-    /// # Returns
-    ///
-    /// - `UpgradeType` - The parsed upgrade type.
-    #[inline(always)]
-    pub fn get_upgrade_type(&self) -> UpgradeType {
-        let upgrade_type: UpgradeType = self
-            .try_get_header_back(UPGRADE)
-            .and_then(|data| data.parse::<UpgradeType>().ok())
-            .unwrap_or_default();
-        upgrade_type
-    }
-
-    /// Checks whether the WebSocket upgrade is enabled for this request.
-    ///
-    /// This method determines if the `UPGRADE` header indicates a WebSocket connection.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether WebSocket upgrade is enabled.
-    #[inline(always)]
-    pub fn is_ws_upgrade_type(&self) -> bool {
-        self.get_upgrade_type().is_ws()
-    }
-
-    /// Checks if the current upgrade type is HTTP/2 cleartext (h2c).
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the upgrade type is h2c.
-    #[inline(always)]
-    pub fn is_h2c_upgrade_type(&self) -> bool {
-        self.get_upgrade_type().is_h2c()
-    }
-
-    /// Checks if the current upgrade type is TLS (any version).
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the upgrade type is TLS.
-    #[inline(always)]
-    pub fn is_tls_upgrade_type(&self) -> bool {
-        self.get_upgrade_type().is_tls()
-    }
-
-    /// Checks whether the upgrade type is unknown.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the upgrade type is unknown.
-    #[inline(always)]
-    pub fn is_unknown_upgrade_type(&self) -> bool {
-        self.get_upgrade_type().is_unknown()
-    }
-
-    /// Checks whether the HTTP version is HTTP/0.9.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP/0.9.
-    #[inline(always)]
-    pub fn is_http0_9_version(&self) -> bool {
-        self.get_version().is_http0_9()
-    }
-
-    /// Checks whether the HTTP version is HTTP/1.0.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP/1.0.
-    #[inline(always)]
-    pub fn is_http1_0_version(&self) -> bool {
-        self.get_version().is_http1_0()
-    }
-
-    /// Checks whether the HTTP version is HTTP/1.1.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP/1.1.
-    #[inline(always)]
-    pub fn is_http1_1_version(&self) -> bool {
-        self.get_version().is_http1_1()
-    }
-
-    /// Checks if the HTTP version is HTTP/1.1 or higher.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP/1.1 or higher.
-    #[inline(always)]
-    pub fn is_http1_1_or_higher_version(&self) -> bool {
-        self.get_version().is_http1_1_or_higher()
-    }
-
-    /// Checks whether the HTTP version is HTTP/2.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP/2.
-    #[inline(always)]
-    pub fn is_http2_version(&self) -> bool {
-        self.get_version().is_http2()
-    }
-
-    /// Checks whether the HTTP version is HTTP/3.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP/3.
-    #[inline(always)]
-    pub fn is_http3_version(&self) -> bool {
-        self.get_version().is_http3()
-    }
-
-    /// Checks whether the HTTP version is unknown.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is unknown.
-    #[inline(always)]
-    pub fn is_unknown_version(&self) -> bool {
-        self.get_version().is_unknown()
-    }
-
-    /// Checks whether the version belongs to the HTTP family.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - Whether the version is HTTP.
-    #[inline(always)]
-    pub fn is_http_version(&self) -> bool {
-        self.get_version().is_http()
     }
 
     /// Checks whether the request method is GET.
@@ -1825,6 +1665,128 @@ impl Request {
         self.get_method().is_unknown()
     }
 
+    /// Checks whether the HTTP version is HTTP/0.9.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is HTTP/0.9.
+    #[inline(always)]
+    pub fn is_http0_9_version(&self) -> bool {
+        self.get_version().is_http0_9()
+    }
+
+    /// Checks whether the HTTP version is HTTP/1.0.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is HTTP/1.0.
+    #[inline(always)]
+    pub fn is_http1_0_version(&self) -> bool {
+        self.get_version().is_http1_0()
+    }
+
+    /// Checks whether the HTTP version is HTTP/1.1.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is HTTP/1.1.
+    #[inline(always)]
+    pub fn is_http1_1_version(&self) -> bool {
+        self.get_version().is_http1_1()
+    }
+
+    /// Checks if the HTTP version is HTTP/1.1 or higher.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is HTTP/1.1 or higher.
+    #[inline(always)]
+    pub fn is_http1_1_or_higher_version(&self) -> bool {
+        self.get_version().is_http1_1_or_higher()
+    }
+
+    /// Checks whether the HTTP version is HTTP/2.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is HTTP/2.
+    #[inline(always)]
+    pub fn is_http2_version(&self) -> bool {
+        self.get_version().is_http2()
+    }
+
+    /// Checks whether the HTTP version is HTTP/3.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is HTTP/3.
+    #[inline(always)]
+    pub fn is_http3_version(&self) -> bool {
+        self.get_version().is_http3()
+    }
+
+    /// Checks whether the HTTP version is unknown.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is unknown.
+    #[inline(always)]
+    pub fn is_unknown_version(&self) -> bool {
+        self.get_version().is_unknown()
+    }
+
+    /// Checks whether the version belongs to the HTTP family.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the version is HTTP.
+    #[inline(always)]
+    pub fn is_http_version(&self) -> bool {
+        self.get_version().is_http()
+    }
+
+    /// Checks whether the WebSocket upgrade is enabled for this request.
+    ///
+    /// This method determines if the `UPGRADE` header indicates a WebSocket connection.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether WebSocket upgrade is enabled.
+    #[inline(always)]
+    pub fn is_ws_upgrade_type(&self) -> bool {
+        self.get_upgrade_type().is_ws()
+    }
+
+    /// Checks if the current upgrade type is HTTP/2 cleartext (h2c).
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the upgrade type is h2c.
+    #[inline(always)]
+    pub fn is_h2c_upgrade_type(&self) -> bool {
+        self.get_upgrade_type().is_h2c()
+    }
+
+    /// Checks if the current upgrade type is TLS (any version).
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the upgrade type is TLS.
+    #[inline(always)]
+    pub fn is_tls_upgrade_type(&self) -> bool {
+        self.get_upgrade_type().is_tls()
+    }
+
+    /// Checks whether the upgrade type is unknown.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - Whether the upgrade type is unknown.
+    #[inline(always)]
+    pub fn is_unknown_upgrade_type(&self) -> bool {
+        self.get_upgrade_type().is_unknown()
+    }
+
     /// Determines if a keep-alive connection should be enabled for this request.
     ///
     /// This function checks the `Connection` header and the HTTP version to determine
@@ -1860,5 +1822,25 @@ impl Request {
     #[inline(always)]
     pub fn is_disable_keep_alive(&self) -> bool {
         !self.is_enable_keep_alive()
+    }
+
+    /// Serializes the request to a JSON byte vector.
+    ///
+    /// # Returns
+    ///
+    /// - `Vec<u8>`: The JSON representation of the request as a byte vector.
+    #[inline(always)]
+    pub fn get_json_vec(&self) -> Vec<u8> {
+        serde_json::to_vec(self).unwrap_or_default()
+    }
+
+    /// Serializes the request to a JSON string.
+    ///
+    /// # Returns
+    ///
+    /// - `String`: The JSON representation of the request as a string.
+    #[inline(always)]
+    pub fn get_json_string(&self) -> String {
+        serde_json::to_string(self).unwrap_or_default()
     }
 }
