@@ -30,7 +30,7 @@ impl Display for UpgradeType {
     #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::WebSocket => write!(f, "{WEBSOCKET_LOWERCASE}"),
+            Self::WebSocket => write!(f, "{WEBSOCKET}"),
             Self::H2c => write!(f, "{H2C_LOWERCASE}"),
             Self::Tls(version) => write!(f, "{version}"),
             Self::Unknown(tmp_str) => write!(f, "{tmp_str}"),
@@ -60,7 +60,7 @@ impl FromStr for UpgradeType {
     #[inline(always)]
     fn from_str(from_str: &str) -> Result<Self, Self::Err> {
         match from_str.to_ascii_lowercase().as_str() {
-            WEBSOCKET_LOWERCASE => Ok(Self::WebSocket),
+            WEBSOCKET => Ok(Self::WebSocket),
             H2C_LOWERCASE => Ok(Self::H2c),
             val if val.starts_with(TLS_LOWERCASE) => Ok(Self::Tls(val.to_string())),
             other => Ok(Self::Unknown(other.to_string())),
