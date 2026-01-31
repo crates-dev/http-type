@@ -90,7 +90,7 @@ impl ArcRwLockStream {
             .await
             .write_all(data.as_ref())
             .await
-            .map_err(|error| ResponseError::Response(error.to_string()))?;
+            .map_err(|error| ResponseError::Send(error.to_string()))?;
         Ok(())
     }
 
@@ -127,7 +127,7 @@ impl ArcRwLockStream {
             .await
             .write_all(data.as_ref())
             .await
-            .map_err(|error| ResponseError::Response(error.to_string()))?;
+            .map_err(|error| ResponseError::Send(error.to_string()))?;
         Ok(())
     }
 
@@ -166,7 +166,7 @@ impl ArcRwLockStream {
             stream
                 .write_all(data.as_ref())
                 .await
-                .map_err(|error| ResponseError::Response(error.to_string()))?;
+                .map_err(|error| ResponseError::Send(error.to_string()))?;
         }
         Ok(())
     }

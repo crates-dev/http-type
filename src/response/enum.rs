@@ -12,8 +12,8 @@ pub enum ResponseError {
     ConnectionClosed,
     /// Represents a terminated operation or connection.
     Terminated,
-    /// Represents an error with a message string.
-    Response(String),
+    /// Represents a send error with a message string.
+    Send(String),
     /// Represents a flush operation error with a message string.
     FlushError(String),
 }
