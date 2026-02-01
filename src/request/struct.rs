@@ -71,7 +71,9 @@ pub struct RequestConfig(#[get(pub(super))] pub(super) ArcRwLock<RequestConfigDa
 /// HTTP request representation.
 ///
 /// Contains all components of an HTTP request.
-#[derive(Clone, Debug, Deserialize, DisplayDebug, Eq, Getter, PartialEq, Serialize)]
+#[derive(
+    Clone, Debug, Deserialize, DisplayDebug, Eq, Getter, GetterMut, PartialEq, Serialize, Setter,
+)]
 pub struct Request {
     /// HTTP request method.
     pub(super) method: RequestMethod,
