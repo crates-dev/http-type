@@ -1833,7 +1833,6 @@ impl Request {
     ///
     /// - `Result<Vec<u8>, serde_json::Error>` - The serialized JSON bytes on success,
     ///   or a serialization error on failure.
-    #[inline(always)]
     pub fn try_json_vec(&self) -> Result<Vec<u8>, serde_json::Error> {
         serde_json::to_vec(self)
     }
@@ -1850,7 +1849,6 @@ impl Request {
     /// # Panics
     ///
     /// This function will panic if the serialization fails.
-    #[inline(always)]
     pub fn json_vec(&self) -> Vec<u8> {
         self.try_json_vec().unwrap()
     }
@@ -1862,14 +1860,13 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(key, value)),
+    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(&String, &mut Value)),
     ///   returns `true` to keep the field, `false` to remove it.
     ///
     /// # Returns
     ///
     /// - `Result<Vec<u8>, serde_json::Error>` - The serialized JSON bytes on success,
     ///   or a serialization error on failure.
-    #[inline(always)]
     pub fn try_json_vec_filter<F>(&self, predicate: F) -> Result<Vec<u8>, serde_json::Error>
     where
         F: FnMut(&(&String, &mut Value)) -> bool,
@@ -1893,7 +1890,7 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(key, value)),
+    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(&String, &mut Value)),
     ///   returns `true` to keep the field, `false` to remove it.
     ///
     /// # Returns
@@ -1903,7 +1900,6 @@ impl Request {
     /// # Panics
     ///
     /// This function will panic if the serialization fails.
-    #[inline(always)]
     pub fn json_vec_filter<F>(&self, predicate: F) -> Vec<u8>
     where
         F: FnMut(&(&String, &mut Value)) -> bool,
@@ -1920,7 +1916,6 @@ impl Request {
     ///
     /// - `Result<String, serde_json::Error>` - The serialized JSON string on success,
     ///   or a serialization error on failure.
-    #[inline(always)]
     pub fn try_json_string(&self) -> Result<String, serde_json::Error> {
         serde_json::to_string(self)
     }
@@ -1937,7 +1932,6 @@ impl Request {
     /// # Panics
     ///
     /// This function will panic if the serialization fails.
-    #[inline(always)]
     pub fn json_string(&self) -> String {
         self.try_json_string().unwrap()
     }
@@ -1949,14 +1943,13 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(key, value)),
+    /// - `F: FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(&String, &mut Value)),
     ///   returns `true` to keep the field, `false` to remove it.
     ///
     /// # Returns
     ///
     /// - `Result<String, serde_json::Error>` - The serialized JSON string on success,
     ///   or a serialization error on failure.
-    #[inline(always)]
     pub fn try_json_string_filter<F>(&self, predicate: F) -> Result<String, serde_json::Error>
     where
         F: FnMut(&(&String, &mut Value)) -> bool,
@@ -1980,7 +1973,7 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(key, value)),
+    /// - `FnMut(&(&String, &mut Value)) -> bool` - A function that takes a reference to a map entry (&(&String, &mut Value)),
     ///   returns `true` to keep the field, `false` to remove it.
     ///
     /// # Returns
@@ -1990,7 +1983,6 @@ impl Request {
     /// # Panics
     ///
     /// This function will panic if the serialization fails.
-    #[inline(always)]
     pub fn json_string_filter<F>(&self, predicate: F) -> String
     where
         F: FnMut(&(&String, &mut Value)) -> bool,
