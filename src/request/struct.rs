@@ -6,17 +6,17 @@ use crate::*;
 /// denial-of-service attacks and other security vulnerabilities
 /// when parsing HTTP requests.
 #[derive(
-    Debug,
     Clone,
     Copy,
-    PartialEq,
+    Debug,
+    Deserialize,
+    DisplayDebug,
     Eq,
     Getter,
     GetterMut,
-    Setter,
-    DisplayDebug,
-    Deserialize,
+    PartialEq,
     Serialize,
+    Setter,
 )]
 pub struct RequestConfigData {
     /// Buffer size for reading operations.
@@ -65,13 +65,13 @@ pub struct RequestConfigData {
 /// This struct uses `ArcRwLock` to provide thread-safe access to `RequestConfigData `,
 /// allowing concurrent reads and exclusive writes. It is the public-facing API
 /// for configuring HTTP request parsing limits.
-#[derive(Clone, Getter, CustomDebug, DisplayDebug)]
+#[derive(Clone, CustomDebug, DisplayDebug, Getter)]
 pub struct RequestConfig(#[get(pub(super))] pub(super) ArcRwLock<RequestConfigData>);
 
 /// HTTP request representation.
 ///
 /// Contains all components of an HTTP request.
-#[derive(Debug, Clone, Eq, PartialEq, Getter, DisplayDebug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, DisplayDebug, Eq, Getter, PartialEq, Serialize)]
 pub struct Request {
     /// HTTP request method.
     pub(super) method: RequestMethod,
@@ -90,9 +90,9 @@ pub struct Request {
 }
 
 /// HTTP request representation.
-#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, New, PartialEq, Serialize)]
 pub(crate) struct Http;
 
 /// WebSocket request representation.
-#[derive(Copy, Clone, Debug, Default, Eq, New, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, New, PartialEq, Serialize)]
 pub(crate) struct Ws;

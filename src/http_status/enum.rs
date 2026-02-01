@@ -3,7 +3,7 @@ use crate::*;
 /// Standard HTTP status codes.
 ///
 /// Includes informational, success, redirection, client and server error codes.
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum HttpStatus {
     /// HTTP 100 Continue
     Continue,

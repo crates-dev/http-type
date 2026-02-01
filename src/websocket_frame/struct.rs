@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Represents a decoded WebSocket frame.
-#[derive(Debug, Clone, Getter, DisplayDebug, Eq, PartialEq)]
+#[derive(Clone, Debug, DisplayDebug, Eq, Getter, PartialEq)]
 pub struct WebSocketFrame {
     /// FIN flag indicating if this is the final frame.
     pub(super) fin: bool,

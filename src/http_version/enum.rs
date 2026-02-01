@@ -5,7 +5,7 @@ use crate::*;
 /// This enum defines the various HTTP protocol versions supported,
 /// including HTTP/0.9, HTTP/1.0, HTTP/1.1, HTTP/2, and HTTP/3.
 /// It also includes an `Unknown` variant for unrecognized versions.
-#[derive(Debug, Default, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum HttpVersion {
     /// HTTP version 0.9
     Http0_9,

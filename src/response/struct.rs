@@ -2,7 +2,7 @@ use crate::*;
 
 /// Represents a parsed HTTP response.
 #[derive(
-    Clone, Debug, DisplayDebug, Eq, PartialEq, Getter, GetterMut, Setter, Serialize, Deserialize,
+    Clone, Debug, Deserialize, DisplayDebug, Eq, PartialEq, Getter, GetterMut, Serialize, Setter,
 )]
 pub struct Response {
     /// The HTTP version used in the response.
