@@ -1,68 +1,40 @@
 use crate::*;
 
-#[tokio::test]
-async fn request_config_from_json() {
+#[test]
+fn request_config_from_json() {
     let request_config_json: &'static str = r#"
     {
         "buffer_size": 8192,
-        "max_request_line_size": 8192,
         "max_path_size": 8192,
-        "max_query_size": 8192,
-        "max_header_line_size": 8192,
         "max_header_count": 100,
         "max_header_key_size": 8192,
         "max_header_value_size": 8192,
         "max_body_size": 2097152,
-        "max_ws_frame_size": 65536,
-        "max_ws_frames_count": 6000,
-        "http_read_timeout_ms": 6000,
-        "ws_read_timeout_ms": 1800000
+        "read_timeout_ms": 6000
     }
     "#;
     let request_config: RequestConfig = RequestConfig::from_json(request_config_json).unwrap();
-    let new_request_config: RequestConfig = RequestConfig::new().await;
+    let mut new_request_config: RequestConfig = RequestConfig::default();
     new_request_config
-        .buffer_size(8192)
-        .await
-        .max_request_line_size(8192)
-        .await
-        .max_path_size(8192)
-        .await
-        .max_query_size(8192)
-        .await
-        .max_header_line_size(8192)
-        .await
-        .max_header_count(100)
-        .await
-        .max_header_key_size(8192)
-        .await
-        .max_header_value_size(8192)
-        .await
-        .max_body_size(2097152)
-        .await
-        .max_ws_frame_size(65536)
-        .await
-        .max_ws_frames_count(6000)
-        .await
-        .http_read_timeout_ms(6000)
-        .await
-        .ws_read_timeout_ms(1800000)
-        .await;
+        .set_buffer_size(8192)
+        .set_max_path_size(8192)
+        .set_max_header_count(100)
+        .set_max_header_key_size(8192)
+        .set_max_header_value_size(8192)
+        .set_max_body_size(2097152)
+        .set_read_timeout_ms(6000);
     assert_eq!(request_config, new_request_config);
 }
 
-#[tokio::test]
-async fn request_config_security_levels() {
-    let default_config: RequestConfig = RequestConfig::new().await;
-    let low_config: RequestConfig = RequestConfig::low_security().await;
-    let high_config: RequestConfig = RequestConfig::high_security().await;
-    let default_data: RequestConfigData = default_config.get_data().await;
-    let low_data: RequestConfigData = low_config.get_data().await;
-    let high_data: RequestConfigData = high_config.get_data().await;
-    assert!(low_data.get_max_body_size() > default_data.get_max_body_size());
-    assert!(high_data.get_max_body_size() < default_data.get_max_body_size());
-    assert!(low_data.get_http_read_timeout_ms() > default_data.get_http_read_timeout_ms());
-    assert!(high_data.get_http_read_timeout_ms() < default_data.get_http_read_timeout_ms());
+#[test]
+fn request_config_security_levels() {
+    let default_config: RequestConfig = RequestConfig::default();
+    let low_config: RequestConfig = RequestConfig::low_security();
+    let high_config: RequestConfig = RequestConfig::high_security();
+    assert!(low_config.get_max_body_size() > default_config.get_max_body_size());
+    assert!(high_config.get_max_body_size() < default_config.get_max_body_size());
+    assert!(low_config.get_read_timeout_ms() > default_config.get_read_timeout_ms());
+    assert!(high_config.get_read_timeout_ms() < default_config.get_read_timeout_ms());
 }
 
 #[test]
@@ -272,18 +244,18 @@ fn request_error_from_parse_int_error() {
 }
 
 #[test]
-fn request_config_data_default() {
-    let config: RequestConfigData = RequestConfigData::default();
+fn request_config_default() {
+    let config: RequestConfig = RequestConfig::default();
     assert!(config.get_buffer_size() > 0);
     assert!(config.get_max_body_size() > 0);
-    assert!(config.get_http_read_timeout_ms() > 0);
+    assert!(config.get_read_timeout_ms() > 0);
 }
 
 #[test]
-fn request_config_data_security_presets() {
-    let low: RequestConfigData = RequestConfigData::low_security();
-    let high: RequestConfigData = RequestConfigData::high_security();
-    let default: RequestConfigData = RequestConfigData::default();
+fn request_config_security_presets() {
+    let low: RequestConfig = RequestConfig::low_security();
+    let high: RequestConfig = RequestConfig::high_security();
+    let default: RequestConfig = RequestConfig::default();
     assert!(low.get_max_body_size() > default.get_max_body_size());
     assert!(high.get_max_body_size() < default.get_max_body_size());
 }

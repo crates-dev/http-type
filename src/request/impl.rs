@@ -170,88 +170,6 @@ impl RequestError {
     }
 }
 
-impl Default for RequestConfigData {
-    /// Creates a `RequestConfig` with secure default values.
-    ///
-    /// # Returns
-    ///
-    /// - `RequestConfigData ` - A new config instance with secure defaults.
-    #[inline(always)]
-    fn default() -> Self {
-        Self {
-            buffer_size: DEFAULT_BUFFER_SIZE,
-            max_request_line_size: DEFAULT_MAX_REQUEST_LINE_SIZE,
-            max_path_size: DEFAULT_MAX_PATH_SIZE,
-            max_query_size: DEFAULT_MAX_QUERY_SIZE,
-            max_header_line_size: DEFAULT_MAX_HEADER_LINE_SIZE,
-            max_header_count: DEFAULT_MAX_HEADER_COUNT,
-            max_header_key_size: DEFAULT_MAX_HEADER_KEY_SIZE,
-            max_header_value_size: DEFAULT_MAX_HEADER_VALUE_SIZE,
-            max_body_size: DEFAULT_MAX_BODY_SIZE,
-            max_ws_frame_size: DEFAULT_MAX_WS_FRAME_SIZE,
-            max_ws_frames_count: DEFAULT_MAX_WS_FRAMES_COUNT,
-            http_read_timeout_ms: DEFAULT_HTTP_READ_TIMEOUT_MS,
-            ws_read_timeout_ms: DEFAULT_WS_READ_TIMEOUT_MS,
-        }
-    }
-}
-
-impl RequestConfigData {
-    /// Creates a config optimized for low-security environments.
-    ///
-    /// This configuration uses less restrictive limits to provide
-    /// basic protection against common attacks.
-    ///
-    /// # Returns
-    ///
-    /// - `RequestConfigData ` - A new config with low-security settings.
-    #[inline(always)]
-    pub(super) fn low_security() -> Self {
-        Self {
-            buffer_size: DEFAULT_LOW_SECURITY_BUFFER_SIZE,
-            max_request_line_size: DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_SIZE,
-            max_path_size: DEFAULT_LOW_SECURITY_MAX_PATH_SIZE,
-            max_query_size: DEFAULT_LOW_SECURITY_MAX_QUERY_SIZE,
-            max_header_line_size: DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_SIZE,
-            max_header_count: DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT,
-            max_header_key_size: DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_SIZE,
-            max_header_value_size: DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_SIZE,
-            max_body_size: DEFAULT_LOW_SECURITY_MAX_BODY_SIZE,
-            max_ws_frame_size: DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE,
-            max_ws_frames_count: DEFAULT_LOW_SECURITY_MAX_WS_FRAMES_COUNT,
-            http_read_timeout_ms: DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS,
-            ws_read_timeout_ms: DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS,
-        }
-    }
-
-    /// Creates a config optimized for high-security environments.
-    ///
-    /// This configuration uses more restrictive limits to provide
-    /// maximum protection against various attacks.
-    ///
-    /// # Returns
-    ///
-    /// - `RequestConfigData ` - A new config with high-security settings.
-    #[inline(always)]
-    pub(super) fn high_security() -> Self {
-        Self {
-            buffer_size: DEFAULT_HIGH_SECURITY_BUFFER_SIZE,
-            max_request_line_size: DEFAULT_HIGH_SECURITY_MAX_REQUEST_LINE_SIZE,
-            max_path_size: DEFAULT_HIGH_SECURITY_MAX_PATH_SIZE,
-            max_query_size: DEFAULT_HIGH_SECURITY_MAX_QUERY_SIZE,
-            max_header_line_size: DEFAULT_HIGH_SECURITY_MAX_HEADER_LINE_SIZE,
-            max_header_count: DEFAULT_HIGH_SECURITY_MAX_HEADER_COUNT,
-            max_header_key_size: DEFAULT_HIGH_SECURITY_MAX_HEADER_KEY_SIZE,
-            max_header_value_size: DEFAULT_HIGH_SECURITY_MAX_HEADER_VALUE_SIZE,
-            max_body_size: DEFAULT_HIGH_SECURITY_MAX_BODY_SIZE,
-            max_ws_frame_size: DEFAULT_HIGH_SECURITY_MAX_WS_FRAME_SIZE,
-            max_ws_frames_count: DEFAULT_HIGH_SECURITY_MAX_WS_FRAMES_COUNT,
-            http_read_timeout_ms: DEFAULT_HIGH_SECURITY_HTTP_READ_TIMEOUT_MS,
-            ws_read_timeout_ms: DEFAULT_HIGH_SECURITY_WS_READ_TIMEOUT_MS,
-        }
-    }
-}
-
 /// Implementation of `Default` trait for `RequestConfig`.
 impl Default for RequestConfig {
     /// Creates a new `RequestConfig` with default secure settings.
@@ -264,66 +182,19 @@ impl Default for RequestConfig {
     /// - `Self` - A new `RequestConfig` instance with default settings.
     #[inline(always)]
     fn default() -> Self {
-        Self(arc_rwlock(RequestConfigData::default()))
-    }
-}
-
-/// Implementation of `PartialEq` trait for `RequestConfig`.
-impl PartialEq for RequestConfig {
-    /// Compares two `RequestConfig` instances for equality.
-    ///
-    /// # Arguments
-    ///
-    /// - `other` - The second `RequestConfig` instance to compare.
-    ///
-    /// # Returns
-    ///
-    /// - `bool` - `true` if the instances are equal, `false` otherwise.
-    fn eq(&self, other: &Self) -> bool {
-        if Arc::ptr_eq(self.get_0(), other.get_0()) {
-            return true;
+        Self {
+            buffer_size: DEFAULT_BUFFER_SIZE,
+            max_path_size: DEFAULT_MAX_PATH_SIZE,
+            max_header_count: DEFAULT_MAX_HEADER_COUNT,
+            max_header_key_size: DEFAULT_MAX_HEADER_KEY_SIZE,
+            max_header_value_size: DEFAULT_MAX_HEADER_VALUE_SIZE,
+            max_body_size: DEFAULT_MAX_BODY_SIZE,
+            read_timeout_ms: DEFAULT_READ_TIMEOUT_MS,
         }
-        if let (Ok(s), Ok(o)) = (self.get_0().try_read(), other.get_0().try_read()) {
-            *s == *o
-        } else {
-            false
-        }
-    }
-}
-
-/// Implementation of `Eq` trait for `RequestConfig`.
-impl Eq for RequestConfig {}
-
-/// Implementation of `From` trait for `RequestConfig`.
-impl From<RequestConfigData> for RequestConfig {
-    /// Converts a `RequestConfigData` into a `RequestConfig`.
-    ///
-    /// # Arguments
-    ///
-    /// - `RequestConfigData` - The wrapped context data.
-    ///
-    /// # Returns
-    ///
-    /// - `RequestConfig` - The newly created context instance.
-    #[inline(always)]
-    fn from(ctx: RequestConfigData) -> Self {
-        Self(arc_rwlock(ctx))
     }
 }
 
 impl RequestConfig {
-    /// Creates a new `RequestConfig` with default secure settings.
-    ///
-    /// This constructor initializes the configuration with standard security limits
-    /// suitable for most HTTP request parsing scenarios.
-    ///
-    /// # Returns
-    ///
-    /// - `Self` - A new `RequestConfig` instance with default settings.
-    pub async fn new() -> Self {
-        Self(arc_rwlock(RequestConfigData::default()))
-    }
-
     /// Creates a new `RequestConfig` from a JSON string.
     ///
     /// # Arguments
@@ -337,19 +208,28 @@ impl RequestConfig {
     where
         C: AsRef<str>,
     {
-        serde_json::from_str(json.as_ref()).map(|data: RequestConfigData| Self::from(data))
+        serde_json::from_str(json.as_ref())
     }
 
     /// Creates a new `RequestConfig` with low-security settings.
     ///
     /// This constructor initializes the configuration with less restrictive limits
-    /// to provide maximum protection against various attacks in high-risk environments.
+    /// for environments where higher limits are needed.
     ///
     /// # Returns
     ///
     /// - `Self` - A new `RequestConfig` instance with low-security settings.
-    pub async fn low_security() -> Self {
-        Self(arc_rwlock(RequestConfigData::low_security()))
+    #[inline(always)]
+    pub fn low_security() -> Self {
+        Self {
+            buffer_size: DEFAULT_LOW_SECURITY_BUFFER_SIZE,
+            max_path_size: DEFAULT_LOW_SECURITY_MAX_PATH_SIZE,
+            max_header_count: DEFAULT_LOW_SECURITY_MAX_HEADER_COUNT,
+            max_header_key_size: DEFAULT_LOW_SECURITY_MAX_HEADER_KEY_SIZE,
+            max_header_value_size: DEFAULT_LOW_SECURITY_MAX_HEADER_VALUE_SIZE,
+            max_body_size: DEFAULT_LOW_SECURITY_MAX_BODY_SIZE,
+            read_timeout_ms: DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS,
+        }
     }
 
     /// Creates a new `RequestConfig` with high-security settings.
@@ -360,241 +240,17 @@ impl RequestConfig {
     /// # Returns
     ///
     /// - `Self` - A new `RequestConfig` instance with high-security settings.
-    pub async fn high_security() -> Self {
-        Self(arc_rwlock(RequestConfigData::high_security()))
-    }
-
-    /// Acquires a read lock on the inner configuration.
-    ///
-    /// This method returns a `RwLockReadGuard` that allows reading the
-    /// `RequestConfigData ` values. Multiple threads can read concurrently.
-    ///
-    /// # Returns
-    ///
-    /// - `RwLockReadGuard<'_, RequestConfigData >` - A read guard providing access to the inner configuration.
-    async fn read(&'_ self) -> RwLockReadGuard<'_, RequestConfigData> {
-        self.get_0().read().await
-    }
-
-    /// Acquires a write lock on the inner configuration.
-    ///
-    /// This method returns a `RwLockWriteGuard` that allows mutating the
-    /// `RequestConfigData ` values. Write access is exclusive.
-    ///
-    /// # Returns
-    ///
-    /// - `RwLockWriteGuard<'_, RequestConfigData >` - A write guard providing exclusive access to the inner configuration.
-    async fn write(&'_ self) -> RwLockWriteGuard<'_, RequestConfigData> {
-        self.get_0().write().await
-    }
-
-    /// Sets the configuration data.
-    ///
-    /// # Arguments
-    ///
-    /// - `RequestConfigData` - The configuration data.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn data(&self, data: RequestConfigData) -> &Self {
-        *self.write().await = data;
-        self
-    }
-
-    /// Gets the configuration data.
-    ///
-    /// # Returns
-    ///
-    /// - `RequestConfigData ` - The inner configuration.
-    pub async fn get_data(&self) -> RequestConfigData {
-        *self.read().await
-    }
-
-    /// Sets the buffer size for reading operations.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The buffer size in bytes.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn buffer_size(&self, buffer_size: usize) -> &Self {
-        self.write().await.set_buffer_size(buffer_size);
-        self
-    }
-
-    /// Sets the maximum length for HTTP request line in bytes.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum request line size.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_request_line_size(&self, size: usize) -> &Self {
-        self.write().await.set_max_request_line_size(size);
-        self
-    }
-
-    /// Sets the maximum length for URL path in bytes.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum path length.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_path_size(&self, size: usize) -> &Self {
-        self.write().await.set_max_path_size(size);
-        self
-    }
-
-    /// Sets the maximum length for query string in bytes.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum query string length.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_query_size(&self, size: usize) -> &Self {
-        self.write().await.set_max_query_size(size);
-        self
-    }
-
-    /// Sets the maximum length for a single header line in bytes.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum header line size.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_header_line_size(&self, size: usize) -> &Self {
-        self.write().await.set_max_header_line_size(size);
-        self
-    }
-
-    /// Sets the maximum number of headers allowed in a request.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum header count.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_header_count(&self, count: usize) -> &Self {
-        self.write().await.set_max_header_count(count);
-        self
-    }
-
-    /// Sets the maximum length for a header key in bytes.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum header key length.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_header_key_size(&self, size: usize) -> &Self {
-        self.write().await.set_max_header_key_size(size);
-        self
-    }
-
-    /// Sets the maximum length for a header value in bytes.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum header value length.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_header_value_size(&self, size: usize) -> &Self {
-        self.write().await.set_max_header_value_size(size);
-        self
-    }
-
-    /// Sets the maximum size for request body in bytes.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum body size.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_body_size(&self, size: usize) -> &Self {
-        self.write().await.set_max_body_size(size);
-        self
-    }
-
-    /// Sets the maximum size for WebSocket frame in bytes.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum WebSocket frame size.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_ws_frame_size(&self, size: usize) -> &Self {
-        self.write().await.set_max_ws_frame_size(size);
-        self
-    }
-
-    /// Sets the maximum number of WebSocket frames to process in a single request.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize` - The maximum WebSocket frames count.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn max_ws_frames_count(&self, size: usize) -> &Self {
-        self.write().await.set_max_ws_frames_count(size);
-        self
-    }
-
-    /// Sets the timeout for reading HTTP request in milliseconds.
-    ///
-    /// # Arguments
-    ///
-    /// - `u64` - The HTTP read timeout in milliseconds.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn http_read_timeout_ms(&self, http_read_timeout_ms: u64) -> &Self {
-        self.write()
-            .await
-            .set_http_read_timeout_ms(http_read_timeout_ms);
-        self
-    }
-
-    /// Sets the timeout for reading WebSocket frames in milliseconds.
-    ///
-    /// # Arguments
-    ///
-    /// - `u64` - The WebSocket read timeout in milliseconds.
-    ///
-    /// # Returns
-    ///
-    /// - `&Self` - The RequestConfig instance for chaining.
-    pub async fn ws_read_timeout_ms(&self, ws_read_timeout_ms: u64) -> &Self {
-        self.write()
-            .await
-            .set_ws_read_timeout_ms(ws_read_timeout_ms);
-        self
+    #[inline(always)]
+    pub fn high_security() -> Self {
+        Self {
+            buffer_size: DEFAULT_HIGH_SECURITY_BUFFER_SIZE,
+            max_path_size: DEFAULT_HIGH_SECURITY_MAX_PATH_SIZE,
+            max_header_count: DEFAULT_HIGH_SECURITY_MAX_HEADER_COUNT,
+            max_header_key_size: DEFAULT_HIGH_SECURITY_MAX_HEADER_KEY_SIZE,
+            max_header_value_size: DEFAULT_HIGH_SECURITY_MAX_HEADER_VALUE_SIZE,
+            max_body_size: DEFAULT_HIGH_SECURITY_MAX_BODY_SIZE,
+            read_timeout_ms: DEFAULT_HIGH_SECURITY_READ_TIMEOUT_MS,
+        }
     }
 }
 
@@ -617,31 +273,6 @@ impl Default for Request {
 }
 
 impl Http {
-    /// Reads the HTTP request line from the buffered reader.
-    ///
-    /// # Arguments
-    ///
-    /// - `&mut BufReader<&mut TcpStream>`: The buffered reader to read from.
-    /// - `usize`: The buffer size for initial string capacity.
-    /// - `usize`: The maximum allowed request line size.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<String, RequestError>`: The request line string or an error.
-    #[inline(always)]
-    async fn check_first_line(
-        reader: &mut BufReader<&mut TcpStream>,
-        buffer_size: usize,
-        max_size: usize,
-    ) -> Result<String, RequestError> {
-        let mut line: String = String::with_capacity(buffer_size);
-        let size: usize = AsyncBufReadExt::read_line(reader, &mut line).await?;
-        if size > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_REQUEST_LINE_SIZE {
-            return Err(RequestError::RequestTooLong(HttpStatus::BadRequest));
-        }
-        Ok(line)
-    }
-
     /// Parses the first line of HTTP request into method, path, and version components.
     ///
     /// # Arguments
@@ -730,24 +361,6 @@ impl Http {
         })
     }
 
-    /// Validates the query string length against the maximum allowed size.
-    ///
-    /// # Arguments
-    ///
-    /// - `&str`: The query string to check.
-    /// - `usize`: The maximum allowed query size.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<(), RequestError>`: Ok if valid, or an error if the query is too long.
-    #[inline(always)]
-    fn check_query_size(query: &str, max_size: usize) -> Result<(), RequestError> {
-        if query.len() > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_QUERY_SIZE {
-            return Err(RequestError::QueryTooLong(HttpStatus::URITooLong));
-        }
-        Ok(())
-    }
-
     /// Parses the request path without query string or hash fragment.
     ///
     /// # Arguments
@@ -799,26 +412,6 @@ impl Http {
             }
         }
         query_map
-    }
-
-    /// Checks if a header line exceeds the maximum allowed length.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize`: The number of bytes read for the header line.
-    /// - `usize`: The maximum allowed length for a header line.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<(), RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
-    #[inline(always)]
-    fn check_header_line_size(size: usize, max_size: usize) -> Result<(), RequestError> {
-        if size > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_HEADER_LINE_SIZE {
-            return Err(RequestError::HeaderLineTooLong(
-                HttpStatus::RequestHeaderFieldsTooLarge,
-            ));
-        }
-        Ok(())
     }
 
     /// Checks if the header count exceeds the maximum allowed.
@@ -911,7 +504,7 @@ impl Http {
     /// # Arguments
     ///
     /// - `&mut AsyncBufReadExt + Unpin`: A mutable reference to a buffered reader implementing `AsyncBufReadExt`.
-    /// - `&RequestConfigData`: Configuration for security limits and buffer settings.
+    /// - `&RequestConfig`: Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
@@ -922,30 +515,25 @@ impl Http {
     ///   - Or an error if parsing fails
     async fn parse_headers<R>(
         reader: &mut R,
-        config: &RequestConfigData,
+        config: &RequestConfig,
     ) -> Result<(RequestHeaders, RequestHost, usize), RequestError>
     where
         R: AsyncBufReadExt + Unpin,
     {
         let buffer_size: usize = config.get_buffer_size();
-        let max_header_line_size: usize = config.get_max_header_line_size();
         let max_header_count: usize = config.get_max_header_count();
         let max_header_key_size: usize = config.get_max_header_key_size();
         let max_header_value_size: usize = config.get_max_header_value_size();
         let max_body_size: usize = config.get_max_body_size();
-        let mut headers: RequestHeaders = HashMapXxHash3_64::with_capacity_and_hasher(
-            max_header_count.min(64),
-            BuildHasherDefault::default(),
-        );
+        let mut headers: RequestHeaders =
+            HashMapXxHash3_64::with_capacity_and_hasher(B_16, BuildHasherDefault::default());
         let mut host: RequestHost = String::new();
         let mut content_size: usize = 0;
         let mut header_count: usize = 0;
         let mut header_line_buffer: String = String::with_capacity(buffer_size);
         loop {
             header_line_buffer.clear();
-            let bytes_read: usize =
-                AsyncBufReadExt::read_line(reader, &mut header_line_buffer).await?;
-            Self::check_header_line_size(bytes_read, max_header_line_size)?;
+            AsyncBufReadExt::read_line(reader, &mut header_line_buffer).await?;
             let header_line: &str = header_line_buffer.trim();
             if header_line.is_empty() {
                 break;
@@ -1006,31 +594,28 @@ impl Http {
     /// # Arguments
     ///
     /// - `&ArcRwLock<TcpStream>`: The TCP stream to read from.
-    /// - `&RequestConfigData`: Configuration for security limits and buffer settings.
+    /// - `&RequestConfig`: Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
     /// - `Result<Request, RequestError>`: The parsed request or an error.
     async fn parse_from_stream(
         stream: &ArcRwLockStream,
-        config: &RequestConfigData,
+        config: &RequestConfig,
     ) -> Result<Request, RequestError> {
         let buffer_size: usize = config.get_buffer_size();
-        let max_request_line_size: usize = config.get_max_request_line_size();
         let max_path_size: usize = config.get_max_path_size();
-        let max_query_size: usize = config.get_max_query_size();
         let mut buf_stream: RwLockWriteGuard<'_, TcpStream> = stream.write().await;
         let reader: &mut BufReader<&mut TcpStream> =
             &mut BufReader::with_capacity(buffer_size, &mut buf_stream);
-        let line: String =
-            Self::check_first_line(reader, buffer_size, max_request_line_size).await?;
+        let mut line: String = String::with_capacity(buffer_size);
+        AsyncBufReadExt::read_line(reader, &mut line).await?;
         let (method, path, version): (RequestMethod, &str, RequestVersion) =
             Self::parse_first_line(&line)?;
         Self::check_path_size(path, max_path_size)?;
         let hash_index: Option<usize> = path.find(HASH);
         let query_index: Option<usize> = path.find(QUERY);
         let query_slice: &str = Self::get_query_slice(path, query_index, hash_index);
-        Self::check_query_size(query_slice, max_query_size)?;
         let querys: RequestQuerys = Self::parse_querys(query_slice);
         let path: RequestPath = Self::parse_path(path, query_index, hash_index);
         let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =
@@ -1049,26 +634,6 @@ impl Http {
 }
 
 impl Ws {
-    /// Checks if the WebSocket frame count exceeds the maximum allowed.
-    ///
-    /// # Arguments
-    ///
-    /// - `usize`: The current number of frames.
-    /// - `usize`: The maximum allowed number of frames.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<(), RequestError>`: Returns an error if the limit is exceeded and not in low security mode.
-    #[inline(always)]
-    fn check_frame_count(count: usize, max_count: usize) -> Result<(), RequestError> {
-        if count > max_count && max_count != DEFAULT_LOW_SECURITY_MAX_WS_FRAMES_COUNT {
-            return Err(RequestError::TooManyHeaders(
-                HttpStatus::RequestHeaderFieldsTooLarge,
-            ));
-        }
-        Ok(())
-    }
-
     /// Reads data from the stream with optional timeout handling.
     ///
     /// # Arguments
@@ -1116,7 +681,6 @@ impl Ws {
     /// - `&Request`: The request to update on completion.
     /// - `&WebSocketFrame`: The decoded WebSocket frame.
     /// - `&mut Vec<u8>`: The accumulated frame data.
-    /// - `usize`: Maximum allowed frame size.
     ///
     /// # Returns
     ///
@@ -1126,21 +690,8 @@ impl Ws {
         request: &Request,
         frame: &WebSocketFrame,
         full_frame: &mut Vec<u8>,
-        max_size: usize,
     ) -> Result<Option<Request>, RequestError> {
         let payload_data: &[u8] = frame.get_payload_data();
-        let payload_data_len: usize = payload_data.len();
-        if payload_data_len > max_size {
-            return Err(RequestError::WebSocketFrameTooLarge(
-                HttpStatus::PayloadTooLarge,
-            ));
-        }
-        let sum_len: usize = full_frame.len() + payload_data_len;
-        if sum_len > max_size && max_size != DEFAULT_LOW_SECURITY_MAX_WS_FRAME_SIZE {
-            return Err(RequestError::WebSocketFrameTooLarge(
-                HttpStatus::PayloadTooLarge,
-            ));
-        }
         full_frame.extend_from_slice(payload_data);
         if *frame.get_fin() {
             let mut result: Request = request.clone();
@@ -1155,22 +706,22 @@ impl Request {
     /// Parses an HTTP request from a TCP stream.
     ///
     /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
-    /// If the timeout is DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS, no timeout is applied.
+    /// If the timeout is DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS, no timeout is applied.
     ///
     /// # Arguments
     ///
     /// - `&ArcRwLock<TcpStream>` - The TCP stream to read from.
-    /// - `&RequestConfigData` - Configuration for security limits and buffer settings.
+    /// - `&RequestConfig` - Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
     /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn http_from_stream(
         stream: &ArcRwLockStream,
-        config: &RequestConfigData,
+        config: &RequestConfig,
     ) -> Result<Request, RequestError> {
-        let timeout_ms: u64 = config.get_http_read_timeout_ms();
-        if timeout_ms == DEFAULT_LOW_SECURITY_HTTP_READ_TIMEOUT_MS {
+        let timeout_ms: u64 = config.get_read_timeout_ms();
+        if timeout_ms == DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS {
             return Http::parse_from_stream(stream, config).await;
         }
         let duration: Duration = Duration::from_millis(timeout_ms);
@@ -1180,12 +731,12 @@ impl Request {
     /// Parses a WebSocket request from a TCP stream.
     ///
     /// Wraps the stream in a buffered reader and delegates to `ws_from_reader`.
-    /// If the timeout is DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS, no timeout is applied.
+    /// If the timeout is DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS, no timeout is applied.
     ///
     /// # Arguments
     ///
     /// - `&ArcRwLock<TcpStream>`: The TCP stream to read from.
-    /// - `&RequestConfigData`: Configuration for security limits and buffer settings.
+    /// - `&RequestConfig`: Configuration for security limits and buffer settings.
     ///
     /// # Returns
     ///
@@ -1193,22 +744,19 @@ impl Request {
     pub async fn ws_from_stream(
         &self,
         stream: &ArcRwLockStream,
-        config: &RequestConfigData,
+        config: &RequestConfig,
     ) -> Result<Request, RequestError> {
         let buffer_size: usize = config.get_buffer_size();
-        let max_ws_frame_size: usize = config.get_max_ws_frame_size();
-        let ws_read_timeout_ms: u64 = config.get_ws_read_timeout_ms();
-        let max_ws_frames_count: usize = config.get_max_ws_frames_count();
+        let read_timeout_ms: u64 = config.get_read_timeout_ms();
         let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
         let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
-        let mut full_frame: Vec<u8> = Vec::with_capacity(max_ws_frame_size);
-        let mut frame_count: usize = 0;
+        let mut full_frame: Vec<u8> = Vec::new();
         let mut is_client_response: bool = false;
         let duration_opt: Option<Duration> =
-            if ws_read_timeout_ms == DEFAULT_LOW_SECURITY_WS_READ_TIMEOUT_MS {
+            if read_timeout_ms == DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS {
                 None
             } else {
-                let adjusted_timeout_ms: u64 = (ws_read_timeout_ms >> 1) + (ws_read_timeout_ms & 1);
+                let adjusted_timeout_ms: u64 = (read_timeout_ms >> 1) + (read_timeout_ms & 1);
                 Some(Duration::from_millis(adjusted_timeout_ms))
             };
         loop {
@@ -1233,15 +781,13 @@ impl Request {
             while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&dynamic_buffer) {
                 is_client_response = true;
                 dynamic_buffer.drain(0..consumed);
-                frame_count += 1;
-                Ws::check_frame_count(frame_count, max_ws_frames_count)?;
                 match frame.get_opcode() {
                     WebSocketOpcode::Close => {
                         return Err(RequestError::ClientClosedConnection(HttpStatus::BadRequest));
                     }
                     WebSocketOpcode::Ping | WebSocketOpcode::Pong => continue,
                     WebSocketOpcode::Text | WebSocketOpcode::Binary => {
-                        match Ws::parse_frame(self, &frame, &mut full_frame, max_ws_frame_size) {
+                        match Ws::parse_frame(self, &frame, &mut full_frame) {
                             Ok(Some(result)) => return Ok(result),
                             Ok(None) => continue,
                             Err(error) => return Err(error),
@@ -1526,11 +1072,9 @@ impl Request {
     /// - `UpgradeType` - The parsed upgrade type.
     #[inline(always)]
     pub fn get_upgrade_type(&self) -> UpgradeType {
-        let upgrade_type: UpgradeType = self
-            .try_get_header_back(UPGRADE)
+        self.try_get_header_back(UPGRADE)
             .and_then(|data| data.parse::<UpgradeType>().ok())
-            .unwrap_or_default();
-        upgrade_type
+            .unwrap_or_default()
     }
 
     /// Retrieves the body content of the request as a UTF-8 encoded string.
@@ -1558,6 +1102,7 @@ impl Request {
     /// # Returns
     ///
     /// - `Result<T, serde_json::Error>` - The deserialization result.
+    #[inline(always)]
     pub fn try_get_body_json<T>(&self) -> Result<T, serde_json::Error>
     where
         T: DeserializeOwned,
@@ -1581,6 +1126,7 @@ impl Request {
     /// # Panics
     ///
     /// This function will panic if the deserialization fails.
+    #[inline(always)]
     pub fn get_body_json<T>(&self) -> T
     where
         T: DeserializeOwned,
