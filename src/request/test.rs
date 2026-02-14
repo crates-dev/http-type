@@ -128,25 +128,31 @@ fn request_has_header_value() {
 
 #[test]
 fn request_body_operations() {
-    let mut request: Request = Request::default();
-    request.body = b"hello world".to_vec();
+    let request: Request = Request {
+        body: b"hello world".to_vec(),
+        ..Default::default()
+    };
     assert_eq!(request.get_body(), b"hello world");
     assert_eq!(request.get_body_string(), "hello world");
 }
 
 #[test]
 fn request_body_string_utf8() {
-    let mut request: Request = Request::default();
     let body: Vec<u8> = "你好世界".as_bytes().to_vec();
-    request.body = body.clone();
+    let request: Request = Request {
+        body: body.clone(),
+        ..Default::default()
+    };
     assert_eq!(request.get_body_string(), "你好世界");
 }
 
 #[test]
 fn request_body_json() {
-    let mut request: Request = Request::default();
     let json: &'static str = r#"{"name":"test","value":123}"#;
-    request.body = json.as_bytes().to_vec();
+    let request: Request = Request {
+        body: json.as_bytes().to_vec(),
+        ..Default::default()
+    };
     #[derive(Debug, Deserialize, PartialEq)]
     struct TestData {
         name: String,
@@ -159,8 +165,10 @@ fn request_body_json() {
 
 #[test]
 fn request_method_checks() {
-    let mut request: Request = Request::default();
-    request.method = Method::Get;
+    let request: Request = Request {
+        method: Method::Get,
+        ..Default::default()
+    };
     assert!(request.is_get_method());
     assert!(!request.is_post_method());
     assert!(!request.is_put_method());
@@ -175,8 +183,10 @@ fn request_method_checks() {
 
 #[test]
 fn request_version_checks() {
-    let mut request: Request = Request::default();
-    request.version = HttpVersion::Http1_1;
+    let request: Request = Request {
+        version: HttpVersion::Http1_1,
+        ..Default::default()
+    };
     assert!(request.is_http1_1_version());
     assert!(request.is_http1_1_or_higher_version());
     assert!(request.is_http_version());
@@ -201,8 +211,10 @@ fn request_upgrade_type_checks() {
 
 #[test]
 fn request_keep_alive_checks() {
-    let mut request: Request = Request::default();
-    request.version = HttpVersion::Http1_1;
+    let mut request: Request = Request {
+        version: HttpVersion::Http1_1,
+        ..Default::default()
+    };
     assert!(request.is_enable_keep_alive());
     assert!(!request.is_disable_keep_alive());
     let mut values: VecDeque<String> = VecDeque::new();
@@ -233,7 +245,7 @@ fn request_error_from_io_error() {
     let io_error: std::io::Error = std::io::Error::new(ErrorKind::ConnectionReset, "reset");
     let request_error: RequestError = RequestError::from(io_error);
     assert!(matches!(request_error, RequestError::ClientDisconnected(_)));
-    let io_error: std::io::Error = std::io::Error::new(ErrorKind::Other, "other");
+    let io_error: std::io::Error = std::io::Error::other("other");
     let request_error: RequestError = RequestError::from(io_error);
     assert!(matches!(request_error, RequestError::ReadConnection(_)));
 }
