@@ -657,19 +657,28 @@ impl Http {
     ///   - Or an error if parsing fails
     #[inline(always)]
     fn parse_first_line(line: &str) -> Result<(RequestMethod, &str, RequestVersion), RequestError> {
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if parts.len() < 3 {
-            return Err(RequestError::HttpRequestPartsInsufficient(
+        let mut parts = line.split_whitespace();
+        let method_str: &str = parts
+            .next()
+            .ok_or(RequestError::HttpRequestPartsInsufficient(
                 HttpStatus::BadRequest,
-            ));
-        }
-        let method: RequestMethod = parts[0]
+            ))?;
+        let full_path: &str = parts
+            .next()
+            .ok_or(RequestError::HttpRequestPartsInsufficient(
+                HttpStatus::BadRequest,
+            ))?;
+        let version_str: &str = parts
+            .next()
+            .ok_or(RequestError::HttpRequestPartsInsufficient(
+                HttpStatus::BadRequest,
+            ))?;
+        let method: RequestMethod = method_str
             .parse::<RequestMethod>()
-            .unwrap_or(Method::Unknown(parts[0].to_string()));
-        let full_path: &str = parts[1];
-        let version: RequestVersion = parts[2]
+            .unwrap_or_else(|_| Method::Unknown(method_str.to_string()));
+        let version: RequestVersion = version_str
             .parse::<RequestVersion>()
-            .unwrap_or(RequestVersion::Unknown(parts[2].to_string()));
+            .unwrap_or_else(|_| RequestVersion::Unknown(version_str.to_string()));
         Ok((method, full_path, version))
     }
 
@@ -704,15 +713,19 @@ impl Http {
     ///
     /// # Returns
     ///
-    /// - `String`: The parsed query string, or empty string if no query.
+    /// - `&str`: The parsed query string slice, or empty string if no query.
     #[inline(always)]
-    fn parse_query(path: &str, query_index: Option<usize>, hash_index: Option<usize>) -> String {
-        query_index.map_or_else(String::new, |i: usize| {
-            let temp: &str = &path[i + 1..];
+    fn get_query_slice<'a>(
+        path: &'a str,
+        query_index: Option<usize>,
+        hash_index: Option<usize>,
+    ) -> &'a str {
+        query_index.map_or(EMPTY_STR, |i: usize| {
+            let temp: &'a str = &path[i + 1..];
             match hash_index {
-                None => temp.to_owned(),
-                Some(hash_idx) if hash_idx <= i => temp.to_owned(),
-                Some(hash_idx) => temp[..hash_idx - i - 1].to_owned(),
+                None => temp,
+                Some(hash_idx) if hash_idx <= i => temp,
+                Some(hash_idx) => &temp[..hash_idx - i - 1],
             }
         })
     }
@@ -740,7 +753,6 @@ impl Http {
     /// # Arguments
     ///
     /// - `&str`: The full path string.
-    /// - `RequestPath`: The owned full path for fallback.
     /// - `Option<usize>`: The index of the query separator (`?`), if present.
     /// - `Option<usize>`: The index of the hash separator (`#`), if present.
     ///
@@ -770,8 +782,13 @@ impl Http {
     /// # Returns
     ///
     /// - `RequestQuerys` - The parsed query parameters.
+    #[inline(always)]
     fn parse_querys(query: &str) -> RequestQuerys {
-        let mut query_map: RequestQuerys = hash_map_xx_hash3_64();
+        let estimated_capacity: usize = query.matches(AND).count() + 1;
+        let mut query_map: RequestQuerys = HashMapXxHash3_64::with_capacity_and_hasher(
+            estimated_capacity,
+            BuildHasherDefault::default(),
+        );
         for pair in query.split(AND) {
             if let Some((key, value)) = pair.split_once(EQUAL) {
                 if !key.is_empty() {
@@ -916,15 +933,20 @@ impl Http {
         let max_header_key_size: usize = config.get_max_header_key_size();
         let max_header_value_size: usize = config.get_max_header_value_size();
         let max_body_size: usize = config.get_max_body_size();
-        let mut headers: RequestHeaders = hash_map_xx_hash3_64();
+        let mut headers: RequestHeaders = HashMapXxHash3_64::with_capacity_and_hasher(
+            max_header_count.min(64),
+            BuildHasherDefault::default(),
+        );
         let mut host: RequestHost = String::new();
         let mut content_size: usize = 0;
         let mut header_count: usize = 0;
+        let mut header_line_buffer: String = String::with_capacity(buffer_size);
         loop {
-            let header_line: &mut String = &mut String::with_capacity(buffer_size);
-            let bytes_read: usize = AsyncBufReadExt::read_line(reader, header_line).await?;
+            header_line_buffer.clear();
+            let bytes_read: usize =
+                AsyncBufReadExt::read_line(reader, &mut header_line_buffer).await?;
             Self::check_header_line_size(bytes_read, max_header_line_size)?;
-            let header_line: &str = header_line.trim();
+            let header_line: &str = header_line_buffer.trim();
             if header_line.is_empty() {
                 break;
             }
@@ -934,10 +956,11 @@ impl Http {
                 Some(parts) => parts,
                 None => continue,
             };
-            let key: String = key_part.trim().to_ascii_lowercase();
-            if key.is_empty() {
+            let key_trimmed: &str = key_part.trim();
+            if key_trimmed.is_empty() {
                 continue;
             }
+            let key: String = key_trimmed.to_ascii_lowercase();
             Self::check_header_key_size(&key, max_header_key_size)?;
             let value: String = value_part.trim().to_string();
             Self::check_header_value_size(&value, max_header_value_size)?;
@@ -1006,9 +1029,9 @@ impl Http {
         Self::check_path_size(path, max_path_size)?;
         let hash_index: Option<usize> = path.find(HASH);
         let query_index: Option<usize> = path.find(QUERY);
-        let query_string: String = Self::parse_query(path, query_index, hash_index);
-        Self::check_query_size(&query_string, max_query_size)?;
-        let querys: RequestQuerys = Self::parse_querys(&query_string);
+        let query_slice: &str = Self::get_query_slice(path, query_index, hash_index);
+        Self::check_query_size(query_slice, max_query_size)?;
+        let querys: RequestQuerys = Self::parse_querys(query_slice);
         let path: RequestPath = Self::parse_path(path, query_index, hash_index);
         let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =
             Self::parse_headers(reader, config).await?;
@@ -1486,7 +1509,7 @@ impl Request {
         V: AsRef<str>,
     {
         if let Some(values) = self.headers.get(key.as_ref()) {
-            values.contains(&value.as_ref().to_owned())
+            values.iter().any(|v| v == value.as_ref())
         } else {
             false
         }
@@ -1512,7 +1535,7 @@ impl Request {
 
     /// Retrieves the body content of the request as a UTF-8 encoded string.
     ///
-    /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` as_ref a string.
+    /// This method uses `String::from_utf8_lossy` to convert the byte slice returned by `self.get_body()` as a string.
     /// If the byte slice contains invalid UTF-8 sequences, they will be replaced with the Unicode replacement character ().
     ///
     /// # Returns
