@@ -72,6 +72,37 @@ impl Default for Response {
 }
 
 impl Response {
+    /// Pushes a header with a key and value as_ref the response string.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut String`: A mutable reference to the string where the header will be added.
+    /// - `&str`: The header key as a string slice (`&str`).
+    /// - `&str`: The header value as a string slice (`&str`).
+    #[inline(always)]
+    fn push_header(response_string: &mut String, key: &str, value: &str) {
+        response_string.push_str(key);
+        response_string.push_str(COLON);
+        response_string.push_str(value);
+        response_string.push_str(HTTP_BR);
+    }
+
+    /// Pushes the first line of an HTTP response (version, status code, and reason phrase) as_ref the response string.
+    /// This corresponds to the status line of the HTTP response.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut String`: A mutable reference to the string where the first line will be added.
+    #[inline(always)]
+    fn push_http_first_line(&self, response_string: &mut String) {
+        response_string.push_str(&self.get_version().to_string());
+        response_string.push_str(SPACE);
+        response_string.push_str(&self.get_status_code().to_string());
+        response_string.push_str(SPACE);
+        response_string.push_str(self.get_reason_phrase());
+        response_string.push_str(HTTP_BR);
+    }
+
     /// Tries to retrieve the value of a response header by its key.
     ///
     /// # Arguments
@@ -500,35 +531,81 @@ impl Response {
         self
     }
 
-    /// Pushes a header with a key and value as_ref the response string.
+    /// Tries to parse cookies from the `Set-Cookie` header.
     ///
-    /// # Arguments
+    /// This method retrieves the last `Set-Cookie` header value and parses it
+    /// into a collection of key-value pairs representing the cookies.
     ///
-    /// - `&mut String`: A mutable reference to the string where the header will be added.
-    /// - `&str`: The header key as a string slice (`&str`).
-    /// - `&str`: The header value as a string slice (`&str`).
+    /// # Returns
+    ///
+    /// - `Option<Cookies>` - The parsed cookies if the `Set-Cookie` header exists, otherwise `None`.
     #[inline(always)]
-    fn push_header(response_string: &mut String, key: &str, value: &str) {
-        response_string.push_str(key);
-        response_string.push_str(COLON);
-        response_string.push_str(value);
-        response_string.push_str(HTTP_BR);
+    pub fn try_get_cookies(&self) -> Option<Cookies> {
+        self.try_get_header_back(SET_COOKIE)
+            .map(|cookie_header: String| Cookie::parse(cookie_header))
     }
 
-    /// Pushes the first line of an HTTP response (version, status code, and reason phrase) as_ref the response string.
-    /// This corresponds to the status line of the HTTP response.
+    /// Parses cookies from the `Set-Cookie` headers.
+    ///
+    /// This method retrieves all `Set-Cookie` header values and parses each one
+    /// into a collection of key-value pairs representing the cookies.
+    ///
+    /// # Returns
+    ///
+    /// - `Cookies` - The parsed cookies.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the `Set-Cookie` header is not found.
+    #[inline(always)]
+    pub fn get_cookies(&self) -> Cookies {
+        self.try_get_cookies().unwrap()
+    }
+
+    /// Tries to get a cookie value by its key from `Set-Cookie` headers.
+    ///
+    /// This method parses the cookies from all `Set-Cookie` headers,
+    /// then attempts to retrieve the value for the specified key.
     ///
     /// # Arguments
     ///
-    /// - `&mut String`: A mutable reference to the string where the first line will be added.
+    /// - `AsRef<str>` - The cookie key (implements AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `Option<CookieValue>` - The cookie value if exists.
     #[inline(always)]
-    fn push_http_first_line(&self, response_string: &mut String) {
-        response_string.push_str(&self.get_version().to_string());
-        response_string.push_str(SPACE);
-        response_string.push_str(&self.get_status_code().to_string());
-        response_string.push_str(SPACE);
-        response_string.push_str(self.get_reason_phrase());
-        response_string.push_str(HTTP_BR);
+    pub fn try_get_cookie<K>(&self, key: K) -> Option<CookieValue>
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_cookies()
+            .and_then(|cookies: Cookies| cookies.get(key.as_ref()).cloned())
+    }
+
+    /// Gets a cookie value by its key from `Set-Cookie` headers.
+    ///
+    /// This method parses the cookies from all `Set-Cookie` headers,
+    /// then retrieves the value for the specified key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The cookie key (implements AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `CookieValue` - The cookie value.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the `Set-Cookie` header is not found
+    /// or the cookie key does not exist.
+    #[inline(always)]
+    pub fn get_cookie<K>(&self, key: K) -> CookieValue
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_cookie(key).unwrap()
     }
 
     /// Builds the full HTTP response as a byte vector.

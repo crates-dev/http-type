@@ -1061,6 +1061,83 @@ impl Request {
         }
     }
 
+    /// Tries to parse cookies from the `Cookie` header.
+    ///
+    /// This method retrieves the `Cookie` header value and parses it into
+    /// a collection of key-value pairs representing the cookies.
+    ///
+    /// # Returns
+    ///
+    /// - `Option<Cookies>` - The parsed cookies if the header exists, otherwise `None`.
+    #[inline(always)]
+    pub fn try_get_cookies(&self) -> Option<Cookies> {
+        self.try_get_header_back(COOKIE)
+            .map(|cookie_header: String| Cookie::parse(cookie_header))
+    }
+
+    /// Parses cookies from the `Cookie` header.
+    ///
+    /// This method retrieves the `Cookie` header value and parses it into
+    /// a collection of key-value pairs representing the cookies.
+    ///
+    /// # Returns
+    ///
+    /// - `Cookies` - The parsed cookies.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the `Cookie` header is not found.
+    #[inline(always)]
+    pub fn get_cookies(&self) -> Cookies {
+        self.try_get_cookies().unwrap()
+    }
+
+    /// Tries to get a cookie value by its key.
+    ///
+    /// This method first parses the cookies from the `Cookie` header,
+    /// then attempts to retrieve the value for the specified key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The cookie key (implements AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `Option<CookieValue>` - The cookie value if exists.
+    #[inline(always)]
+    pub fn try_get_cookie<K>(&self, key: K) -> Option<CookieValue>
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_cookies()
+            .and_then(|cookies: Cookies| cookies.get(key.as_ref()).cloned())
+    }
+
+    /// Gets a cookie value by its key.
+    ///
+    /// This method first parses the cookies from the `Cookie` header,
+    /// then retrieves the value for the specified key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The cookie key (implements AsRef<str>).
+    ///
+    /// # Returns
+    ///
+    /// - `CookieValue` - The cookie value.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the `Cookie` header is not found
+    /// or the cookie key does not exist.
+    #[inline(always)]
+    pub fn get_cookie<K>(&self, key: K) -> CookieValue
+    where
+        K: AsRef<str>,
+    {
+        self.try_get_cookie(key).unwrap()
+    }
+
     /// Retrieves the upgrade type from the request headers.
     ///
     /// This method looks for the `UPGRADE` header and attempts to parse its value

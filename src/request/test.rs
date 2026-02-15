@@ -259,3 +259,66 @@ fn request_config_security_presets() {
     assert!(low.get_max_body_size() > default.get_max_body_size());
     assert!(high.get_max_body_size() < default.get_max_body_size());
 }
+
+#[test]
+fn request_cookie_operations() {
+    let mut request: Request = Request::default();
+    let mut values: VecDeque<String> = VecDeque::new();
+    values.push_back("session_id=abc123; user_id=xyz789".to_string());
+    request.headers.insert("cookie".to_string(), values);
+    let cookies: Cookies = request.get_cookies();
+    assert_eq!(cookies.len(), 2);
+    assert_eq!(cookies.get("session_id"), Some(&"abc123".to_string()));
+    assert_eq!(cookies.get("user_id"), Some(&"xyz789".to_string()));
+}
+
+#[test]
+fn request_try_get_cookies() {
+    let request: Request = Request::default();
+    assert!(request.try_get_cookies().is_none());
+    let mut request: Request = Request::default();
+    let mut values: VecDeque<String> = VecDeque::new();
+    values.push_back("theme=dark".to_string());
+    request.headers.insert("cookie".to_string(), values);
+    let cookies_opt: Option<Cookies> = request.try_get_cookies();
+    assert!(cookies_opt.is_some());
+    let cookies: Cookies = cookies_opt.unwrap();
+    assert_eq!(cookies.get("theme"), Some(&"dark".to_string()));
+}
+
+#[test]
+fn request_try_get_cookie() {
+    let mut request: Request = Request::default();
+    let mut values: VecDeque<String> = VecDeque::new();
+    values.push_back("token=secret123; lang=en".to_string());
+    request.headers.insert("cookie".to_string(), values);
+    assert_eq!(
+        request.try_get_cookie("token"),
+        Some("secret123".to_string())
+    );
+    assert_eq!(request.try_get_cookie("lang"), Some("en".to_string()));
+    assert_eq!(request.try_get_cookie("not_exist"), None);
+}
+
+#[test]
+fn request_get_cookie() {
+    let mut request: Request = Request::default();
+    let mut values: VecDeque<String> = VecDeque::new();
+    values.push_back("session=value123".to_string());
+    request.headers.insert("cookie".to_string(), values);
+    assert_eq!(request.get_cookie("session"), "value123".to_string());
+}
+
+#[test]
+#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+fn request_get_cookie_panic() {
+    let request: Request = Request::default();
+    let _: CookieValue = request.get_cookie("not_exist");
+}
+
+#[test]
+#[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+fn request_get_cookies_panic() {
+    let request: Request = Request::default();
+    let _: Cookies = request.get_cookies();
+}
