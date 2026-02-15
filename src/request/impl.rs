@@ -288,7 +288,7 @@ impl Http {
     ///   - Or an error if parsing fails
     #[inline(always)]
     fn parse_first_line(line: &str) -> Result<(RequestMethod, &str, RequestVersion), RequestError> {
-        let mut parts = line.split_whitespace();
+        let mut parts: SplitWhitespace<'_> = line.split_whitespace();
         let method_str: &str = parts
             .next()
             .ok_or(RequestError::HttpRequestPartsInsufficient(

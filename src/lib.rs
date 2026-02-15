@@ -46,7 +46,7 @@ use std::{
     num::ParseIntError,
     rc::Rc,
     result::Result,
-    str::FromStr,
+    str::{FromStr, SplitWhitespace},
     sync::Arc,
     time::Duration,
 };
