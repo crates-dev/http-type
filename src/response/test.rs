@@ -150,10 +150,7 @@ fn response_error_display() {
     let error: ResponseError = ResponseError::ConnectionClosed;
     assert_eq!(format!("{error}"), "Connection has been closed");
     let error: ResponseError = ResponseError::Terminated;
-    assert_eq!(
-        format!("{error}"),
-        "Current processing has been terminated"
-    );
+    assert_eq!(format!("{error}"), "Current processing has been terminated");
     let error: ResponseError = ResponseError::Send("network error".to_string());
     assert_eq!(format!("{error}"), "Send error: network error");
 }
