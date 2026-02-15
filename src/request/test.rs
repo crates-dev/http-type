@@ -141,16 +141,16 @@ fn request_method_checks() {
         method: Method::Get,
         ..Default::default()
     };
-    assert!(request.is_get_method());
-    assert!(!request.is_post_method());
-    assert!(!request.is_put_method());
-    assert!(!request.is_delete_method());
-    assert!(!request.is_patch_method());
-    assert!(!request.is_head_method());
-    assert!(!request.is_options_method());
-    assert!(!request.is_connect_method());
-    assert!(!request.is_trace_method());
-    assert!(!request.is_unknown_method());
+    assert!(request.get_method().is_get());
+    assert!(!request.get_method().is_post());
+    assert!(!request.get_method().is_put());
+    assert!(!request.get_method().is_delete());
+    assert!(!request.get_method().is_patch());
+    assert!(!request.get_method().is_head());
+    assert!(!request.get_method().is_options());
+    assert!(!request.get_method().is_connect());
+    assert!(!request.get_method().is_trace());
+    assert!(!request.get_method().is_unknown());
 }
 
 #[test]
@@ -159,14 +159,14 @@ fn request_version_checks() {
         version: HttpVersion::Http1_1,
         ..Default::default()
     };
-    assert!(request.is_http1_1_version());
-    assert!(request.is_http1_1_or_higher_version());
-    assert!(request.is_http_version());
-    assert!(!request.is_http0_9_version());
-    assert!(!request.is_http1_0_version());
-    assert!(!request.is_http2_version());
-    assert!(!request.is_http3_version());
-    assert!(!request.is_unknown_version());
+    assert!(request.get_version().is_http1_1());
+    assert!(request.get_version().is_http1_1_or_higher());
+    assert!(request.get_version().is_http());
+    assert!(!request.get_version().is_http0_9());
+    assert!(!request.get_version().is_http1_0());
+    assert!(!request.get_version().is_http2());
+    assert!(!request.get_version().is_http3());
+    assert!(!request.get_version().is_unknown());
 }
 
 #[test]
