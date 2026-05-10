@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "17.5.0"
+version = "17.5.1"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -20,7 +20,7 @@ http-compress = "3.0.18"
 http-constant = "5.4.0"
 lombok-macros = "2.0.27"
 serde_urlencoded = "0.7.1"
-tokio = { version = "1.50.0", features = ["full"] }
+tokio = { version = "1.52.3", features = ["full"] }
 serde = { version = "1.0.228", features = ["derive"] }
 
 [profile.dev]
