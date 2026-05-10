@@ -1922,6 +1922,8 @@ pub enum FileExtension {
     FileExtensionWebm,
     /// The `webp` file extension.
     FileExtensionWebp,
+    /// The `wasm` file extension.
+    FileExtensionWasm,
     /// The `wg` file extension.
     FileExtensionWg,
     /// The `wgt` file extension.
@@ -2100,6 +2102,8 @@ pub enum FileExtension {
     FileExtensionYin,
     /// The `z` file extension.
     FileExtensionZ,
+    /// The `Z` file extension.
+    FileExtensionZUppercasee,
     /// The `z1` file extension.
     FileExtensionZ1,
     /// The `z2` file extension.
