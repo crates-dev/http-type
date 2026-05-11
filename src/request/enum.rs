@@ -100,6 +100,8 @@ pub enum RequestError {
     TlsConnectorBuildString(HttpStatus),
     /// Request error with custom message
     Request(String),
+    /// Stream not found error with HTTP status
+    NotFoundStream(HttpStatus),
     /// Unknown error with HTTP status
     Unknown(HttpStatus),
 }

@@ -18,6 +18,7 @@ mod hash_set_xx_hash3_64;
 mod http_status;
 mod http_url;
 mod http_version;
+mod lifetime;
 mod methods;
 mod protocol;
 mod rc_rwlock;
@@ -30,8 +31,8 @@ mod websocket_frame;
 pub use {
     any::*, arc_mutex::*, arc_rwlock::*, box_rwlock::*, content_type::*, cookie::*,
     file_extension::*, hash_map_xx_hash3_64::*, hash_set_xx_hash3_64::*, http_status::*,
-    http_url::*, http_version::*, methods::*, protocol::*, rc_rwlock::*, request::*, response::*,
-    stream::*, upgrade_type::*, websocket_frame::*,
+    http_url::*, http_version::*, lifetime::*, methods::*, protocol::*, rc_rwlock::*, request::*,
+    response::*, stream::*, upgrade_type::*, websocket_frame::*,
 };
 
 pub use {http_compress::*, http_constant::*, serde_json, tokio};

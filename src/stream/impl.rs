@@ -1,177 +1,400 @@
 use crate::*;
 
-/// Implementation of `PartialEq` trait for `ArcRwLockStream`.
-impl PartialEq for ArcRwLockStream {
-    /// Compares two `ArcRwLockStream` instances for equality.
+/// Implementation of `From` trait for converting `usize` address into `&Stream`.
+impl From<usize> for &'static Stream {
+    /// Converts a memory address into a reference to `Stream`.
     ///
     /// # Arguments
     ///
-    /// - `&Self` - The second `ArcRwLockStream` instance to compare.
+    /// - `usize` - The memory address of the `Stream` instance.
     ///
     /// # Returns
     ///
-    /// - `bool` - `true` if the instances point to the same Arc, `false` otherwise.
-    fn eq(&self, other: &Self) -> bool {
-        Arc::as_ptr(self.get_0()) == Arc::as_ptr(other.get_0())
+    /// - `&'static Stream` - A reference to the `Stream` at the given address.
+    ///
+    /// # Safety
+    ///
+    /// - The address is guaranteed to be a valid `Stream` instance
+    ///   that was previously converted from a reference and is managed by the runtime.
+    #[inline(always)]
+    fn from(address: usize) -> &'static Stream {
+        unsafe { &*(address as *const Stream) }
     }
 }
 
-/// Implementation of `Eq` trait for `ArcRwLockStream`.
-impl Eq for ArcRwLockStream {}
-
-impl ArcRwLockStream {
-    /// Creates a new ArcRwLockStream from an Arc<RwLock<TcpStream>>.
+/// Implementation of `From` trait for converting `usize` address into `&mut Stream`.
+impl<'a> From<usize> for &'a mut Stream {
+    /// Converts a memory address into a mutable reference to `Stream`.
     ///
     /// # Arguments
     ///
-    /// - `Arc<RwLock<TcpStream>>` - The stream to wrap.
+    /// - `usize` - The memory address of the `Stream` instance.
     ///
     /// # Returns
     ///
-    /// - `ArcRwLockStream` - The new stream wrapper.
+    /// - `&mut Stream` - A mutable reference to the `Stream` at the given address.
+    ///
+    /// # Safety
+    ///
+    /// - The address is guaranteed to be a valid `Stream` instance
+    ///   that was previously converted from a reference and is managed by the runtime.
     #[inline(always)]
-    pub fn from(arc_rw_lock_stream: ArcRwLock<TcpStream>) -> Self {
-        Self(arc_rw_lock_stream)
+    fn from(address: usize) -> &'a mut Stream {
+        unsafe { &mut *(address as *mut Stream) }
     }
+}
 
-    /// Creates a new ArcRwLockStream from a TcpStream.
-    ///
-    /// Wraps the stream in an Arc<RwLock<_>>.
+/// Implementation of `From` trait for converting `&Stream` into `usize` address.
+impl From<&Stream> for usize {
+    /// Converts a reference to `Stream` into its memory address.
     ///
     /// # Arguments
     ///
-    /// - `TcpStream` - The raw stream to wrap.
+    /// - `&Stream` - The reference to the `Stream` instance.
     ///
     /// # Returns
     ///
-    /// - `ArcRwLockStream` - The new thread-safe stream wrapper.
+    /// - `usize` - The memory address of the `Stream` instance.
     #[inline(always)]
-    pub fn from_stream(stream: TcpStream) -> Self {
-        Self(arc_rwlock(stream))
+    fn from(stream: &Stream) -> Self {
+        stream as *const Stream as usize
     }
+}
 
-    /// Gets a read lock on the inner TcpStream.
-    ///
-    /// Allows shared read access to the stream.
-    ///
-    /// # Returns
-    ///
-    /// - `RwLockReadGuard<'_, TcpStream>` - The read guard for the stream.
-    pub async fn read(&'_ self) -> RwLockReadGuard<'_, TcpStream> {
-        self.get_0().read().await
-    }
-
-    /// Gets a write lock on the inner TcpStream.
-    ///
-    /// Allows exclusive write access to the stream.
-    ///
-    /// # Returns
-    ///
-    /// - `RwLockWriteGuard<'_, TcpStream>` - The write guard for the stream.
-    pub(crate) async fn write(&'_ self) -> RwLockWriteGuard<'_, TcpStream> {
-        self.get_0().write().await
-    }
-
-    /// Sends HTTP response data over the stream.
+/// Implementation of `From` trait for converting `&mut Stream` into `usize` address.
+impl From<&mut Stream> for usize {
+    /// Converts a mutable reference to `Stream` into its memory address.
     ///
     /// # Arguments
     ///
-    /// - `AsRef<[u8]>` - The response data to send (must implement AsRef<[u8]>).
+    /// - `&mut Stream` - The mutable reference to the `Stream` instance.
+    ///
+    /// # Returns
+    ///
+    /// - `usize` - The memory address of the `Stream` instance.
+    #[inline(always)]
+    fn from(stream: &mut Stream) -> Self {
+        stream as *mut Stream as usize
+    }
+}
+
+/// Implementation of `AsRef` trait for `Stream`.
+impl AsRef<Stream> for Stream {
+    /// Converts `&Stream` to `&Stream` via memory address conversion.
+    ///
+    /// # Returns
+    ///
+    /// - `&Stream` - A reference to the `Stream` instance.
+    #[inline(always)]
+    fn as_ref(&self) -> &Self {
+        let address: usize = self.into();
+        address.into()
+    }
+}
+
+/// Implementation of `AsMut` trait for `Stream`.
+impl AsMut<Stream> for Stream {
+    /// Converts `&mut Stream` to `&mut Stream` via memory address conversion.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Stream` - A mutable reference to the `Stream` instance.
+    #[inline(always)]
+    fn as_mut(&mut self) -> &mut Self {
+        let address: usize = self.into();
+        address.into()
+    }
+}
+
+/// Implementation of `Lifetime` trait for `Stream`.
+impl Lifetime for Stream {
+    /// Converts a reference to the stream into a `'static` reference.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static Self`: A reference to the stream with a `'static` lifetime.
+    ///
+    /// # Safety
+    ///
+    /// - The address is guaranteed to be a valid `Self` instance
+    ///   that was previously converted from a reference and is managed by the runtime.
+    #[inline(always)]
+    unsafe fn leak(&self) -> &'static Self {
+        let address: usize = self.into();
+        address.into()
+    }
+
+    /// Converts a reference to the stream into a `'static` mutable reference.
+    ///
+    /// # Returns
+    ///
+    /// - `&'static mut Self`: A mutable reference to the stream with a `'static` lifetime.
+    ///
+    /// # Safety
+    ///
+    /// - The address is guaranteed to be a valid `Self` instance
+    ///   that was previously converted from a reference and is managed by the runtime.
+    #[inline(always)]
+    unsafe fn leak_mut(&self) -> &'static mut Self {
+        let address: usize = self.into();
+        address.into()
+    }
+}
+
+impl Stream {
+    /// Checks if the connection should be kept alive.
+    ///
+    /// This method evaluates whether the connection should remain open based on
+    /// the closed state and the keep_alive parameter.
+    ///
+    /// # Arguments
+    ///
+    /// - `bool` - Whether keep-alive is enabled for the request.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - True if the connection should be kept alive, otherwise false.
+    #[inline(always)]
+    pub fn is_keep_alive(&self, keep_alive: bool) -> bool {
+        !self.get_closed() && keep_alive
+    }
+
+    /// Free the context.
+    ///
+    /// # Safety
+    ///
+    /// - The address is guaranteed to be a valid `Self` instance
+    ///   that was previously converted from a reference and is managed by the runtime.
+    #[inline(always)]
+    pub unsafe fn free(&mut self) {
+        let _ = unsafe { Box::from_raw(self) };
+    }
+
+    /// Parses the HTTP request content from the stream.
+    ///
+    /// This is an internal helper function that performs the actual parsing.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Request, RequestError>`: The parsed request or an error.
+    async fn get_http_from_stream(&mut self) -> Result<Request, RequestError> {
+        let config: RequestConfig = *self.get_request_config();
+        let buffer_size: usize = config.get_buffer_size();
+        let max_path_size: usize = config.get_max_path_size();
+        let reader: &mut BufReader<&mut TcpStream> =
+            &mut BufReader::with_capacity(buffer_size, self.get_mut_stream());
+        let mut line: String = String::with_capacity(buffer_size);
+        AsyncBufReadExt::read_line(reader, &mut line).await?;
+        let (method, path, version): (RequestMethod, &str, RequestVersion) =
+            Request::get_http_first_line(&line)?;
+        Request::check_http_path_size(path, max_path_size)?;
+        let hash_index: Option<usize> = path.find(HASH);
+        let query_index: Option<usize> = path.find(QUERY);
+        let query: &str = Request::get_http_query(path, query_index, hash_index);
+        let querys: RequestQuerys = Request::get_http_querys(query);
+        let path: RequestPath = Request::get_http_path(path, query_index, hash_index);
+        let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =
+            Request::get_http_headers(reader, &config).await?;
+        let body: RequestBody = Request::get_http_body(reader, content_size).await?;
+        Ok(Request {
+            method,
+            host,
+            version,
+            path,
+            querys,
+            headers,
+            body,
+        })
+    }
+
+    /// Parses an HTTP request from a TCP stream.
+    ///
+    /// Wraps the stream in a buffered reader and delegates to `http_from_reader`.
+    /// If the timeout is DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS, no timeout is applied.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Request, RequestError>` - The parsed request or an error.
+    pub async fn try_get_http_request(&mut self) -> Result<Request, RequestError> {
+        let timeout_ms: u64 = self.get_request_config().get_read_timeout_ms();
+        if timeout_ms == DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS {
+            return self.get_http_from_stream().await;
+        }
+        let duration: Duration = Duration::from_millis(timeout_ms);
+        timeout(duration, self.get_http_from_stream()).await?
+    }
+
+    /// Parses a WebSocket request from a TCP stream.
+    ///
+    /// Wraps the stream in a buffered reader and delegates to `ws_from_reader`.
+    /// If the timeout is DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS, no timeout is applied.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Request, RequestError>`: The parsed WebSocket request or an error.
+    pub async fn try_get_websocket_request(&mut self) -> Result<RequestBody, RequestError> {
+        let config: RequestConfig = *self.get_request_config();
+        let buffer_size: usize = config.get_buffer_size();
+        let read_timeout_ms: u64 = config.get_read_timeout_ms();
+        let mut dynamic_buffer: Vec<u8> = Vec::with_capacity(buffer_size);
+        let mut temp_buffer: Vec<u8> = vec![0; buffer_size];
+        let mut full_frame: Vec<u8> = Vec::new();
+        let mut is_client_response: bool = false;
+        let duration_opt: Option<Duration> =
+            if read_timeout_ms == DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS {
+                None
+            } else {
+                let adjusted_timeout_ms: u64 = (read_timeout_ms >> 1) + (read_timeout_ms & 1);
+                Some(Duration::from_millis(adjusted_timeout_ms))
+            };
+        loop {
+            let len: usize = match self
+                .get_websocket_from_stream(&mut temp_buffer, duration_opt, &mut is_client_response)
+                .await
+            {
+                Ok(Some(len)) => len,
+                Ok(None) => continue,
+                Err(error) => return Err(error),
+            };
+            if len == 0 {
+                return Err(RequestError::IncompleteWebSocketFrame(
+                    HttpStatus::BadRequest,
+                ));
+            }
+            dynamic_buffer.extend_from_slice(&temp_buffer[..len]);
+            while let Some((frame, consumed)) = WebSocketFrame::decode_ws_frame(&dynamic_buffer) {
+                is_client_response = true;
+                dynamic_buffer.drain(0..consumed);
+                match frame.get_opcode() {
+                    WebSocketOpcode::Close => {
+                        return Err(RequestError::ClientClosedConnection(HttpStatus::BadRequest));
+                    }
+                    WebSocketOpcode::Ping | WebSocketOpcode::Pong => continue,
+                    WebSocketOpcode::Text | WebSocketOpcode::Binary => {
+                        match frame.build_full_frame(&mut full_frame) {
+                            Ok(Some(result)) => return Ok(result),
+                            Ok(None) => continue,
+                            Err(error) => return Err(error),
+                        }
+                    }
+                    _ => {
+                        return Err(RequestError::WebSocketOpcodeUnsupported(
+                            HttpStatus::NotImplemented,
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    /// Reads data from the stream with optional timeout handling.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut [u8]`: The buffer to read data into.
+    /// - `Option<Duration>`: The optional timeout duration. If Some, timeout is applied; if None, no timeout.
+    /// - `&mut bool`: Mutable reference to track if we got a client response.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<usize>, RequestError>`: The number of bytes read, None for timeout/ping, or an error.
+    pub(crate) async fn get_websocket_from_stream(
+        &mut self,
+        buffer: &mut [u8],
+        duration_opt: Option<Duration>,
+        is_client_response: &mut bool,
+    ) -> Result<Option<usize>, RequestError> {
+        let stream: &mut TcpStream = self.get_mut_stream();
+        if let Some(duration) = duration_opt {
+            return match timeout(duration, stream.read(buffer)).await {
+                Ok(result) => match result {
+                    Ok(len) => Ok(Some(len)),
+                    Err(error) => Err(error.into()),
+                },
+                Err(error) => {
+                    if !*is_client_response {
+                        return Err(error.into());
+                    }
+                    *is_client_response = false;
+                    self.try_send(&PING_FRAME).await?;
+                    Ok(None)
+                }
+            };
+        }
+        match stream.read(buffer).await {
+            Ok(len) => Ok(Some(len)),
+            Err(error) => Err(error.into()),
+        }
+    }
+
+    /// Sends data over the stream.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<[u8]>` - The data to send (must implement AsRef<[u8]>).
     ///
     /// # Returns
     ///
     /// - `Result<(), ResponseError>` - Result indicating success or failure.
-    pub async fn try_send<D>(&self, data: D) -> Result<(), ResponseError>
+    pub async fn try_send<D>(&mut self, data: D) -> Result<(), ResponseError>
     where
         D: AsRef<[u8]>,
     {
-        Ok(self.write().await.write_all(data.as_ref()).await?)
+        Ok(self.get_mut_stream().write_all(data.as_ref()).await?)
     }
 
-    /// Sends HTTP response data over the stream.
+    /// Sends data over the stream.
     ///
     /// # Arguments
     ///
-    /// - `AsRef<[u8]>` - The response data to send (must implement AsRef<[u8]>).
+    /// - `AsRef<[u8]>` - The data to send (must implement AsRef<[u8]>).
     ///
     /// # Panics
     ///
     /// Panics if the write operation fails.
-    pub async fn send<D>(&self, data: D)
+    pub async fn send<D>(&mut self, data: D)
     where
         D: AsRef<[u8]>,
     {
         self.try_send(data).await.unwrap();
     }
 
-    /// Sends HTTP response body.
+    /// Sends multiple data.
     ///
     /// # Arguments
     ///
-    /// - `AsRef<[u8]>` - The response body data (must implement AsRef<[u8]>).
+    /// - `IntoIterator<Item = AsRef<[u8]>>` - The data list to send.
     ///
     /// # Returns
     ///
     /// - `Result<(), ResponseError>` - Result indicating success or failure.
-    pub async fn try_send_body<D>(&self, data: D) -> Result<(), ResponseError>
-    where
-        D: AsRef<[u8]>,
-    {
-        Ok(self.write().await.write_all(data.as_ref()).await?)
-    }
-
-    /// Sends HTTP response body.
-    ///
-    /// # Arguments
-    ///
-    /// - `AsRef<[u8]>` - The response body data (must implement AsRef<[u8]>).
-    ///
-    /// # Panics
-    ///
-    /// Panics if the write operation fails.
-    pub async fn send_body<D>(&self, data: D)
-    where
-        D: AsRef<[u8]>,
-    {
-        self.try_send_body(data).await.unwrap();
-    }
-
-    /// Sends multiple HTTP response bodies sequentially.
-    ///
-    /// # Arguments
-    ///
-    /// - `I: IntoIterator<Item = D>, D: AsRef<[u8]>` - The response body data list to send.
-    ///
-    /// # Returns
-    ///
-    /// - `Result<(), ResponseError>` - Result indicating success or failure.
-    pub async fn try_send_body_list<I, D>(&self, data_iter: I) -> Result<(), ResponseError>
+    pub async fn try_send_list<I, D>(&mut self, data_iter: I) -> Result<(), ResponseError>
     where
         I: IntoIterator<Item = D>,
         D: AsRef<[u8]>,
     {
-        let mut stream: RwLockWriteGuard<'_, TcpStream> = self.write().await;
+        let stream: &mut TcpStream = self.get_mut_stream();
         for data in data_iter {
             stream.write_all(data.as_ref()).await?;
         }
         Ok(())
     }
 
-    /// Sends multiple HTTP response bodies sequentially.
+    /// Sends multiple data.
     ///
     /// # Arguments
     ///
-    /// - `I: IntoIterator<Item = D>, D: AsRef<[u8]>` - The response body data list to send.
+    /// - `IntoIterator<Item = AsRef<[u8]>>` - The data list to send.
     ///
     /// # Panics
     ///
     /// Panics if any write operation fails.
-    pub async fn send_body_list<I, D>(&self, data_iter: I)
+    pub async fn send_list<I, D>(&mut self, data_iter: I)
     where
         I: IntoIterator<Item = D>,
         D: AsRef<[u8]>,
     {
-        self.try_send_body_list(data_iter).await.unwrap();
+        self.try_send_list(data_iter).await.unwrap();
     }
 
     /// Flushes all buffered data to the stream.
@@ -179,8 +402,8 @@ impl ArcRwLockStream {
     /// # Returns
     ///
     /// - `Result<(), ResponseError>` - Result indicating success or failure.
-    pub async fn try_flush(&self) -> Result<(), ResponseError> {
-        Ok(self.write().await.flush().await?)
+    pub async fn try_flush(&mut self) -> Result<(), ResponseError> {
+        Ok(self.get_mut_stream().flush().await?)
     }
 
     /// Flushes all buffered data to the stream.
@@ -188,7 +411,7 @@ impl ArcRwLockStream {
     /// # Panics
     ///
     /// Panics if the flush operation fails.
-    pub async fn flush(&self) {
+    pub async fn flush(&mut self) {
         self.try_flush().await.unwrap();
     }
 }

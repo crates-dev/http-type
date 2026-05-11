@@ -1,11 +1,14 @@
 use crate::*;
 
-/// Thread-safe TCP stream wrapper.
-///
-/// Provides shared access to a TcpStream using Arc and RwLock.
-///
-/// # Fields
-///
-/// - `Arc<RwLock<TcpStream>>` - The protected TCP stream.
-#[derive(Clone, Debug, Getter)]
-pub struct ArcRwLockStream(#[get(pub(super))] pub(super) ArcRwLock<TcpStream>);
+#[derive(CustomDebug, Data, DisplayDebug, New)]
+pub struct Stream {
+    #[get_mut(pub(super))]
+    #[set(pub(super))]
+    pub(super) stream: TcpStream,
+    #[get_mut(pub(super))]
+    #[set(pub(super))]
+    pub(super) request_config: RequestConfig,
+    #[get(type(copy))]
+    #[get_mut(pub(super))]
+    pub(super) closed: bool,
+}

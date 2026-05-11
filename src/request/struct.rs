@@ -47,25 +47,17 @@ pub struct RequestConfig {
 )]
 pub struct Request {
     /// HTTP request method.
-    pub(super) method: RequestMethod,
+    pub(crate) method: RequestMethod,
     /// Request host.
-    pub(super) host: RequestHost,
+    pub(crate) host: RequestHost,
     /// HTTP protocol version.
-    pub(super) version: RequestVersion,
+    pub(crate) version: RequestVersion,
     /// Request path.
-    pub(super) path: RequestPath,
+    pub(crate) path: RequestPath,
     /// URL query parameters.
-    pub(super) querys: RequestQuerys,
+    pub(crate) querys: RequestQuerys,
     /// HTTP headers collection.
-    pub(super) headers: RequestHeaders,
+    pub(crate) headers: RequestHeaders,
     /// Request body content.
-    pub(super) body: RequestBody,
+    pub(crate) body: RequestBody,
 }
-
-/// HTTP request representation.
-#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, New, PartialEq, Serialize)]
-pub(crate) struct Http;
-
-/// WebSocket request representation.
-#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, New, PartialEq, Serialize)]
-pub(crate) struct Ws;

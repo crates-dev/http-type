@@ -9,7 +9,7 @@ impl Default for WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// A default `WebSocketFrame` instance.
+    /// - `Self` - A default `WebSocketFrame` instance.
     #[inline(always)]
     fn default() -> Self {
         Self {
@@ -30,7 +30,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// A `WebSocketOpcode` enum variant corresponding to the raw value.
+    /// - `Self` - A `WebSocketOpcode` enum variant corresponding to the raw value.
     #[inline(always)]
     pub fn from_u8(opcode: u8) -> Self {
         match opcode {
@@ -48,7 +48,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// The raw u8 value of the opcode.
+    /// - `u8` - The raw u8 value of the opcode.
     #[inline(always)]
     pub fn to_u8(&self) -> u8 {
         match self {
@@ -66,7 +66,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode represents a control frame (Close, Ping, Pong), otherwise `false`.
+    /// - `bool` - `true` if the opcode represents a control frame (Close, Ping, Pong), otherwise `false`.
     #[inline(always)]
     pub fn is_control(&self) -> bool {
         matches!(self, Self::Close | Self::Ping | Self::Pong)
@@ -76,7 +76,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode represents a data frame (Text, Binary, Continuation), otherwise `false`.
+    /// - `bool` - `true` if the opcode represents a data frame (Text, Binary, Continuation), otherwise `false`.
     #[inline(always)]
     pub fn is_data(&self) -> bool {
         matches!(self, Self::Text | Self::Binary | Self::Continuation)
@@ -86,7 +86,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Continuation`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Continuation`, otherwise `false`.
     #[inline(always)]
     pub fn is_continuation(&self) -> bool {
         matches!(self, Self::Continuation)
@@ -96,7 +96,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Text`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Text`, otherwise `false`.
     #[inline(always)]
     pub fn is_text(&self) -> bool {
         matches!(self, Self::Text)
@@ -106,7 +106,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Binary`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Binary`, otherwise `false`.
     #[inline(always)]
     pub fn is_binary(&self) -> bool {
         matches!(self, Self::Binary)
@@ -116,7 +116,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Close`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Close`, otherwise `false`.
     #[inline(always)]
     pub fn is_close(&self) -> bool {
         matches!(self, Self::Close)
@@ -126,7 +126,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Ping`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Ping`, otherwise `false`.
     #[inline(always)]
     pub fn is_ping(&self) -> bool {
         matches!(self, Self::Ping)
@@ -136,7 +136,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Pong`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Pong`, otherwise `false`.
     #[inline(always)]
     pub fn is_pong(&self) -> bool {
         matches!(self, Self::Pong)
@@ -146,7 +146,7 @@ impl WebSocketOpcode {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Reserved(_)`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Reserved(_)`, otherwise `false`.
     #[inline(always)]
     pub fn is_reserved(&self) -> bool {
         matches!(self, Self::Reserved(_))
@@ -166,9 +166,10 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - `Some((WebSocketFrame, usize))`: If the frame is successfully decoded, returns the decoded frame
-    ///   and the number of bytes consumed from the input slice.
-    /// - `None`: If the frame is incomplete or malformed.
+    /// - `Option<(WebSocketFrame, usize)>`
+    ///     - `Some((WebSocketFrame, usize))`: If the frame is successfully decoded, returns the decoded frame
+    ///       and the number of bytes consumed from the input slice.
+    ///     - `None`: If the frame is incomplete or malformed.
     pub fn decode_ws_frame<D>(data: D) -> Option<(WebSocketFrame, usize)>
     where
         D: AsRef<[u8]>,
@@ -238,7 +239,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - A vector of `ResponseBody` (byte vectors), where each element represents a framed WebSocket message.
+    /// - `Vec<ResponseBody>` - A vector of `ResponseBody` (byte vectors), where each element represents a framed WebSocket message.
     pub fn create_frame_list<D>(data: D) -> Vec<ResponseBody>
     where
         D: AsRef<[u8]>,
@@ -304,7 +305,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - A 20-byte array representing the SHA-1 hash of the input data.
+    /// - `[u8; 20]` - A 20-byte array representing the SHA-1 hash of the input data.
     pub fn sha1<D>(data: D) -> [u8; 20]
     where
         D: AsRef<[u8]>,
@@ -377,6 +378,7 @@ impl WebSocketFrame {
     /// # Returns
     ///
     /// - `Option<String>` - An optional string representing the generated WebSocket accept key (typically for the `Sec-WebSocket-Accept` header).
+    #[inline(always)]
     pub fn try_generate_accept_key<K>(key: K) -> Option<String>
     where
         K: AsRef<str>,
@@ -406,6 +408,7 @@ impl WebSocketFrame {
     /// # Panics
     ///
     /// This function will panic if the input key cannot be converted to a UTF-8 string.
+    #[inline(always)]
     pub fn generate_accept_key<K>(key: K) -> String
     where
         K: AsRef<str>,
@@ -460,11 +463,12 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// - A string with the base64 encoded representation of the input data.
+    /// - `String` - A string with the base64 encoded representation of the input data.
     ///
     /// # Panics
     ///
     /// This function will panic if the input data cannot be converted to a UTF-8 string.
+    #[inline(always)]
     pub fn base64_encode<D>(data: D) -> String
     where
         D: AsRef<[u8]>,
@@ -476,7 +480,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Continuation`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Continuation`, otherwise `false`.
     #[inline(always)]
     pub fn is_continuation_opcode(&self) -> bool {
         self.opcode.is_continuation()
@@ -486,7 +490,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Text`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Text`, otherwise `false`.
     #[inline(always)]
     pub fn is_text_opcode(&self) -> bool {
         self.opcode.is_text()
@@ -496,7 +500,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Binary`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Binary`, otherwise `false`.
     #[inline(always)]
     pub fn is_binary_opcode(&self) -> bool {
         self.opcode.is_binary()
@@ -506,7 +510,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Close`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Close`, otherwise `false`.
     #[inline(always)]
     pub fn is_close_opcode(&self) -> bool {
         self.opcode.is_close()
@@ -516,7 +520,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Ping`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Ping`, otherwise `false`.
     #[inline(always)]
     pub fn is_ping_opcode(&self) -> bool {
         self.opcode.is_ping()
@@ -526,7 +530,7 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Pong`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Pong`, otherwise `false`.
     #[inline(always)]
     pub fn is_pong_opcode(&self) -> bool {
         self.opcode.is_pong()
@@ -536,9 +540,31 @@ impl WebSocketFrame {
     ///
     /// # Returns
     ///
-    /// `true` if the opcode is `Reserved(_)`, otherwise `false`.
+    /// - `bool` - `true` if the opcode is `Reserved(_)`, otherwise `false`.
     #[inline(always)]
     pub fn is_reserved_opcode(&self) -> bool {
         self.opcode.is_reserved()
+    }
+
+    /// Handles a decoded WebSocket Text or Binary frame and accumulates payload data.
+    ///
+    /// # Arguments
+    ///
+    /// - `&mut Vec<u8>`: The accumulated frame data.
+    ///
+    /// # Returns
+    ///
+    /// - `Result<Option<RequestBody>, RequestError>`: Some(request) if frame is complete, None to continue, or error.
+    #[inline(always)]
+    pub(crate) fn build_full_frame(
+        &self,
+        full_frame: &mut Vec<u8>,
+    ) -> Result<Option<RequestBody>, RequestError> {
+        let payload_data: &[u8] = self.get_payload_data();
+        full_frame.extend_from_slice(payload_data);
+        if *self.get_fin() {
+            return Ok(Some(full_frame.clone()));
+        }
+        Ok(None)
     }
 }
