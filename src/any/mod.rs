@@ -1,4 +1,6 @@
 mod r#impl;
+#[cfg(test)]
+mod test;
 mod r#trait;
 mod r#type;
 

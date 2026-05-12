@@ -9,6 +9,7 @@
 mod any;
 mod arc_mutex;
 mod arc_rwlock;
+mod box_leak;
 mod box_rwlock;
 mod content_type;
 mod cookie;
@@ -29,7 +30,7 @@ mod upgrade_type;
 mod websocket_frame;
 
 pub use {
-    any::*, arc_mutex::*, arc_rwlock::*, box_rwlock::*, content_type::*, cookie::*,
+    any::*, arc_mutex::*, arc_rwlock::*, box_leak::*, box_rwlock::*, content_type::*, cookie::*,
     file_extension::*, hash_map_xx_hash3_64::*, hash_set_xx_hash3_64::*, http_status::*,
     http_url::*, http_version::*, lifetime::*, methods::*, protocol::*, rc_rwlock::*, request::*,
     response::*, stream::*, upgrade_type::*, websocket_frame::*,
