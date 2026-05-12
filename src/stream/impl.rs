@@ -216,6 +216,9 @@ impl Stream {
     ///
     /// - `Result<Request, RequestError>` - The parsed request or an error.
     pub async fn try_get_http_request(&mut self) -> Result<Request, RequestError> {
+        if self.get_closed() {
+            return Err(RequestError::ServerClosedConnection(HttpStatus::BadRequest));
+        }
         let timeout_ms: u64 = self.get_request_config().get_read_timeout_ms();
         if timeout_ms == DEFAULT_LOW_SECURITY_READ_TIMEOUT_MS {
             return self.get_http_from_stream().await;
@@ -233,6 +236,9 @@ impl Stream {
     ///
     /// - `Result<Request, RequestError>`: The parsed WebSocket request or an error.
     pub async fn try_get_websocket_request(&mut self) -> Result<RequestBody, RequestError> {
+        if self.get_closed() {
+            return Err(RequestError::ServerClosedConnection(HttpStatus::BadRequest));
+        }
         let config: RequestConfig = *self.get_request_config();
         let buffer_size: usize = config.get_buffer_size();
         let read_timeout_ms: u64 = config.get_read_timeout_ms();
@@ -340,6 +346,9 @@ impl Stream {
     where
         D: AsRef<[u8]>,
     {
+        if self.get_closed() {
+            return Err(ResponseError::ConnectionClosed);
+        }
         Ok(self.get_mut_stream().write_all(data.as_ref()).await?)
     }
 
@@ -373,6 +382,9 @@ impl Stream {
         I: IntoIterator<Item = D>,
         D: AsRef<[u8]>,
     {
+        if self.get_closed() {
+            return Err(ResponseError::ConnectionClosed);
+        }
         let stream: &mut TcpStream = self.get_mut_stream();
         for data in data_iter {
             stream.write_all(data.as_ref()).await?;
@@ -403,6 +415,9 @@ impl Stream {
     ///
     /// - `Result<(), ResponseError>` - Result indicating success or failure.
     pub async fn try_flush(&mut self) -> Result<(), ResponseError> {
+        if self.get_closed() {
+            return Err(ResponseError::ConnectionClosed);
+        }
         Ok(self.get_mut_stream().flush().await?)
     }
 

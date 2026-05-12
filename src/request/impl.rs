@@ -118,6 +118,7 @@ impl RequestError {
             Self::ClientDisconnected(status) => *status,
             Self::RedirectUrlDeadLoop(status) => *status,
             Self::ClientClosedConnection(status) => *status,
+            Self::ServerClosedConnection(status) => *status,
             Self::IncompleteWebSocketFrame(status) => *status,
             Self::RequestTooLong(status) => *status,
             Self::PathTooLong(status) => *status,
@@ -154,7 +155,6 @@ impl RequestError {
             Self::TcpStreamConnectString(status) => *status,
             Self::TlsConnectorBuildString(status) => *status,
             Self::Request(_) => HttpStatus::BadRequest,
-            Self::NotFoundStream(status) => *status,
             Self::Unknown(status) => *status,
         }
     }

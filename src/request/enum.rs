@@ -28,6 +28,8 @@ pub enum RequestError {
     RedirectUrlDeadLoop(HttpStatus),
     /// Client closed connection with HTTP status
     ClientClosedConnection(HttpStatus),
+    /// Server closed connection with HTTP status
+    ServerClosedConnection(HttpStatus),
     /// Incomplete WebSocket frame with HTTP status
     IncompleteWebSocketFrame(HttpStatus),
     /// Request too long with HTTP status
@@ -100,8 +102,6 @@ pub enum RequestError {
     TlsConnectorBuildString(HttpStatus),
     /// Request error with custom message
     Request(String),
-    /// Stream not found error with HTTP status
-    NotFoundStream(HttpStatus),
     /// Unknown error with HTTP status
     Unknown(HttpStatus),
 }
