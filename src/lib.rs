@@ -9,6 +9,7 @@
 mod any;
 mod arc_mutex;
 mod arc_rwlock;
+mod attribute;
 mod box_leak;
 mod box_rwlock;
 mod content_type;
@@ -33,8 +34,8 @@ mod upgrade_type;
 mod websocket_frame;
 
 pub use {
-    any::*, arc_mutex::*, arc_rwlock::*, box_leak::*, box_rwlock::*, content_type::*, cookie::*,
-    file_extension::*, hash_map_xx_hash3_64::*, hash_set_xx_hash3_64::*, http_status::*,
+    any::*, arc_mutex::*, arc_rwlock::*, attribute::*, box_leak::*, box_rwlock::*, content_type::*,
+    cookie::*, file_extension::*, hash_map_xx_hash3_64::*, hash_set_xx_hash3_64::*, http_status::*,
     http_url::*, http_version::*, lifetime::*, methods::*, panic::*, protocol::*, rc_rwlock::*,
     request::*, response::*, status::*, stream::*, task::*, upgrade_type::*, websocket_frame::*,
 };
@@ -61,7 +62,7 @@ use std::{
 };
 
 #[cfg(test)]
-use tokio::task::JoinHandle;
+use tokio::{spawn, task::JoinHandle};
 use {
     core::hash::BuildHasherDefault,
     lombok_macros::*,

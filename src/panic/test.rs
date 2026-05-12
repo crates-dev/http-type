@@ -14,7 +14,7 @@ fn panic_new() {
 
 #[tokio::test]
 async fn from_join_error() {
-    let handle: JoinHandle<()> = tokio::spawn(async {
+    let handle: JoinHandle<()> = spawn(async {
         panic!("test panic");
     });
     let result: Result<(), JoinError> = handle.await;
