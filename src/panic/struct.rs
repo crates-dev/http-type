@@ -6,7 +6,17 @@ use crate::*;
 /// source code location, and payload. It is used by the server's panic handling
 /// mechanism and passed to the configured panic hook for custom processing.
 #[derive(
-    Clone, CustomDebug, Default, Deserialize, DisplayDebug, Eq, Getter, PartialEq, Serialize, Setter,
+    Clone,
+    CustomDebug,
+    Default,
+    Deserialize,
+    DisplayDebug,
+    Eq,
+    Getter,
+    PartialEq,
+    Serialize,
+    Setter,
+    New,
 )]
 pub struct PanicData {
     /// The message associated with the panic.
