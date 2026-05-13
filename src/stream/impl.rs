@@ -159,17 +159,6 @@ impl Stream {
         !self.get_closed() && keep_alive
     }
 
-    /// Free the context.
-    ///
-    /// # Safety
-    ///
-    /// - The address is guaranteed to be a valid `Self` instance
-    ///   that was previously converted from a reference and is managed by the runtime.
-    #[inline(always)]
-    pub unsafe fn free(&mut self) {
-        let _ = unsafe { Box::from_raw(self) };
-    }
-
     /// Parses the HTTP request content from the stream.
     ///
     /// This is an internal helper function that performs the actual parsing.
