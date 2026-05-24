@@ -1,22 +1,5 @@
 use crate::*;
 
-struct TestLifetimeStruct {
-    value: i32,
-}
-
-impl Lifetime for TestLifetimeStruct {
-    unsafe fn leak(&self) -> &'static Self {
-        let boxed: Box<Self> = Box::new(Self { value: self.value });
-        Box::leak(boxed)
-    }
-    unsafe fn leak_mut(&self) -> &'static mut Self {
-        let mut boxed: Box<Self> = Box::new(Self { value: self.value });
-        let reference: *mut Self = std::ptr::addr_of_mut!(*boxed);
-        std::mem::forget(boxed);
-        unsafe { &mut *reference }
-    }
-}
-
 #[test]
 fn test_lifetime_trait_leak() {
     let data: TestLifetimeStruct = TestLifetimeStruct { value: 42 };

@@ -8,23 +8,23 @@ use crate::*;
 #[derive(Clone, CustomDebug, Data, DisplayDebug)]
 pub struct Task {
     /// Pool of unbounded senders for distributing tasks to worker threads.
-    #[get(pub(super))]
-    #[get_mut(pub(super))]
-    #[set(pub(super))]
-    pub(super) pool: Vec<UnboundedSender<AsyncTask>>,
+    #[get(pub)]
+    #[get_mut(pub)]
+    #[set(pub)]
+    pub pool: Vec<UnboundedSender<AsyncTask>>,
     /// Atomic counter for round-robin task distribution across workers.
-    #[get(pub(super))]
-    #[get_mut(pub(super))]
-    #[set(pub(super))]
-    pub(super) counter: Arc<AtomicUsize>,
+    #[get(pub)]
+    #[get_mut(pub)]
+    #[set(pub)]
+    pub counter: Arc<AtomicUsize>,
     /// Flag indicating whether the task pool should shut down.
-    #[get(pub(super))]
-    #[get_mut(pub(super))]
-    #[set(pub(super))]
-    pub(super) shutdown: Arc<AtomicBool>,
+    #[get(pub)]
+    #[get_mut(pub)]
+    #[set(pub)]
+    pub shutdown: Arc<AtomicBool>,
     /// Notification handles for precise wake-up of specific workers.
-    #[get(pub(super))]
-    #[get_mut(pub(super))]
-    #[set(pub(super))]
-    pub(super) notifies: Vec<Arc<Notify>>,
+    #[get(pub)]
+    #[get_mut(pub)]
+    #[set(pub)]
+    pub notifies: Vec<Arc<Notify>>,
 }

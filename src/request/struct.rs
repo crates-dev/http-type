@@ -12,31 +12,31 @@ pub struct RequestConfig {
     /// Buffer size for reading operations.
     #[get(type(copy))]
     #[set]
-    pub(super) buffer_size: usize,
+    pub buffer_size: usize,
     /// Maximum size for URL path in bytes.
     #[get(type(copy))]
     #[set]
-    pub(super) max_path_size: usize,
+    pub max_path_size: usize,
     /// Maximum number of headers allowed in a request.
     #[get(type(copy))]
     #[set]
-    pub(super) max_header_count: usize,
+    pub max_header_count: usize,
     /// Maximum size for a header key in bytes.
     #[get(type(copy))]
     #[set]
-    pub(super) max_header_key_size: usize,
+    pub max_header_key_size: usize,
     /// Maximum size for a header value in bytes.
     #[get(type(copy))]
     #[set]
-    pub(super) max_header_value_size: usize,
+    pub max_header_value_size: usize,
     /// Maximum size for request body in bytes.
     #[get(type(copy))]
     #[set]
-    pub(super) max_body_size: usize,
+    pub max_body_size: usize,
     /// Timeout for reading data in milliseconds.
     #[get(type(copy))]
     #[set]
-    pub(super) read_timeout_ms: u64,
+    pub read_timeout_ms: u64,
 }
 
 /// HTTP request representation.
@@ -47,17 +47,17 @@ pub struct RequestConfig {
 )]
 pub struct Request {
     /// HTTP request method.
-    pub(crate) method: RequestMethod,
+    pub method: RequestMethod,
     /// Request host.
-    pub(crate) host: RequestHost,
+    pub host: RequestHost,
     /// HTTP protocol version.
-    pub(crate) version: RequestVersion,
+    pub version: RequestVersion,
     /// Request path.
-    pub(crate) path: RequestPath,
+    pub path: RequestPath,
     /// URL query parameters.
-    pub(crate) querys: RequestQuerys,
+    pub querys: RequestQuerys,
     /// HTTP headers collection.
-    pub(crate) headers: RequestHeaders,
+    pub headers: RequestHeaders,
     /// Request body content.
-    pub(crate) body: RequestBody,
+    pub body: RequestBody,
 }
