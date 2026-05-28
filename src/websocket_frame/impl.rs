@@ -213,8 +213,8 @@ impl WebSocketFrame {
         }
         let mut payload: Vec<u8> = data_ref[index..index + payload_len].to_vec();
         if let Some(mask_key) = mask_key {
-            for (i, byte) in payload.iter_mut().enumerate() {
-                *byte ^= mask_key[i % 4];
+            for (byte_index, payload_byte) in payload.iter_mut().enumerate() {
+                *payload_byte ^= mask_key[byte_index % 4];
             }
         }
         index += payload_len;
@@ -321,50 +321,54 @@ impl WebSocketFrame {
         padded_data.extend_from_slice(&original_size_bits.to_be_bytes());
         for block in padded_data.chunks_exact(64) {
             let mut message_schedule: [u32; 80] = [0u32; 80];
-            for (i, block_chunk) in block.chunks_exact(4).enumerate().take(16) {
-                message_schedule[i] = u32::from_be_bytes([
+            for (chunk_index, block_chunk) in block.chunks_exact(4).enumerate().take(16) {
+                message_schedule[chunk_index] = u32::from_be_bytes([
                     block_chunk[0],
                     block_chunk[1],
                     block_chunk[2],
                     block_chunk[3],
                 ]);
             }
-            for i in 16..80 {
-                message_schedule[i] = (message_schedule[i - 3]
-                    ^ message_schedule[i - 8]
-                    ^ message_schedule[i - 14]
-                    ^ message_schedule[i - 16])
+            for schedule_index in 16..80 {
+                message_schedule[schedule_index] = (message_schedule[schedule_index - 3]
+                    ^ message_schedule[schedule_index - 8]
+                    ^ message_schedule[schedule_index - 14]
+                    ^ message_schedule[schedule_index - 16])
                     .rotate_left(1);
             }
-            let [mut a, mut b, mut c, mut d, mut e] = hash_state;
-            for (i, &word) in message_schedule.iter().enumerate() {
-                let (f, k) = match i {
-                    0..=19 => ((b & c) | (!b & d), 0x5A827999),
-                    20..=39 => (b ^ c ^ d, 0x6ED9EBA1),
-                    40..=59 => ((b & c) | (b & d) | (c & d), 0x8F1BBCDC),
-                    _ => (b ^ c ^ d, 0xCA62C1D6),
+            let [mut hash_a, mut hash_b, mut hash_c, mut hash_d, mut hash_e] = hash_state;
+            for (round_index, &schedule_word) in message_schedule.iter().enumerate() {
+                let (round_function, round_constant): (u32, u32) = match round_index {
+                    0..=19 => ((hash_b & hash_c) | (!hash_b & hash_d), 0x5A827999),
+                    20..=39 => (hash_b ^ hash_c ^ hash_d, 0x6ED9EBA1),
+                    40..=59 => (
+                        (hash_b & hash_c) | (hash_b & hash_d) | (hash_c & hash_d),
+                        0x8F1BBCDC,
+                    ),
+                    _ => (hash_b ^ hash_c ^ hash_d, 0xCA62C1D6),
                 };
-                let temp: u32 = a
+                let temp: u32 = hash_a
                     .rotate_left(5)
-                    .wrapping_add(f)
-                    .wrapping_add(e)
-                    .wrapping_add(k)
-                    .wrapping_add(word);
-                e = d;
-                d = c;
-                c = b.rotate_left(30);
-                b = a;
-                a = temp;
+                    .wrapping_add(round_function)
+                    .wrapping_add(hash_e)
+                    .wrapping_add(round_constant)
+                    .wrapping_add(schedule_word);
+                hash_e = hash_d;
+                hash_d = hash_c;
+                hash_c = hash_b.rotate_left(30);
+                hash_b = hash_a;
+                hash_a = temp;
             }
-            hash_state[0] = hash_state[0].wrapping_add(a);
-            hash_state[1] = hash_state[1].wrapping_add(b);
-            hash_state[2] = hash_state[2].wrapping_add(c);
-            hash_state[3] = hash_state[3].wrapping_add(d);
-            hash_state[4] = hash_state[4].wrapping_add(e);
+            hash_state[0] = hash_state[0].wrapping_add(hash_a);
+            hash_state[1] = hash_state[1].wrapping_add(hash_b);
+            hash_state[2] = hash_state[2].wrapping_add(hash_c);
+            hash_state[3] = hash_state[3].wrapping_add(hash_d);
+            hash_state[4] = hash_state[4].wrapping_add(hash_e);
         }
         let mut result: [u8; 20] = [0u8; 20];
-        for (i, &val) in hash_state.iter().enumerate() {
-            result[i * 4..(i + 1) * 4].copy_from_slice(&val.to_be_bytes());
+        for (state_index, &state_value) in hash_state.iter().enumerate() {
+            result[state_index * 4..(state_index + 1) * 4]
+                .copy_from_slice(&state_value.to_be_bytes());
         }
         result
     }

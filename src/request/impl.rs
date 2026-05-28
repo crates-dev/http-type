@@ -698,7 +698,7 @@ impl Request {
     {
         self.headers
             .get(key.as_ref())
-            .and_then(|values| values.front().cloned())
+            .and_then(|header_values: &VecDeque<String>| header_values.front().cloned())
     }
 
     /// Retrieves the first value of a request header by its key.
@@ -738,7 +738,7 @@ impl Request {
     {
         self.headers
             .get(key.as_ref())
-            .and_then(|values| values.back().cloned())
+            .and_then(|header_values: &VecDeque<String>| header_values.back().cloned())
     }
 
     /// Retrieves the last value of a request header by its key.
@@ -776,7 +776,9 @@ impl Request {
     where
         K: AsRef<str>,
     {
-        self.headers.get(key.as_ref()).map(|values| values.len())
+        self.headers
+            .get(key.as_ref())
+            .map(|header_values: &VecDeque<String>| header_values.len())
     }
 
     /// Retrieves the number of values for a specific header.
@@ -807,7 +809,10 @@ impl Request {
     /// - `usize` - The total count of all header values.
     #[inline(always)]
     pub fn get_headers_values_size(&self) -> usize {
-        self.headers.values().map(|values| values.len()).sum()
+        self.headers
+            .values()
+            .map(|header_values: &VecDeque<String>| header_values.len())
+            .sum()
     }
 
     /// Retrieves the number of unique headers.

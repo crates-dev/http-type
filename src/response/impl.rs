@@ -656,11 +656,14 @@ impl Response {
         if !content_type.eq_ignore_ascii_case(TEXT_EVENT_STREAM) {
             self.set_header_without_check(CONTENT_LENGTH, body.len().to_string());
         }
-        self.get_headers().iter().for_each(|(key, values)| {
-            for value in values.iter() {
-                Self::push_header(&mut response_string, key, value);
-            }
-        });
+        self.get_headers()
+            .iter()
+            .for_each(|header_entry: (&String, &VecDeque<String>)| {
+                let (header_key, header_values): (&String, &VecDeque<String>) = header_entry;
+                for header_value in header_values.iter() {
+                    Self::push_header(&mut response_string, header_key, header_value);
+                }
+            });
         response_string.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_string.into_bytes();
         response_bytes.extend_from_slice(&body);
