@@ -9,16 +9,16 @@ impl Display for HttpUrlError {
     ///
     /// # Arguments
     ///
-    /// - `&mut fmt::Formatter<'_>` - The formatter to write the string into.
+    /// - `&mut Formatter<'_>` - The formatter to write the string into.
     ///
     /// # Returns
     ///
     /// A `fmt::Result` indicating success or failure of the formatting operation.
     #[inline(always)]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, data: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            HttpUrlError::InvalidUrl => write!(f, "Invalid URL"),
-            HttpUrlError::Unknown => write!(f, "Unknown error"),
+            HttpUrlError::InvalidUrl => write!(data, "Invalid URL"),
+            HttpUrlError::Unknown => write!(data, "Unknown error"),
         }
     }
 }
@@ -63,11 +63,11 @@ impl HttpUrlComponents {
         let protocol: String = parsed_url.scheme().to_string();
         let res: Self = Self {
             protocol,
-            host: parsed_url.host_str().map(|h| h.to_string()),
+            host: parsed_url.host_str().map(|data: &str| data.to_string()),
             port: parsed_url.port(),
             path: Some(parsed_url.path().to_string()),
-            query: parsed_url.query().map(|q| q.to_string()),
-            fragment: parsed_url.fragment().map(|f| f.to_string()),
+            query: parsed_url.query().map(|data: &str| data.to_string()),
+            fragment: parsed_url.fragment().map(|data: &str| data.to_string()),
         };
         Ok(res)
     }

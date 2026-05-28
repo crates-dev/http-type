@@ -40,8 +40,9 @@ impl Task {
         let mut pool: Vec<UnboundedSender<AsyncTask>> = Vec::with_capacity(worker_count);
         let counter: Arc<AtomicUsize> = Arc::new(AtomicUsize::new(0));
         let shutdown: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-        let notifies: Vec<Arc<Notify>> =
-            (0..worker_count).map(|_| Arc::new(Notify::new())).collect();
+        let notifies: Vec<Arc<Notify>> = (0..worker_count)
+            .map(|_: usize| Arc::new(Notify::new()))
+            .collect();
         for notify in notifies.iter().take(worker_count) {
             let (sender, mut receiver): (UnboundedSender<AsyncTask>, UnboundedReceiver<AsyncTask>) =
                 unbounded_channel();

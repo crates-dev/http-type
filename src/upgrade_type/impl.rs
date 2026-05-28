@@ -22,18 +22,18 @@ impl Display for UpgradeType {
     ///
     /// # Arguments
     ///
-    /// - `&mut fmt::Formatter<'_>`: A mutable reference to a `fmt::Formatter` used for writing the formatted string.
+    /// - `&mut Formatter<'_>`: A mutable reference to a `Formatter` used for writing the formatted string.
     ///
     /// # Returns
     ///
     /// A `fmt::Result` indicating whether the formatting was successful.
     #[inline(always)]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, data: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Self::WebSocket => write!(f, "{WEBSOCKET}"),
-            Self::H2c => write!(f, "{H2C_LOWERCASE}"),
-            Self::Tls(version) => write!(f, "{version}"),
-            Self::Unknown(tmp_str) => write!(f, "{tmp_str}"),
+            Self::WebSocket => write!(data, "{WEBSOCKET}"),
+            Self::H2c => write!(data, "{H2C_LOWERCASE}"),
+            Self::Tls(version) => write!(data, "{version}"),
+            Self::Unknown(tmp_str) => write!(data, "{tmp_str}"),
         }
     }
 }

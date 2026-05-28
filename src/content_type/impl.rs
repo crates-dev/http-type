@@ -15,7 +15,7 @@ impl ContentType {
     where
         T: Serialize + Display,
     {
-        serde_json::to_string(data).unwrap_or_else(|_| "{}".to_string())
+        serde_json::to_string(data).unwrap_or_default()
     }
 
     /// Serializes data into XML format.
@@ -31,7 +31,7 @@ impl ContentType {
     where
         T: Serialize + Display,
     {
-        serde_xml_rs::to_string(data).unwrap_or_else(|_| "<root></root>".to_string())
+        serde_xml_rs::to_string(data).unwrap_or_default()
     }
 
     /// Formats data into plain text.
@@ -83,7 +83,7 @@ impl ContentType {
     where
         T: Serialize + Display,
     {
-        serde_urlencoded::to_string(data).unwrap_or_else(|_| String::new())
+        serde_urlencoded::to_string(data).unwrap_or_default()
     }
 
     /// Formats data as hexadecimal string.

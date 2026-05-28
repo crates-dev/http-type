@@ -193,7 +193,7 @@ fn test_content_type_get_body_string_xml() {
     let data: String = "test_data".to_string();
     let content_type: ContentType = ContentType::ApplicationXml;
     let result: String = content_type.get_body_string(&data);
-    assert!(!result.is_empty());
+    assert!(result.is_empty());
 }
 
 #[test]

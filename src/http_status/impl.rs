@@ -185,12 +185,12 @@ impl Display for HttpStatus {
     ///
     /// # Arguments
     ///
-    /// - `&mut fmt::Formatter` - The formatter to write to.
+    /// - `&mut Formatter` - The formatter to write to.
     ///
     /// # Returns
     ///
     /// - `fmt::Result` - The formatting result.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, data: &mut Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::Continue => CONTINUE,
             Self::SwitchingProtocols => SWITCHING_PROTOCOLS,
@@ -256,7 +256,7 @@ impl Display for HttpStatus {
             Self::NetworkAuthenticationRequired => NETWORK_AUTHENTICATION_REQUIRED,
             Self::Unknown => UNKNOWN,
         };
-        write!(f, "{res}")
+        write!(data, "{res}")
     }
 }
 

@@ -309,10 +309,10 @@ impl Request {
             ))?;
         let method: RequestMethod = method_str
             .parse::<RequestMethod>()
-            .unwrap_or_else(|_| Method::Unknown(method_str.to_string()));
+            .unwrap_or(Method::Unknown(method_str.to_string()));
         let version: RequestVersion = version_str
             .parse::<RequestVersion>()
-            .unwrap_or_else(|_| RequestVersion::Unknown(version_str.to_string()));
+            .unwrap_or(RequestVersion::Unknown(version_str.to_string()));
         Ok((method, full_path, version))
     }
 
@@ -354,12 +354,12 @@ impl Request {
         query_index: Option<usize>,
         hash_index: Option<usize>,
     ) -> &str {
-        query_index.map_or(EMPTY_STR, |i: usize| {
-            let temp: &str = &path[i + 1..];
+        query_index.map_or(EMPTY_STR, |query_index: usize| {
+            let temp: &str = &path[query_index + 1..];
             match hash_index {
                 None => temp,
-                Some(hash_idx) if hash_idx <= i => temp,
-                Some(hash_idx) => &temp[..hash_idx - i - 1],
+                Some(hash_index) if hash_index <= query_index => temp,
+                Some(hash_index) => &temp[..hash_index - query_index - 1],
             }
         })
     }
@@ -382,7 +382,7 @@ impl Request {
         hash_index: Option<usize>,
     ) -> RequestPath {
         match query_index.or(hash_index) {
-            Some(i) => path[..i].to_owned(),
+            Some(separator_index) => path[..separator_index].to_owned(),
             None => path.to_owned(),
         }
     }
@@ -854,7 +854,7 @@ impl Request {
         V: AsRef<str>,
     {
         if let Some(values) = self.headers.get(key.as_ref()) {
-            values.iter().any(|v| v == value.as_ref())
+            values.iter().any(|data: &String| data == value.as_ref())
         } else {
             false
         }
@@ -949,7 +949,7 @@ impl Request {
     #[inline(always)]
     pub fn get_upgrade_type(&self) -> UpgradeType {
         self.try_get_header_back(UPGRADE)
-            .and_then(|data| data.parse::<UpgradeType>().ok())
+            .and_then(|data: String| data.parse::<UpgradeType>().ok())
             .unwrap_or_default()
     }
 

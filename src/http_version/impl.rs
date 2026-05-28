@@ -6,12 +6,12 @@ impl fmt::Display for HttpVersion {
     ///
     /// # Arguments
     ///
-    /// - `&mut fmt::Formatter<'_>` - The formatter to write the string into.
+    /// - `&mut Formatter<'_>` - The formatter to write the string into.
     ///
     /// # Returns
     ///
     /// A `fmt::Result` indicating success or failure of the formatting operation.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, data: &mut Formatter<'_>) -> fmt::Result {
         let version_str: &str = match self {
             Self::Http0_9 => HTTP_VERSION_0_9,
             Self::Http1_0 => HTTP_VERSION_1_0,
@@ -20,7 +20,7 @@ impl fmt::Display for HttpVersion {
             Self::Http3 => HTTP_VERSION_3,
             Self::Unknown(version) => version,
         };
-        write!(f, "{version_str}")
+        write!(data, "{version_str}")
     }
 }
 

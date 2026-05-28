@@ -19,13 +19,13 @@ impl Display for Method {
     ///
     /// # Arguments
     ///
-    /// - `&mut fmt::Formatter<'_>` - The formatter to write the string into.
+    /// - `&mut Formatter<'_>` - The formatter to write the string into.
     ///
     /// # Returns
     ///
     /// A `fmt::Result` indicating success or failure of the formatting operation.
     #[inline(always)]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, data: &mut Formatter<'_>) -> fmt::Result {
         let res: &str = match self {
             Self::Get => GET,
             Self::Post => POST,
@@ -38,7 +38,7 @@ impl Display for Method {
             Self::Options => OPTIONS,
             Self::Unknown(methods) => methods,
         };
-        write!(f, "{res}")
+        write!(data, "{res}")
     }
 }
 

@@ -48,7 +48,7 @@ pub use {http_compress::*, http_constant::*, serde_json, tokio};
 use std::{
     any::Any,
     collections::{HashMap, HashSet, VecDeque},
-    fmt::{self, Debug, Display},
+    fmt::{self, Debug, Display, Formatter},
     hash::Hash,
     io::ErrorKind,
     net::IpAddr,

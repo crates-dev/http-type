@@ -30,26 +30,26 @@ impl Display for ResponseError {
     ///
     /// # Arguments
     ///
-    /// - `f`: A mutable reference to a `fmt::Formatter` used for writing the formatted string.
+    /// - `f`: A mutable reference to a `Formatter` used for writing the formatted string.
     ///
     /// # Returns
     ///
     /// A `fmt::Result` indicating whether the formatting was successful.
     #[inline(always)]
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, data: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Self::NotFoundStream => {
-                write!(f, "Not found stream")
+                write!(data, "Not found stream")
             }
             Self::ConnectionClosed => {
-                write!(f, "Connection has been closed")
+                write!(data, "Connection has been closed")
             }
             Self::Terminated => {
-                write!(f, "Current processing has been terminated")
+                write!(data, "Current processing has been terminated")
             }
-            Self::Send(error) => write!(f, "Send error{COLON_SPACE}{error}"),
-            Self::FlushError(error) => write!(f, "Flush error{COLON_SPACE}{error}"),
-            Self::Unknown => write!(f, "Unknown error"),
+            Self::Send(error) => write!(data, "Send error{COLON_SPACE}{error}"),
+            Self::FlushError(error) => write!(data, "Flush error{COLON_SPACE}{error}"),
+            Self::Unknown => write!(data, "Unknown error"),
         }
     }
 }
@@ -157,7 +157,7 @@ impl Response {
     {
         self.headers
             .get(key.as_ref())
-            .and_then(|values| values.front().cloned())
+            .and_then(|data: &VecDeque<String>| data.front().cloned())
     }
 
     /// Retrieves the first value of a response header by its key.
@@ -197,7 +197,7 @@ impl Response {
     {
         self.headers
             .get(key.as_ref())
-            .and_then(|values| values.back().cloned())
+            .and_then(|data: &VecDeque<String>| data.back().cloned())
     }
 
     /// Retrieves the last value of a response header by its key.
@@ -285,7 +285,9 @@ impl Response {
     where
         K: AsRef<str>,
     {
-        self.headers.get(key.as_ref()).map(|values| values.len())
+        self.headers
+            .get(key.as_ref())
+            .map(|data: &VecDeque<String>| data.len())
     }
 
     /// Gets the number of values for a specific header key.
@@ -319,7 +321,10 @@ impl Response {
     /// - `usize` - The total count of all header values.
     #[inline(always)]
     pub fn get_headers_values_size(&self) -> usize {
-        self.headers.values().map(|values| values.len()).sum()
+        self.headers
+            .values()
+            .map(|data: &VecDeque<String>| data.len())
+            .sum()
     }
 
     /// Retrieves the body content of the response as a UTF-8 encoded string.
@@ -510,7 +515,7 @@ impl Response {
     {
         let key: ResponseHeadersKey = key.as_ref().to_owned();
         if let Some(values) = self.headers.get_mut(&key) {
-            values.retain(|v| v != &value.as_ref().to_owned());
+            values.retain(|data: &String| data != &value.as_ref().to_owned());
             if values.is_empty() {
                 self.headers.remove(&key);
             }
@@ -625,7 +630,7 @@ impl Response {
         self.push_http_first_line(&mut response_string);
         let compress_type_opt: Option<Compress> = self
             .try_get_header_back(CONTENT_ENCODING)
-            .map(|value| value.parse::<Compress>().unwrap_or_default());
+            .map(|data: String| data.parse::<Compress>().unwrap_or_default());
         if self.try_get_header_back(CONNECTION).is_none() {
             self.set_header_without_check(CONNECTION, KEEP_ALIVE);
         }

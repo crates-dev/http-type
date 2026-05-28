@@ -35,7 +35,7 @@ impl FileExtension {
         let full_path_ref: &str = full_path.as_ref();
         full_path_ref
             .rfind(POINT)
-            .map(|pos| full_path_ref[pos + 1..].to_string())
+            .map(|index: usize| full_path_ref[index + 1..].to_string())
             .unwrap_or_default()
     }
 
@@ -2214,12 +2214,12 @@ impl Display for FileExtension {
     ///
     /// # Arguments
     ///
-    /// - `&mut fmt::Formatter<'_>` - The formatter to write into.
+    /// - `&mut Formatter<'_>` - The formatter to write into.
     ///
     /// # Returns
     ///
     /// A `Result` indicating success or failure of the formatting operation.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, data: &mut Formatter<'_>) -> fmt::Result {
         let version_str: &str = match self {
             Self::FileExtension123 => FILE_EXTENSION_123,
             Self::FileExtension3dml => FILE_EXTENSION_3DML,
@@ -3285,6 +3285,6 @@ impl Display for FileExtension {
             Self::FileExtensionZmm => FILE_EXTENSION_ZMM,
             Self::Unknown => EMPTY_STR,
         };
-        write!(f, "{version_str}")
+        write!(data, "{version_str}")
     }
 }
