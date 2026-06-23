@@ -58,6 +58,11 @@ pub struct Request {
     pub querys: RequestQuerys,
     /// HTTP headers collection.
     pub headers: RequestHeaders,
+    /// HTTP/2 or HTTP/3 pseudo-headers (`:authority`, `:method`, `:path`, `:scheme`).
+    pub pseudo_headers: RequestPseudoHeaders,
     /// Request body content.
     pub body: RequestBody,
+    /// HTTP/2 or HTTP/3 stream identifier. `0` for HTTP/1.x.
+    #[get(type(copy))]
+    pub stream_id: RequestStreamId,
 }

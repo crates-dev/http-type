@@ -36,6 +36,7 @@ impl Display for Method {
             Self::Trace => TRACE,
             Self::Put => PUT,
             Self::Options => OPTIONS,
+            Self::Pri => "PRI",
             Self::Unknown(methods) => methods,
         };
         write!(data, "{res}")
@@ -72,12 +73,40 @@ impl FromStr for Method {
             OPTIONS => Ok(Self::Options),
             CONNECT => Ok(Self::Connect),
             TRACE => Ok(Self::Trace),
+            "PRI" => Ok(Self::Pri),
             _ => Ok(Self::Unknown(methods_str.to_string())),
         }
     }
 }
 
 impl Method {
+    /// Returns the method as a static string slice.
+    ///
+    /// For known methods this returns the canonical uppercase name; for
+    /// `Method::Unknown` it returns the stored string.
+    ///
+    /// This is cheaper than `to_string()` because it does not allocate.
+    ///
+    /// # Returns
+    ///
+    /// - `&str`: The string representation of the method.
+    #[inline(always)]
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Get => GET,
+            Self::Post => POST,
+            Self::Put => PUT,
+            Self::Delete => DELETE,
+            Self::Patch => PATCH,
+            Self::Head => HEAD,
+            Self::Options => OPTIONS,
+            Self::Connect => CONNECT,
+            Self::Trace => TRACE,
+            Self::Pri => "PRI",
+            Self::Unknown(methods) => methods.as_str(),
+        }
+    }
+
     /// Checks if the current method is `GET`.
     ///
     /// # Returns
@@ -176,5 +205,15 @@ impl Method {
     #[inline(always)]
     pub fn is_unknown(&self) -> bool {
         matches!(self, Self::Unknown(_))
+    }
+
+    /// Checks if the current method is `PRI` (HTTP/2 connection preface).
+    ///
+    /// # Returns
+    ///
+    /// `true` if the method is `PRI`, `false` otherwise.
+    #[inline(always)]
+    pub fn is_pri(&self) -> bool {
+        matches!(self, Self::Pri)
     }
 }

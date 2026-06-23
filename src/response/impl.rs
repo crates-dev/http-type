@@ -1,24 +1,24 @@
 use crate::*;
 
-/// Implements the `std::error::Error` trait for `ResponseError`.
+/// Implements the `Error` trait for `ResponseError`.
 /// This allows `ResponseError` to be treated as a standard Rust error type.
-impl std::error::Error for ResponseError {}
+impl StdError for ResponseError {}
 
 /// Converts an I/O error to a `ResponseError`.
 ///
 /// Maps I/O errors to `Send` variant with the error message.
-impl From<std::io::Error> for ResponseError {
+impl From<IoError> for ResponseError {
     /// Converts an I/O error to a `ResponseError`.
     ///
     /// # Arguments
     ///
-    /// - `std::io::Error`: The I/O error to convert.
+    /// - `IoError`: The I/O error to convert.
     ///
     /// # Returns
     ///
     /// - `ResponseError`: The corresponding response error as `Send`.
     #[inline(always)]
-    fn from(error: std::io::Error) -> Self {
+    fn from(error: IoError) -> Self {
         ResponseError::Send(error.to_string())
     }
 }
@@ -30,7 +30,8 @@ impl Display for ResponseError {
     ///
     /// # Arguments
     ///
-    /// - `f`: A mutable reference to a `Formatter` used for writing the formatted string.
+    /// - `&mut Formatter<'_>`: A mutable reference to the formatter used for writing the
+    ///   formatted string.
     ///
     /// # Returns
     ///
@@ -370,7 +371,7 @@ impl Response {
     ///
     /// # Returns
     ///
-    /// - `T` - The deserialized body content.
+    /// - `DeserializeOwned` - The deserialized body content.
     ///
     /// # Panics
     ///
@@ -626,6 +627,9 @@ impl Response {
         if self.reason_phrase.is_empty() {
             self.set_reason_phrase(HttpStatus::phrase(self.get_status_code()));
         }
+        if self.get_version().is_http2() || self.get_version().is_http3() {
+            return self.build_h2_response();
+        }
         let mut response_string: String = String::with_capacity(DEFAULT_BUFFER_SIZE);
         self.push_http_first_line(&mut response_string);
         let compress_type_opt: Option<Compress> = self
@@ -666,6 +670,44 @@ impl Response {
             });
         response_string.push_str(HTTP_BR);
         let mut response_bytes: Vec<u8> = response_string.into_bytes();
+        response_bytes.extend_from_slice(&body);
+        response_bytes
+    }
+
+    /// Builds an HTTP/2 or HTTP/3 response structure.
+    ///
+    /// Returns bytes encoding: status code (4 bytes big-endian), followed by
+    /// length-prefixed headers, a 4-byte separator (`0xFFFFFFFF`), and the body.
+    /// This wire representation is consumed by the h2/h3 handlers in hyperlane.
+    ///
+    /// # Returns
+    ///
+    /// - `ResponseData` - The encoded HTTP/2/HTTP/3 response bytes.
+    fn build_h2_response(&mut self) -> ResponseData {
+        let compress_type_opt: Option<Compress> = self
+            .try_get_header_back(CONTENT_ENCODING)
+            .map(|data: String| data.parse::<Compress>().unwrap_or_default());
+        let mut body: ResponseBody = self.get_body().clone();
+        if let Some(compress_type) = compress_type_opt
+            && !compress_type.is_unknown()
+        {
+            body = compress_type
+                .encode(&body, DEFAULT_BUFFER_SIZE)
+                .into_owned();
+        }
+        let mut response_bytes: Vec<u8> = Vec::with_capacity(DEFAULT_BUFFER_SIZE);
+        response_bytes.extend_from_slice(&(self.get_status_code() as u32).to_be_bytes());
+        for (header_key, header_values) in self.get_headers().iter() {
+            for header_value in header_values.iter() {
+                let key_bytes: &[u8] = header_key.as_bytes();
+                let value_bytes: &[u8] = header_value.as_bytes();
+                response_bytes.extend_from_slice(&(key_bytes.len() as u32).to_be_bytes());
+                response_bytes.extend_from_slice(key_bytes);
+                response_bytes.extend_from_slice(&(value_bytes.len() as u32).to_be_bytes());
+                response_bytes.extend_from_slice(value_bytes);
+            }
+        }
+        response_bytes.extend_from_slice(&[u8::MAX; 4]);
         response_bytes.extend_from_slice(&body);
         response_bytes
     }

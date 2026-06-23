@@ -39,6 +39,12 @@ pub type RequestHeadersValue = VecDeque<RequestHeadersValueItem>;
 /// An alias for `HashMapXxHash3_64<RequestHeadersKey, RequestHeadersValue>`, representing all headers sent with the HTTP request.
 pub type RequestHeaders = HashMapXxHash3_64<RequestHeadersKey, RequestHeadersValue>;
 
+/// An alias for `HashMapXxHash3_64<String, String>`, representing HTTP/2 and HTTP/3 pseudo-headers.
+pub type RequestPseudoHeaders = HashMapXxHash3_64<String, String>;
+
+/// An alias for `u32`, representing an HTTP/2 or HTTP/3 stream identifier.
+pub type RequestStreamId = u32;
+
 /// An alias for `RwLockReadGuard<'a, Request>`, representing a read guard for a `Request` wrapped in a `RwLock`.
 pub type RwLockReadGuardRequest<'a> = RwLockReadGuard<'a, Request>;
 

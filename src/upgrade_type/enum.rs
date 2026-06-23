@@ -5,8 +5,12 @@ use crate::*;
 pub enum UpgradeType {
     /// Represents an upgrade to the WebSocket protocol.
     WebSocket,
+    /// Represents an upgrade to HTTP/2 over TLS (ALPN h2).
+    H2,
     /// Represents an upgrade to HTTP/2 cleartext (h2c).
     H2c,
+    /// Represents an upgrade to HTTP/3 (QUIC).
+    H3,
     /// Represents a TLS upgrade, which is rare and experimental. It includes the specific TLS protocol string.
     Tls(String),
     /// Represents other custom or unknown upgrade protocols, including the protocol string.

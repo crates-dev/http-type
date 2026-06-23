@@ -47,6 +47,45 @@ fn test_is_https_with_non_https_protocol() {
 }
 
 #[test]
+fn test_is_h2() {
+    assert!(Protocol::is_h2("h2"));
+    assert!(Protocol::is_h2("h2c"));
+    assert!(Protocol::is_h2("H2"));
+    assert!(Protocol::is_h2("H2C"));
+    assert!(!Protocol::is_h2("http"));
+    assert!(!Protocol::is_h2("https"));
+    assert!(!Protocol::is_h2("h3"));
+}
+
+#[test]
+fn test_is_h2c() {
+    assert!(Protocol::is_h2c("h2c"));
+    assert!(Protocol::is_h2c("H2C"));
+    assert!(!Protocol::is_h2c("h2"));
+    assert!(!Protocol::is_h2c("http"));
+}
+
+#[test]
+fn test_is_h3() {
+    assert!(Protocol::is_h3("h3"));
+    assert!(Protocol::is_h3("H3"));
+    assert!(!Protocol::is_h3("h2"));
+    assert!(!Protocol::is_h3("http"));
+    assert!(!Protocol::is_h3("https"));
+}
+
+#[test]
+fn test_is_http_family() {
+    assert!(Protocol::is_http_family("http"));
+    assert!(Protocol::is_http_family("https"));
+    assert!(Protocol::is_http_family("h2"));
+    assert!(Protocol::is_http_family("h2c"));
+    assert!(Protocol::is_http_family("h3"));
+    assert!(!Protocol::is_http_family("ftp"));
+    assert!(!Protocol::is_http_family("ws"));
+}
+
+#[test]
 fn test_get_port_for_http() {
     assert_eq!(Protocol::get_port("http"), 80);
     assert_eq!(Protocol::get_port("HTTP"), 80);
@@ -58,6 +97,35 @@ fn test_get_port_for_https() {
     assert_eq!(Protocol::get_port("https"), 443);
     assert_eq!(Protocol::get_port("HTTPS"), 443);
     assert_eq!(Protocol::get_port("Https"), 443);
+}
+
+#[test]
+fn test_get_port_for_h2() {
+    assert_eq!(Protocol::get_port("h2"), 443);
+    assert_eq!(Protocol::get_port("H2"), 443);
+}
+
+#[test]
+fn test_get_port_for_h2c() {
+    assert_eq!(Protocol::get_port("h2c"), 80);
+    assert_eq!(Protocol::get_port("H2C"), 80);
+}
+
+#[test]
+fn test_get_port_for_h3() {
+    assert_eq!(Protocol::get_port("h3"), 443);
+    assert_eq!(Protocol::get_port("H3"), 443);
+}
+
+#[test]
+fn test_get_h2_port() {
+    assert_eq!(Protocol::get_h2_port(true), 443);
+    assert_eq!(Protocol::get_h2_port(false), 80);
+}
+
+#[test]
+fn test_get_h3_port() {
+    assert_eq!(Protocol::get_h3_port(), 443);
 }
 
 #[test]

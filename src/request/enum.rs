@@ -1,5 +1,6 @@
 use crate::*;
 
+/// Represents errors that can occur while processing an HTTP request.
 #[derive(Clone, Debug, Deserialize, DisplayDebug, Eq, PartialEq, Serialize)]
 pub enum RequestError {
     /// HTTP read error with HTTP status

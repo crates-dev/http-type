@@ -1,7 +1,7 @@
 use crate::*;
 
-/// Implements the `std::error::Error` trait for `HttpUrlError`.
-impl std::error::Error for HttpUrlError {}
+/// Implements the `Error` trait for `HttpUrlError`.
+impl StdError for HttpUrlError {}
 
 /// Implements the `Display` trait for `HttpUrlError`, allowing it to be formatted as a string.
 impl Display for HttpUrlError {

@@ -31,7 +31,9 @@ impl Display for UpgradeType {
     fn fmt(&self, data: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Self::WebSocket => write!(data, "{WEBSOCKET}"),
+            Self::H2 => write!(data, "h2"),
             Self::H2c => write!(data, "{H2C_LOWERCASE}"),
+            Self::H3 => write!(data, "h3"),
             Self::Tls(version) => write!(data, "{version}"),
             Self::Unknown(tmp_str) => write!(data, "{tmp_str}"),
         }
@@ -62,6 +64,8 @@ impl FromStr for UpgradeType {
         match from_str.to_ascii_lowercase().as_str() {
             WEBSOCKET => Ok(Self::WebSocket),
             H2C_LOWERCASE => Ok(Self::H2c),
+            "h2" => Ok(Self::H2),
+            "h3" => Ok(Self::H3),
             val if val.starts_with(TLS_LOWERCASE) => Ok(Self::Tls(val.to_string())),
             other => Ok(Self::Unknown(other.to_string())),
         }
@@ -79,6 +83,16 @@ impl UpgradeType {
         matches!(self, &Self::WebSocket)
     }
 
+    /// Checks if the current upgrade type is HTTP/2 over TLS (`h2`).
+    ///
+    /// # Returns
+    ///
+    /// `bool` - `true` if `self` is `Self::H2`, otherwise `false`.
+    #[inline(always)]
+    pub fn is_h2(&self) -> bool {
+        matches!(self, &Self::H2)
+    }
+
     /// Checks if the current upgrade type is HTTP/2 cleartext (`h2c`).
     ///
     /// # Returns
@@ -87,6 +101,16 @@ impl UpgradeType {
     #[inline(always)]
     pub fn is_h2c(&self) -> bool {
         matches!(self, &Self::H2c)
+    }
+
+    /// Checks if the current upgrade type is HTTP/3 (`h3`).
+    ///
+    /// # Returns
+    ///
+    /// `bool` - `true` if `self` is `Self::H3`, otherwise `false`.
+    #[inline(always)]
+    pub fn is_h3(&self) -> bool {
+        matches!(self, &Self::H3)
     }
 
     /// Checks if the current upgrade type is a TLS variant (any version).
@@ -99,13 +123,13 @@ impl UpgradeType {
         matches!(self, Self::Tls(_))
     }
 
-    /// Checks if the current upgrade type is unknown (neither `WebSocket`, `H2c`, nor `Tls`).
+    /// Checks if the current upgrade type is unknown.
     ///
     /// # Returns
     ///
     /// `bool` - `true` if `self` is none of the known upgrade types, otherwise `false`.
     #[inline(always)]
     pub fn is_unknown(&self) -> bool {
-        !self.is_ws() && !self.is_h2c() && !self.is_tls()
+        !self.is_ws() && !self.is_h2() && !self.is_h2c() && !self.is_h3() && !self.is_tls()
     }
 }

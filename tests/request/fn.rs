@@ -38,6 +38,83 @@ fn request_config_security_levels() {
 }
 
 #[test]
+fn request_stream_id_default() {
+    let request: Request = Request::default();
+    assert_eq!(request.get_stream_id(), 0);
+    assert!(!request.has_stream_id());
+}
+
+#[test]
+fn request_stream_id_set_get() {
+    let mut request: Request = Request::default();
+    request.set_stream_id(42);
+    assert_eq!(request.get_stream_id(), 42);
+    assert!(request.has_stream_id());
+}
+
+#[test]
+fn request_pseudo_headers() {
+    let mut request: Request = Request::default();
+    request
+        .set_pseudo_header(COLON_METHOD, "GET")
+        .set_pseudo_header(COLON_SCHEME, "https")
+        .set_pseudo_header(COLON_PATH, "/path")
+        .set_pseudo_header(COLON_AUTHORITY, "example.com");
+    assert_eq!(
+        request.try_get_pseudo_header(COLON_METHOD),
+        Some("GET".to_string())
+    );
+    assert_eq!(
+        request.try_get_pseudo_header(COLON_SCHEME),
+        Some("https".to_string())
+    );
+    assert_eq!(
+        request.try_get_pseudo_header(COLON_PATH),
+        Some("/path".to_string())
+    );
+    assert_eq!(
+        request.try_get_pseudo_header(COLON_AUTHORITY),
+        Some("example.com".to_string())
+    );
+    assert_eq!(request.try_get_pseudo_header(":missing"), None);
+}
+
+#[test]
+fn request_is_http2_preface() {
+    let request: Request = Request {
+        method: Method::Pri,
+        path: "*".to_string(),
+        version: HttpVersion::Http2,
+        ..Default::default()
+    };
+    assert!(request.is_http2_preface());
+    let request_not_preface: Request = Request {
+        method: Method::Get,
+        path: "/".to_string(),
+        version: HttpVersion::Http2,
+        ..Default::default()
+    };
+    assert!(!request_not_preface.is_http2_preface());
+}
+
+#[test]
+fn request_http2_forbidden_headers() {
+    let mut request: Request = Request::default();
+    request.headers.insert(
+        "connection".to_string(),
+        VecDeque::from(["keep-alive".to_string()]),
+    );
+    request.headers.insert(
+        "content-type".to_string(),
+        VecDeque::from(["text/plain".to_string()]),
+    );
+    assert!(request.has_http2_forbidden_headers());
+    request.strip_http2_forbidden_headers();
+    assert!(!request.has_http2_forbidden_headers());
+    assert!(request.has_header("content-type"));
+}
+
+#[test]
 fn request_default() {
     let request: Request = Request::default();
     assert!(request.get_method().is_unknown());
@@ -170,6 +247,30 @@ fn request_version_checks() {
 }
 
 #[test]
+fn request_version_h2_checks() {
+    let request: Request = Request {
+        version: HttpVersion::Http2,
+        ..Default::default()
+    };
+    assert!(request.get_version().is_http2());
+    assert!(request.get_version().is_http1_1_or_higher());
+    assert!(!request.get_version().is_http1_1());
+    assert!(!request.get_version().is_http3());
+}
+
+#[test]
+fn request_version_h3_checks() {
+    let request: Request = Request {
+        version: HttpVersion::Http3,
+        ..Default::default()
+    };
+    assert!(request.get_version().is_http3());
+    assert!(request.get_version().is_http1_1_or_higher());
+    assert!(!request.get_version().is_http1_1());
+    assert!(!request.get_version().is_http2());
+}
+
+#[test]
 fn request_upgrade_type_checks() {
     let mut request: Request = Request::default();
     let mut values: VecDeque<String> = VecDeque::new();
@@ -214,10 +315,10 @@ fn request_error_default() {
 
 #[test]
 fn request_error_from_io_error() {
-    let io_error: std::io::Error = std::io::Error::new(ErrorKind::ConnectionReset, "reset");
+    let io_error: IoError = IoError::new(ErrorKind::ConnectionReset, "reset");
     let request_error: RequestError = RequestError::from(io_error);
     assert!(matches!(request_error, RequestError::ClientDisconnected(_)));
-    let io_error: std::io::Error = std::io::Error::other("other");
+    let io_error: IoError = IoError::other("other");
     let request_error: RequestError = RequestError::from(io_error);
     assert!(matches!(request_error, RequestError::ReadConnection(_)));
 }

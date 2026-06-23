@@ -142,6 +142,58 @@ impl Lifetime for Stream {
 }
 
 impl Stream {
+    /// Returns a reference to the underlying TCP stream.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the transport is TLS.
+    #[inline(always)]
+    pub fn get_stream(&self) -> &TcpStream {
+        match &self.transport {
+            StreamTransport::Tcp(stream) => stream,
+            StreamTransport::Tls(_) => panic!("expected a TCP stream"),
+        }
+    }
+
+    /// Returns a mutable reference to the underlying TCP stream.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the transport is TLS.
+    #[inline(always)]
+    pub fn get_mut_stream(&mut self) -> &mut TcpStream {
+        match &mut self.transport {
+            StreamTransport::Tcp(stream) => stream,
+            StreamTransport::Tls(_) => panic!("expected a TCP stream"),
+        }
+    }
+
+    /// Returns a reference to the underlying TLS stream.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the transport is plain TCP.
+    #[inline(always)]
+    pub fn get_tls_stream(&self) -> &tokio_rustls::server::TlsStream<TcpStream> {
+        match &self.transport {
+            StreamTransport::Tcp(_) => panic!("expected a TLS stream"),
+            StreamTransport::Tls(stream) => stream,
+        }
+    }
+
+    /// Returns a mutable reference to the underlying TLS stream.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the transport is plain TCP.
+    #[inline(always)]
+    pub fn get_mut_tls_stream(&mut self) -> &mut tokio_rustls::server::TlsStream<TcpStream> {
+        match &mut self.transport {
+            StreamTransport::Tcp(_) => panic!("expected a TLS stream"),
+            StreamTransport::Tls(stream) => stream,
+        }
+    }
+
     /// Checks if the connection should be kept alive.
     ///
     /// This method evaluates whether the connection should remain open based on
@@ -159,6 +211,49 @@ impl Stream {
         !self.get_closed() && keep_alive
     }
 
+    /// Checks whether the incoming bytes match the HTTP/2 connection preface.
+    ///
+    /// This method peeks at the first 24 bytes of a plain TCP stream and compares
+    /// them to the HTTP/2 connection preface defined in RFC 7540. TLS streams
+    /// cannot be peeked, so they always return `false`; HTTP/2 over TLS is
+    /// selected via ALPN before the stream is wrapped.
+    ///
+    /// # Returns
+    ///
+    /// - `bool` - `true` if the stream starts with the HTTP/2 preface.
+    pub async fn is_http2_preface(&mut self) -> bool {
+        let mut peek_buf: [u8; 24] = [0; 24];
+        match &mut self.transport {
+            StreamTransport::Tcp(stream) => match stream.peek(&mut peek_buf).await {
+                Ok(len) if len >= CONNECTION_PREFACE.len() => {
+                    peek_buf[..CONNECTION_PREFACE.len()] == *CONNECTION_PREFACE
+                }
+                _ => false,
+            },
+            StreamTransport::Tls(_) => false,
+        }
+    }
+
+    /// Consumes the `Stream` and returns the wrapped TCP stream.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the transport is TLS.
+    #[inline(always)]
+    pub fn into_tcp_stream(self) -> TcpStream {
+        match self.transport {
+            StreamTransport::Tcp(stream) => stream,
+            StreamTransport::Tls(_) => panic!("cannot convert a TLS stream into a TCP stream"),
+        }
+    }
+
+    /// Replaces the request configuration and returns the mutable stream.
+    #[inline(always)]
+    pub fn replace_request_config(&mut self, config: RequestConfig) -> &mut Self {
+        self.request_config = config;
+        self
+    }
+
     /// Parses the HTTP request content from the stream.
     ///
     /// This is an internal helper function that performs the actual parsing.
@@ -170,8 +265,30 @@ impl Stream {
         let config: RequestConfig = *self.get_request_config();
         let buffer_size: usize = config.get_buffer_size();
         let max_path_size: usize = config.get_max_path_size();
-        let reader: &mut BufReader<&mut TcpStream> =
-            &mut BufReader::with_capacity(buffer_size, self.get_mut_stream());
+        match &mut self.transport {
+            StreamTransport::Tcp(stream) => {
+                let reader: &mut BufReader<&mut TcpStream> =
+                    &mut BufReader::with_capacity(buffer_size, stream);
+                Self::read_http_from_reader(reader, &config, max_path_size).await
+            }
+            StreamTransport::Tls(stream) => {
+                let reader: &mut BufReader<&mut tokio_rustls::server::TlsStream<TcpStream>> =
+                    &mut BufReader::with_capacity(buffer_size, stream);
+                Self::read_http_from_reader(reader, &config, max_path_size).await
+            }
+        }
+    }
+
+    /// Generic HTTP request reader used for both TCP and TLS transports.
+    async fn read_http_from_reader<R>(
+        reader: &mut BufReader<R>,
+        config: &RequestConfig,
+        max_path_size: usize,
+    ) -> Result<Request, RequestError>
+    where
+        R: AsyncRead + Unpin,
+    {
+        let buffer_size: usize = config.get_buffer_size();
         let mut line: String = String::with_capacity(buffer_size);
         AsyncBufReadExt::read_line(reader, &mut line).await?;
         let (method, path, version): (RequestMethod, &str, RequestVersion) =
@@ -183,7 +300,7 @@ impl Stream {
         let querys: RequestQuerys = Request::get_http_querys(query);
         let path: RequestPath = Request::get_http_path(path, query_index, hash_index);
         let (headers, host, content_size): (RequestHeaders, RequestHost, usize) =
-            Request::get_http_headers(reader, &config).await?;
+            Request::get_http_headers(reader, config).await?;
         let body: RequestBody = Request::get_http_body(reader, content_size).await?;
         Ok(Request {
             method,
@@ -192,7 +309,9 @@ impl Stream {
             path,
             querys,
             headers,
+            pseudo_headers: hash_map_xx_hash3_64(),
             body,
+            stream_id: 0,
         })
     }
 
@@ -299,26 +418,47 @@ impl Stream {
         duration_opt: Option<Duration>,
         is_client_response: &mut bool,
     ) -> Result<Option<usize>, RequestError> {
-        let stream: &mut TcpStream = self.get_mut_stream();
         if let Some(duration) = duration_opt {
-            return match timeout(duration, stream.read(buffer)).await {
-                Ok(result) => match result {
-                    Ok(len) => Ok(Some(len)),
-                    Err(error) => Err(error.into()),
-                },
-                Err(error) => {
-                    if !*is_client_response {
-                        return Err(error.into());
+            return match &mut self.transport {
+                StreamTransport::Tcp(stream) => match timeout(duration, stream.read(buffer)).await {
+                    Ok(result) => match result {
+                        Ok(len) => Ok(Some(len)),
+                        Err(error) => Err(error.into()),
+                    },
+                    Err(error) => {
+                        if !*is_client_response {
+                            return Err(error.into());
+                        }
+                        *is_client_response = false;
+                        self.try_send(&PING_FRAME).await?;
+                        Ok(None)
                     }
-                    *is_client_response = false;
-                    self.try_send(&PING_FRAME).await?;
-                    Ok(None)
-                }
+                },
+                StreamTransport::Tls(stream) => match timeout(duration, stream.read(buffer)).await {
+                    Ok(result) => match result {
+                        Ok(len) => Ok(Some(len)),
+                        Err(error) => Err(error.into()),
+                    },
+                    Err(error) => {
+                        if !*is_client_response {
+                            return Err(error.into());
+                        }
+                        *is_client_response = false;
+                        self.try_send(&PING_FRAME).await?;
+                        Ok(None)
+                    }
+                },
             };
         }
-        match stream.read(buffer).await {
-            Ok(len) => Ok(Some(len)),
-            Err(error) => Err(error.into()),
+        match &mut self.transport {
+            StreamTransport::Tcp(stream) => match stream.read(buffer).await {
+                Ok(len) => Ok(Some(len)),
+                Err(error) => Err(error.into()),
+            },
+            StreamTransport::Tls(stream) => match stream.read(buffer).await {
+                Ok(len) => Ok(Some(len)),
+                Err(error) => Err(error.into()),
+            },
         }
     }
 
@@ -338,7 +478,11 @@ impl Stream {
         if self.get_closed() {
             return Err(ResponseError::ConnectionClosed);
         }
-        Ok(self.get_mut_stream().write_all(data.as_ref()).await?)
+        match &mut self.transport {
+            StreamTransport::Tcp(stream) => stream.write_all(data.as_ref()).await?,
+            StreamTransport::Tls(stream) => stream.write_all(data.as_ref()).await?,
+        }
+        Ok(())
     }
 
     /// Sends data over the stream.
@@ -374,9 +518,17 @@ impl Stream {
         if self.get_closed() {
             return Err(ResponseError::ConnectionClosed);
         }
-        let stream: &mut TcpStream = self.get_mut_stream();
-        for data in data_iter {
-            stream.write_all(data.as_ref()).await?;
+        match &mut self.transport {
+            StreamTransport::Tcp(stream) => {
+                for data in data_iter {
+                    stream.write_all(data.as_ref()).await?;
+                }
+            }
+            StreamTransport::Tls(stream) => {
+                for data in data_iter {
+                    stream.write_all(data.as_ref()).await?;
+                }
+            }
         }
         Ok(())
     }
@@ -407,7 +559,11 @@ impl Stream {
         if self.get_closed() {
             return Err(ResponseError::ConnectionClosed);
         }
-        Ok(self.get_mut_stream().flush().await?)
+        match &mut self.transport {
+            StreamTransport::Tcp(stream) => stream.flush().await?,
+            StreamTransport::Tls(stream) => stream.flush().await?,
+        }
+        Ok(())
     }
 
     /// Flushes all buffered data to the stream.

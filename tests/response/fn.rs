@@ -1,6 +1,45 @@
 use crate::*;
 
 #[test]
+fn response_build_h2() {
+    let mut response: Response = Response::default();
+    response.set_version(HttpVersion::Http2);
+    response.set_status_code(200);
+    response.set_header("content-type", "text/plain");
+    response.set_body(b"h2 body");
+    let data: Vec<u8> = response.build();
+    let (status_bytes, rest) = data.split_at(4);
+    assert_eq!(u32::from_be_bytes(status_bytes.try_into().unwrap()), 200);
+    assert!(rest.ends_with(b"h2 body"));
+}
+
+#[test]
+fn response_build_h3() {
+    let mut response: Response = Response::default();
+    response.set_version(HttpVersion::Http3);
+    response.set_status_code(404);
+    response.set_header("content-type", "text/plain");
+    response.set_body(b"h3 body");
+    let data: Vec<u8> = response.build();
+    let (status_bytes, rest) = data.split_at(4);
+    assert_eq!(u32::from_be_bytes(status_bytes.try_into().unwrap()), 404);
+    assert!(rest.ends_with(b"h3 body"));
+}
+
+#[test]
+fn response_build_http1_1() {
+    let mut response: Response = Response::default();
+    response.set_version(HttpVersion::Http1_1);
+    response.set_status_code(200);
+    response.set_header("content-type", "text/plain");
+    response.set_body(b"http/1.1 body");
+    let data: Vec<u8> = response.build();
+    let text: String = String::from_utf8(data).unwrap();
+    assert!(text.starts_with("HTTP/1.1 200 OK"));
+    assert!(text.ends_with("http/1.1 body"));
+}
+
+#[test]
 fn response_default() {
     let response: Response = Response::default();
     assert_eq!(response.get_status_code(), 200);
@@ -157,7 +196,7 @@ fn response_error_display() {
 
 #[test]
 fn response_error_from_io() {
-    let io_error: std::io::Error = std::io::Error::other("test error");
+    let io_error: IoError = IoError::other("test error");
     let response_error: ResponseError = ResponseError::from(io_error);
     assert!(matches!(response_error, ResponseError::Send(_)));
 }

@@ -1,5 +1,8 @@
 use crate::*;
 
+/// A boxed error type commonly returned by protocol handlers.
+pub type BoxError = Box<dyn std::error::Error + Send + Sync>;
+
 /// A type alias for a boxed `Any` trait object.
 ///
 /// This represents a dynamically dispatched trait object that owns its data.

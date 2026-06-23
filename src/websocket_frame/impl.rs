@@ -250,7 +250,7 @@ impl WebSocketFrame {
         let mut frames_list: Vec<ResponseBody> =
             Vec::with_capacity((total_len / MAX_FRAME_SIZE) + 1);
         let mut is_first_frame: bool = true;
-        let is_valid_utf8: bool = std::str::from_utf8(data_ref).is_ok();
+        let is_valid_utf8: bool = str::from_utf8(data_ref).is_ok();
         let base_opcode: WebSocketOpcode = if is_valid_utf8 {
             WebSocketOpcode::Text
         } else {

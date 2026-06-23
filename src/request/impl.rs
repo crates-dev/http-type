@@ -1,7 +1,7 @@
 use crate::*;
 
-/// Implements the `std::error::Error` trait for `RequestError`.
-impl std::error::Error for RequestError {}
+/// Implements the `Error` trait for `RequestError`.
+impl StdError for RequestError {}
 
 /// Provides a default value for `RequestError`.
 impl Default for RequestError {
@@ -18,18 +18,18 @@ impl Default for RequestError {
 ///
 /// Maps connection reset and aborted errors to `ClientDisconnected`,
 /// all other I/O errors are mapped to `ReadConnection`.
-impl From<std::io::Error> for RequestError {
+impl From<IoError> for RequestError {
     /// Converts an I/O error to a `RequestError`.
     ///
     /// # Arguments
     ///
-    /// - `std::io::Error`: The I/O error to convert.
+    /// - `IoError`: The I/O error to convert.
     ///
     /// # Returns
     ///
     /// - `RequestError`: The corresponding request error.
     #[inline(always)]
-    fn from(error: std::io::Error) -> Self {
+    fn from(error: IoError) -> Self {
         let kind: ErrorKind = error.kind();
         if kind == ErrorKind::ConnectionReset || kind == ErrorKind::ConnectionAborted {
             return RequestError::ClientDisconnected(HttpStatus::BadRequest);
@@ -268,12 +268,87 @@ impl Default for Request {
             path: String::new(),
             querys: hash_map_xx_hash3_64(),
             headers: hash_map_xx_hash3_64(),
+            pseudo_headers: hash_map_xx_hash3_64(),
             body: Vec::new(),
+            stream_id: 0,
         }
     }
 }
 
 impl Request {
+    /// Builds an HTTP/2 or HTTP/3 request from decoded `http::request::Parts` and body.
+    ///
+    /// This helper populates the request with `:method`, `:scheme`, `:path`, and
+    /// `:authority` pseudo-headers and sets the version to HTTP/2.
+    ///
+    /// # Arguments
+    ///
+    /// - `http::request::Parts`: The decoded request parts.
+    /// - `RequestBody`: The request body bytes.
+    /// - `RequestStreamId`: The HTTP/2 stream identifier.
+    ///
+    /// # Returns
+    ///
+    /// - `Request`: A fully populated request.
+    #[inline]
+    pub fn from_http2_parts(
+        parts: http::request::Parts,
+        body: RequestBody,
+        stream_id: RequestStreamId,
+    ) -> Self {
+        let method: Method = parts.method.as_str().parse::<Method>().unwrap_or_default();
+        let scheme: String = parts
+            .uri
+            .scheme_str()
+            .map(|s: &str| s.to_lowercase())
+            .unwrap_or_else(|| HTTPS_LOWERCASE.to_string());
+        let authority: String = parts
+            .uri
+            .authority()
+            .map(|a: &_| a.to_string())
+            .unwrap_or_default();
+        let path: String = parts
+            .uri
+            .path_and_query()
+            .map(|p: &_| p.as_str().to_string())
+            .unwrap_or_else(|| "/".to_string());
+        let mut headers: RequestHeaders = hash_map_xx_hash3_64();
+        for (key, value) in parts.headers.iter() {
+            let key_str: &str = key.as_str();
+            if HTTP2_FORBIDDEN_HEADERS.contains(&key_str) {
+                continue;
+            }
+            let value_str: String = value.to_str().unwrap_or("").to_string();
+            headers
+                .entry(key_str.to_owned())
+                .or_default()
+                .push_back(value_str);
+        }
+        let method_str: &str = method.as_str();
+        let path_ref: &str = path.as_str();
+        let querys: RequestQuerys = Self::get_http_querys(Self::get_http_query(
+            path_ref,
+            path_ref.find(QUERY),
+            path_ref.find(HASH),
+        ));
+        let mut pseudo_headers: RequestPseudoHeaders = hash_map_xx_hash3_64();
+        pseudo_headers.insert(COLON_METHOD.to_owned(), method_str.to_owned());
+        pseudo_headers.insert(COLON_SCHEME.to_owned(), scheme.to_owned());
+        pseudo_headers.insert(COLON_PATH.to_owned(), path.to_owned());
+        pseudo_headers.insert(COLON_AUTHORITY.to_owned(), authority.to_owned());
+        Self {
+            method,
+            host: authority,
+            version: HttpVersion::Http2,
+            path,
+            querys,
+            headers,
+            pseudo_headers,
+            body,
+            stream_id,
+        }
+    }
+
     /// Parses the first line of HTTP request into method, path, and version components.
     ///
     /// # Arguments
@@ -583,17 +658,20 @@ impl Request {
     ///
     /// # Arguments
     ///
-    /// - `&mut BufReader<&mut TcpStream>`: The buffered reader to read from.
+    /// - `&mut BufReader<R>`: The buffered reader to read from.
     /// - `usize`: The expected content size.
     ///
     /// # Returns
     ///
     /// - `Result<RequestBody, RequestError>`: The body bytes or an error.
     #[inline(always)]
-    pub(crate) async fn get_http_body(
-        reader: &mut BufReader<&mut TcpStream>,
+    pub(crate) async fn get_http_body<R>(
+        reader: &mut BufReader<R>,
         content_size: usize,
-    ) -> Result<RequestBody, RequestError> {
+    ) -> Result<RequestBody, RequestError>
+    where
+        R: AsyncRead + Unpin,
+    {
         let mut body: RequestBody = Vec::with_capacity(content_size);
         if content_size > 0 {
             body.resize(content_size, 0);
@@ -982,7 +1060,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `Result<T, serde_json::Error>` - The deserialization result.
+    /// - `Result<DeserializeOwned, serde_json::Error>` - The deserialization result.
     #[inline(always)]
     pub fn try_get_body_json<T>(&self) -> Result<T, serde_json::Error>
     where
@@ -1002,7 +1080,7 @@ impl Request {
     ///
     /// # Returns
     ///
-    /// - `T` - The deserialized body content.
+    /// - `DeserializeOwned` - The deserialized body content.
     ///
     /// # Panics
     ///
@@ -1092,5 +1170,86 @@ impl Request {
     #[inline(always)]
     pub fn is_disable_keep_alive(&self) -> bool {
         !self.is_enable_keep_alive()
+    }
+
+    /// Checks if this request has a non-zero stream ID (HTTP/2 or HTTP/3).
+    ///
+    /// # Returns
+    ///
+    /// `true` if the stream ID is non-zero, `false` otherwise.
+    #[inline(always)]
+    pub fn has_stream_id(&self) -> bool {
+        self.stream_id != 0
+    }
+
+    /// Tries to retrieve the value of a pseudo-header by its key.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The pseudo-header key (must implement `AsRef<str>`).
+    ///
+    /// # Returns
+    ///
+    /// - `Option<String>` - The pseudo-header value if it exists.
+    #[inline(always)]
+    pub fn try_get_pseudo_header<K>(&self, key: K) -> Option<String>
+    where
+        K: AsRef<str>,
+    {
+        self.pseudo_headers.get(key.as_ref()).cloned()
+    }
+
+    /// Sets a pseudo-header value.
+    ///
+    /// # Arguments
+    ///
+    /// - `AsRef<str>` - The pseudo-header key.
+    /// - `AsRef<str>` - The pseudo-header value.
+    ///
+    /// # Returns
+    ///
+    /// - `&mut Self` - A mutable reference to self for chaining.
+    #[inline(always)]
+    pub fn set_pseudo_header<K, V>(&mut self, key: K, value: V) -> &mut Self
+    where
+        K: AsRef<str>,
+        V: AsRef<str>,
+    {
+        self.pseudo_headers
+            .insert(key.as_ref().to_owned(), value.as_ref().to_owned());
+        self
+    }
+
+    /// Checks if this request matches the HTTP/2 connection preface.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the method is `PRI`, path is `*`, and version is HTTP/2.
+    #[inline(always)]
+    pub fn is_http2_preface(&self) -> bool {
+        self.get_method().is_pri() && self.get_path() == "*" && self.get_version().is_http2()
+    }
+
+    /// Checks if the request contains any HTTP/2 forbidden headers.
+    ///
+    /// Forbidden headers in HTTP/2 are: connection, keep-alive, proxy-connection,
+    /// transfer-encoding, and upgrade.
+    ///
+    /// # Returns
+    ///
+    /// `true` if any forbidden header is present, `false` otherwise.
+    #[inline(always)]
+    pub fn has_http2_forbidden_headers(&self) -> bool {
+        self.headers
+            .keys()
+            .any(|key| HTTP2_FORBIDDEN_HEADERS.contains(&key.as_str()))
+    }
+
+    /// Removes HTTP/2 forbidden headers from the request.
+    #[inline(always)]
+    pub fn strip_http2_forbidden_headers(&mut self) {
+        for header in HTTP2_FORBIDDEN_HEADERS.iter() {
+            self.headers.remove(*header);
+        }
     }
 }

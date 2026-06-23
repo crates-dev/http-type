@@ -25,6 +25,8 @@ pub enum Method {
     Connect,
     /// Represents the HTTP `TRACE` method.
     Trace,
+    /// HTTP PRI method (used for HTTP/2 connection preface).
+    Pri,
     /// Unknown
     Unknown(String),
 }

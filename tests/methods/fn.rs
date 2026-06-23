@@ -11,6 +11,7 @@ fn test_method_display() {
     assert_eq!(Method::Options.to_string(), OPTIONS);
     assert_eq!(Method::Connect.to_string(), CONNECT);
     assert_eq!(Method::Trace.to_string(), TRACE);
+    assert_eq!(Method::Pri.to_string(), "PRI");
     assert_eq!(Method::Unknown("CUSTOM".to_string()).to_string(), "CUSTOM");
 }
 
@@ -25,6 +26,7 @@ fn test_method_from_str() {
     assert_eq!(OPTIONS.parse::<Method>().unwrap(), Method::Options);
     assert_eq!(CONNECT.parse::<Method>().unwrap(), Method::Connect);
     assert_eq!(TRACE.parse::<Method>().unwrap(), Method::Trace);
+    assert_eq!("PRI".parse::<Method>().unwrap(), Method::Pri);
     assert_eq!(
         "CUSTOM".parse::<Method>().unwrap(),
         Method::Unknown("CUSTOM".to_string())
@@ -167,6 +169,21 @@ fn test_method_is_trace() {
 }
 
 #[test]
+fn test_method_is_pri() {
+    assert!(!Method::Get.is_pri());
+    assert!(!Method::Post.is_pri());
+    assert!(!Method::Put.is_pri());
+    assert!(!Method::Delete.is_pri());
+    assert!(!Method::Patch.is_pri());
+    assert!(!Method::Head.is_pri());
+    assert!(!Method::Options.is_pri());
+    assert!(!Method::Connect.is_pri());
+    assert!(!Method::Trace.is_pri());
+    assert!(Method::Pri.is_pri());
+    assert!(!Method::Unknown("PRI".to_string()).is_pri());
+}
+
+#[test]
 fn test_method_is_unknown() {
     assert!(!Method::Get.is_unknown());
     assert!(!Method::Post.is_unknown());
@@ -245,6 +262,7 @@ fn test_method_all_variants() {
         Method::Options,
         Method::Connect,
         Method::Trace,
+        Method::Pri,
         Method::Unknown("CUSTOM".to_string()),
     ];
     for method in methods {

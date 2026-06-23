@@ -1,3 +1,4 @@
+use crate::*;
 /// Trait for types that can be converted to a `'static` reference.
 ///
 /// This trait provides a way to obtain a `'static` reference or mutable reference from

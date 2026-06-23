@@ -1,3 +1,4 @@
+use crate::*;
 /// Creates a new boxed value and leaks it, returning a static mutable reference.
 ///
 /// # Arguments

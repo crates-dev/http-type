@@ -12,16 +12,25 @@ categories = ["network-programming", "web-programming"]
 exclude = ["target", "Cargo.lock", "sh", ".github"]
 
 [dependencies]
+h3 = "0.0.8"
 hex = "0.4.3"
+h2 = "0.4.15"
 url = "2.5.8"
+http = "1.4.2"
+bytes = "1.12.0"
+h3-quinn = "0.0.10"
 serde_json = "1.0.150"
 serde-xml-rs = "0.8.2"
-http-compress = "3.0.21"
 http-constant = "5.5.2"
+tokio-rustls = "0.26.4"
+rustls-pemfile = "2.2.0"
+http-compress = "3.0.21"
 lombok-macros = "2.0.29"
 serde_urlencoded = "0.7.1"
 tokio = { version = "1.52.3", features = ["full"] }
 serde = { version = "1.0.228", features = ["derive"] }
+rustls = { version = "0.23.40", features = ["ring"] }
+quinn = { version = "0.11.9", features = ["runtime-tokio", "ring"] }
 
 [profile.dev]
 incremental = false
