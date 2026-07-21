@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 #[derive(Clone, Debug, Deserialize, DisplayDebug, Eq, PartialEq, Serialize)]
 pub enum RequestError {

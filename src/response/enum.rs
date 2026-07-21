@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Represents various errors that can occur during HTTP response processing.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]

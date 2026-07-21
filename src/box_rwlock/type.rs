@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// A type alias for a heap-allocated read-write lock.
 ///

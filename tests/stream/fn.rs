@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 #[test]
 fn test_socket_host_type_alias() {

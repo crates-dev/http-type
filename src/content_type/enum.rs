@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Supported HTTP content types.
 ///

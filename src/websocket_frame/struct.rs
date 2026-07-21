@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Represents a decoded WebSocket frame.
 #[derive(Clone, Debug, DisplayDebug, Eq, Getter, PartialEq)]

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Creates a new `HashMapXxHash3_64` with the default hasher.
 ///

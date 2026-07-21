@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 #[test]
 fn test_hash_map_xx_hash3_64_new() {

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Creates a new `ArcMutex` from the given data.
 ///

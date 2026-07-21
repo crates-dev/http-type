@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implements the `Display` trait for `HttpVersion`, allowing it to be formatted as a string.
 impl fmt::Display for HttpVersion {

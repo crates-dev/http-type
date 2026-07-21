@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Creates a new thread-safe reference-counted read-write lock.
 ///

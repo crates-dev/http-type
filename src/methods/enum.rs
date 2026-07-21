@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Defines the `Method` enum, representing HTTP request methods.
 ///

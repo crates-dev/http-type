@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implements the `std::error::Error` trait for `HttpUrlError`.
 impl std::error::Error for HttpUrlError {}

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Represents detailed information about a panic that has occurred within the server.
 ///

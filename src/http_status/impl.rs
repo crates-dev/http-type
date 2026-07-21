@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// The `HttpStatus` enum represents the HTTP status codes.
 ///

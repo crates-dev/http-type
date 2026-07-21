@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// A marker type representing HTTP protocol variants.
 ///

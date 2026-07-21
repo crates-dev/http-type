@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 #[test]
 fn request_config_from_json() {

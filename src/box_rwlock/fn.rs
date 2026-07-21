@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Creates a new boxed read-write lock.
 ///

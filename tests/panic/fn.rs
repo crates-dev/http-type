@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 #[test]
 fn panic_new() {

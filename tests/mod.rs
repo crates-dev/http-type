@@ -25,7 +25,7 @@ mod task;
 mod upgrade_type;
 mod websocket_frame;
 
-use {http_type::*, lifetime::*};
+use http_type::*;
 
 use std::{
     collections::VecDeque,

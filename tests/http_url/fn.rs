@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 #[test]
 fn test_http_url_components_parse_http() {
@@ -51,15 +51,15 @@ fn test_http_url_components_clone() {
 
 #[test]
 fn test_http_url_components_eq() {
-    let a: HttpUrlComponents = HttpUrlComponents {
+    let left: HttpUrlComponents = HttpUrlComponents {
         protocol: "http".to_string(),
         ..Default::default()
     };
-    let b: HttpUrlComponents = HttpUrlComponents {
+    let right: HttpUrlComponents = HttpUrlComponents {
         protocol: "http".to_string(),
         ..Default::default()
     };
-    assert_eq!(a, b);
+    assert_eq!(left, right);
 }
 
 #[test]

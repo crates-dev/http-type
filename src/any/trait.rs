@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Represents a type that can be dynamically downcast and is safe to send across threads.
 ///

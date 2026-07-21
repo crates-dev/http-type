@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Represents different upgrade types.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]

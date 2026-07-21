@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 #[tokio::test]
 async fn get_panic_from_join_error() {

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// A thread-safe reference-counted `TcpStream`.
 pub type ArcStream = Arc<TcpStream>;

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 #[derive(CustomDebug, Data, DisplayDebug, New)]
 pub struct Stream {

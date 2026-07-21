@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 impl Lifetime for TestLifetimeStruct {
     unsafe fn leak(&self) -> &'static Self {

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implementation of `From` trait for `Attribute`.
 impl From<&str> for Attribute {

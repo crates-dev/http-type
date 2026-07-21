@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implements the `Default` trait for `Method`.
 impl Default for Method {

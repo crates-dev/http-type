@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// WebSocket frame opcode types
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implements `AnySend` for types that are `Any` and `Send`.
 ///

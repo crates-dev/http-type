@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implementation of `From` trait for converting `usize` address into `&Stream`.
 impl From<usize> for &'static Stream {

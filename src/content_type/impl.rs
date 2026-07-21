@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implementation for `ContentType` enum.
 impl ContentType {

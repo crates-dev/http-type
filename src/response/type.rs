@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// An alias for `Vec<u8>`, representing the binary body of the HTTP response.
 pub type ResponseBody = Vec<u8>;

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// An alias for `Method`, representing the HTTP request method.
 pub type RequestMethod = Method;

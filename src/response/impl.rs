@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implements the `std::error::Error` trait for `ResponseError`.
 /// This allows `ResponseError` to be treated as a standard Rust error type.

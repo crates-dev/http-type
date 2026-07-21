@@ -1,5 +1,4 @@
-use crate::protocol::*;
-use crate::*;
+use super::*;
 
 /// Implementation of protocol identification and port resolution methods.
 ///

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Represents the HTTP version used in the request or response.
 ///
