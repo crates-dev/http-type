@@ -489,7 +489,7 @@ impl Response {
     where
         K: AsRef<str>,
     {
-        let _ = self.headers.remove(key.as_ref()).is_some();
+        let _: bool = self.headers.remove(key.as_ref()).is_some();
         self
     }
 
