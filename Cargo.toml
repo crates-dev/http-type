@@ -1,6 +1,6 @@
 [package]
 name = "http-type"
-version = "20.1.8"
+version = "20.1.9"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -16,9 +16,9 @@ hex = "0.4.3"
 url = "2.5.8"
 serde_json = "1.0.151"
 serde-xml-rs = "0.8.2"
-http-compress = "3.0.27"
-http-constant = "5.6.14"
-lombok-macros = "2.0.35"
+http-compress = "3.0.28"
+http-constant = "5.6.15"
+lombok-macros = "2.0.36"
 serde_urlencoded = "0.7.1"
 tokio = { version = "1.53.1", features = ["full"] }
 serde = { version = "1.0.229", features = ["derive"] }
